@@ -1,0 +1,143 @@
+name: 🍎 iOS Build
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      build_mode:
+        description: 'Build mode'
+        required: false
+        default: 'release'
+        type: choice
+        options:
+          - release
+          - debug
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: '3.32.1'
+
+jobs:
+  build-ios:
+    name: Build iOS IPA
+    runs-on: macos-15
+
+    steps:
+      # ── Checkout ──────────────────────────────────────────────────────────
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      # ── Flutter ───────────────────────────────────────────────────────────
+      - name: 🐦 Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: 📦 Install dependencies
+        run: flutter pub get
+
+      # ── Code generation (Riverpod, Isar, auto_route, etc.) ────────────────
+      - name: ⚙️ Run build_runner
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      # ── iOS pre-build ─────────────────────────────────────────────────────
+      - name: 🔧 Install CocoaPods
+        run: |
+          sudo gem install cocoapods --no-document
+          cd ios && pod install --repo-update
+
+      # ────────────────────────────────────────────────────────────────────
+      # OPTION A — No code signing (default for testing)
+      # Produces an unsigned .app archive useful for simulator testing or
+      # ad-hoc distribution tools like ios-deploy.
+      # ────────────────────────────────────────────────────────────────────
+      - name: 🏗️ Build iOS (no-codesign)
+        if: vars.IOS_SIGNING_ENABLED != 'true'
+        run: |
+          flutter build ios --release --no-codesign
+
+      # ────────────────────────────────────────────────────────────────────
+      # OPTION B — Signed IPA (enable by adding certs as secrets)
+      # Required secrets:
+      #   BUILD_CERTIFICATE_BASE64   → base64-encoded .p12 certificate
+      #   P12_PASSWORD               → certificate password
+      #   BUILD_PROVISION_PROFILE_BASE64 → base64-encoded .mobileprovision
+      #   KEYCHAIN_PASSWORD          → any strong password for temp keychain
+      # Required variable:
+      #   IOS_SIGNING_ENABLED = true (set in repo Settings → Variables)
+      # ────────────────────────────────────────────────────────────────────
+      - name: 🔐 Install Apple certificate & provisioning profile
+        if: vars.IOS_SIGNING_ENABLED == 'true'
+        env:
+          BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+          BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          # Create temp paths
+          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+          PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+
+          # Decode certificate and provisioning profile
+          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
+          echo -n "$BUILD_PROVISION_PROFILE_BASE64" | base64 --decode -o $PP_PATH
+
+          # Create keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+          # Import certificate to keychain
+          security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A \
+            -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security list-keychain -d user -s $KEYCHAIN_PATH
+
+          # Install provisioning profile
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
+
+      - name: 🏗️ Build iOS (signed IPA)
+        if: vars.IOS_SIGNING_ENABLED == 'true'
+        run: |
+          flutter build ipa --release
+
+      # ── Package the unsigned .app into a zip for download ─────────────────
+      - name: 📦 Package unsigned app
+        if: vars.IOS_SIGNING_ENABLED != 'true'
+        run: |
+          cd build/ios/iphoneos
+          mkdir -p Payload
+          cp -r Runner.app Payload/
+          zip -r WaslaqApp-unsigned.ipa Payload/
+          echo "Built unsigned IPA at build/ios/iphoneos/WaslaqApp-unsigned.ipa"
+
+      # ── Upload artifacts ──────────────────────────────────────────────────
+      - name: ⬆️ Upload unsigned IPA
+        if: vars.IOS_SIGNING_ENABLED != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: WaslaqApp-unsigned-${{ github.sha }}
+          path: build/ios/iphoneos/WaslaqApp-unsigned.ipa
+          retention-days: 14
+
+      - name: ⬆️ Upload signed IPA
+        if: vars.IOS_SIGNING_ENABLED == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: WaslaqApp-signed-${{ github.sha }}
+          path: build/ios/ipa/*.ipa
+          retention-days: 14
+
+      # ── Clean up keychain ─────────────────────────────────────────────────
+      - name: 🧹 Clean up keychain
+        if: always() && vars.IOS_SIGNING_ENABLED == 'true'
+        run: |
+          security delete-keychain $RUNNER_TEMP/app-signing.keychain-db || true
