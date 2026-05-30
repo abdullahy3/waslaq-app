@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  FLUTTER_VERSION: '3.32.1'
+  FLUTTER_VERSION: '3.44.0'  # Match local dev environment
 
 jobs:
   build-ios:
