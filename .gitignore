@@ -65,3 +65,5 @@ ios/Runner/GoogleService-Info.plist
 android/build/reports/
 deps.txt
 bug.md
+.DS_Store
+*.DS_Store
