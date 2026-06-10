@@ -7,6 +7,8 @@ import '../config/app_config.dart';
 import '../storage/secure_storage.dart';
 import '../error/app_exception.dart';
 import '../crashlytics/crash_reporter.dart';
+import '../auth/firebase_service.dart';
+import '../auth/auth_repository.dart';
 
 class SocialClient {
   SocialClient._();
@@ -66,7 +68,40 @@ class _SocialAuthInterceptor extends QueuedInterceptorsWrapper {
       reason: 'Social API error $statusCode on $endpoint',
     );
 
-    if (err.type == DioExceptionType.connectionError ||
+    // Handle 401 token expiration and refresh automatically
+    if (statusCode == 401) {
+      final isAuthSyncCall = endpoint.contains('/store/custom/auth-sync');
+      if (!isAuthSyncCall) {
+        try {
+          final freshFirebaseToken = await FirebaseService.getIdToken(forceRefresh: true);
+          if (freshFirebaseToken != null) {
+            await AuthRepository.authSync(freshFirebaseToken);
+            // New Medusa JWT is now in SecureStorage — retry original request
+            final newToken = await SecureStorage.getMedusaJwt();
+            if (newToken != null) {
+              err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
+              final retryResponse = await dio.fetch(err.requestOptions);
+              handler.resolve(retryResponse);
+              return;
+            }
+          }
+        } catch (refreshError) {
+          CrashReporter.reportError(
+            refreshError, null,
+            reason: 'Token re-auth via auth-sync failed on SocialClient',
+          );
+          // Refresh failed — force sign-out flag so the app shows login
+          await SecureStorage.setSignedOut();
+          await SecureStorage.clearAll();
+        }
+      }
+    }
+
+    // Map timeouts and connection/handshake errors to AppException.network
+    if (err.type == DioExceptionType.connectionTimeout ||
+        err.type == DioExceptionType.sendTimeout ||
+        err.type == DioExceptionType.receiveTimeout ||
+        err.type == DioExceptionType.connectionError ||
         err.type == DioExceptionType.unknown) {
       handler.reject(
         DioException(

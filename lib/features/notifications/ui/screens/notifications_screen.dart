@@ -6,13 +6,31 @@ import '../../../../shared/theme/app_colors.dart';
 import '../../../../i18n/strings.g.dart';
 import '../../../social/data/models/social_models.dart';
 import '../../../social/providers/social_providers.dart';
+import '../../../../router/app_router.dart';
 
 @RoutePage()
-class NotificationsScreen extends ConsumerWidget {
+class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<NotificationsScreen> createState() => _NotificationsScreenState();
+}
+
+class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Mark all notifications as read when screen opens → resets bell badge to 0
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        await ref.read(socialRepositoryProvider).markAllNotificationsRead();
+        ref.invalidate(notificationsProvider);
+      } catch (_) {}
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final notificationsAsync = ref.watch(notificationsProvider);
 
     return Scaffold(
@@ -86,6 +104,49 @@ class NotificationsScreen extends ConsumerWidget {
   }
 }
 
+void _navigateNotification(BuildContext context, NotificationModel notification) {
+  final postId = notification.postId;
+  final slug = notification.communitySlug ?? notification.communityId;
+  final senderId = notification.senderId;
+
+  switch (notification.type) {
+    case 'COMMENT_ON_POST':
+    case 'REPLY_TO_COMMENT':
+    case 'UPVOTE_POST':
+    case 'UPVOTE_COMMENT':
+      if (postId != null && slug != null) {
+        context.router.navigate(PostDetailRoute(community: slug, postId: postId));
+      }
+      break;
+    case 'NEW_FOLLOWER':
+    case 'FOLLOW_REQUEST':
+    case 'FOLLOW_ACCEPTED':
+    case 'JOIN_REJECTED':
+    case 'NEW_MEMBER':
+      if (senderId != null) {
+        context.router.navigate(UserProfileRoute(userId: senderId));
+      }
+      break;
+    case 'ORDER_UPDATE':
+    case 'NEW_ORDER':
+    case 'DISPUTE_OPENED':
+      context.router.navigate(const OrdersRoute());
+      break;
+    case 'PAYOUT_PROCESSED':
+      context.router.navigate(const VendorDashboardRoute());
+      break;
+    case 'NEW_PRODUCT':
+      // Navigate to vendor store if we have senderId (vendor's customerId)
+      // For now navigate to store browse — in future could deep-link to product
+      if (senderId != null) {
+        context.router.navigate(const BrowseStoresRoute());
+      }
+      break;
+    default:
+      break;
+  }
+}
+
 class NotificationTile extends ConsumerWidget {
   final NotificationModel notification;
 
@@ -107,6 +168,7 @@ class NotificationTile extends ConsumerWidget {
 
     switch (notification.type) {
       case 'ORDER_UPDATE':
+      case 'NEW_ORDER':
         iconData = Icons.shopping_bag_outlined;
         iconColor = context.colors.primary;
         break;
@@ -118,9 +180,29 @@ class NotificationTile extends ConsumerWidget {
         iconData = Icons.person_add_outlined;
         iconColor = context.colors.primary;
         break;
+      case 'NEW_MEMBER':
+        iconData = Icons.group_outlined;
+        iconColor = context.colors.success;
+        break;
+      case 'JOIN_REJECTED':
+        iconData = Icons.group_off_outlined;
+        iconColor = context.colors.error;
+        break;
       case 'ESCROW_DISPUTED':
         iconData = Icons.gavel_outlined;
         iconColor = context.colors.warning;
+        break;
+      case 'NEW_PRODUCT':
+        iconData = Icons.new_releases_outlined;
+        iconColor = context.colors.primary;
+        break;
+      case 'NEW_REVIEW':
+        iconData = Icons.star_outline;
+        iconColor = Colors.amber;
+        break;
+      case 'NEW_QA':
+        iconData = Icons.help_outline;
+        iconColor = context.colors.primary;
         break;
       default:
         iconData = Icons.notifications_outlined;
@@ -129,12 +211,15 @@ class NotificationTile extends ConsumerWidget {
 
     return InkWell(
       onTap: () async {
+        // Mark as read
         if (!notification.isRead) {
           try {
             await ref.read(socialRepositoryProvider).markNotificationRead(notification.id);
             ref.invalidate(notificationsProvider);
           } catch (_) {}
         }
+        // Navigate to relevant content based on notification type
+        _navigateNotification(context, notification);
       },
       child: Container(
         color: notification.isRead ? context.colors.surface : context.colors.primary.withOpacity(0.05),

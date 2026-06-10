@@ -25,7 +25,7 @@ final streamChatClientProvider = Provider<StreamChatClient>.internal(
 
 typedef StreamChatClientRef = ProviderRef<StreamChatClient>;
 String _$streamChatConnectionHash() =>
-    r'c405bb4d5934a40a4bdebcd6c48846438fad99df';
+    r'775027a1eee02a28f1be670b29c4c43e172c78ca';
 
 /// Manages the connection state.
 /// Re-runs whenever auth state changes — connects or disconnects accordingly.

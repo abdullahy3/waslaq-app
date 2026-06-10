@@ -144,11 +144,14 @@ class _StreamMessagesBody extends ConsumerWidget {
         return Scaffold(
             backgroundColor: context.colors.background,
             appBar: _buildAppBar(context),
-            floatingActionButton: FloatingActionButton(
+            floatingActionButton: FloatingActionButton.small(
               backgroundColor: context.colors.primary,
               foregroundColor: Colors.white,
+              elevation: 1.0,
+              highlightElevation: 1.5,
+              shape: const CircleBorder(),
               onPressed: () => _openUserSearch(context, ref, client),
-              child: const Icon(Icons.edit_outlined),
+              child: const Icon(Icons.edit_outlined, size: 18),
             ),
             body: StreamChannelListView(
               controller: StreamChannelListController(

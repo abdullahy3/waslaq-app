@@ -8,6 +8,8 @@ import '../../../../core/api/medusa_client.dart';
 import '../../../../core/api/social_client.dart';
 import '../../../../router/app_router.dart';
 import '../../../../i18n/strings.g.dart';
+import '../../../../shared/widgets/context_aware_scaffold.dart';
+import '../../../../features/social/post/providers/fab_context_provider.dart';
 
 @RoutePage()
 class VendorProfileScreen extends ConsumerStatefulWidget {
@@ -27,6 +29,8 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> with 
   String? _error;
   late TabController _tabCtrl;
   bool _isFollowing = false;
+  int _followerCount = 0;
+  bool _notificationsEnabled = true;
 
   @override
   void initState() {
@@ -45,6 +49,7 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> with 
       final data = res.data;
       _vendor = data['vendor'] as Map<String, dynamic>?;
       _products = data['products'] as List<dynamic>? ?? [];
+      _followerCount = (_vendor?['follower_count'] as num?)?.toInt() ?? 0;
 
       // Load Q&A, reviews, policy in parallel (safe — catch errors individually)
       dynamic qRes, rRes, pRes;
@@ -63,6 +68,7 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> with 
         try {
           final profileRes = await SocialClient.instance.get('/store/social/profiles/$vendorCustomerId');
           _isFollowing = profileRes.data['isFollowing'] ?? false;
+          _notificationsEnabled = profileRes.data['notificationsEnabled'] ?? true;
         } catch (_) {}
       }
 
@@ -78,6 +84,8 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> with 
       if (mounted) {
         setState(() {
           _isFollowing = res.data['following'] ?? !_isFollowing;
+          _followerCount += _isFollowing ? 1 : -1;
+          if (_followerCount < 0) _followerCount = 0;
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -95,6 +103,13 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> with 
         );
       }
     }
+  }
+
+  Future<void> _toggleNotifications(String vendorCustomerId) async {
+    try {
+      final res = await SocialClient.instance.patch('/store/social/follow/$vendorCustomerId');
+      if (mounted) setState(() => _notificationsEnabled = res.data['notificationsEnabled'] ?? !_notificationsEnabled);
+    } catch (_) {}
   }
 
   @override
@@ -124,9 +139,16 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> with 
     final avgRating = double.tryParse('${v['avg_rating']}') ?? 0;
     final totalReviews = v['total_reviews'] as int? ?? 0;
 
-    return Scaffold(
-      backgroundColor: context.colors.background,
-      body: RefreshIndicator(
+    return ContextAwareScaffold(
+      fabContext: FabContextData(storeSlug: widget.slug ?? ''),
+      child: Scaffold(
+        backgroundColor: context.colors.background,
+        floatingActionButton: const WaslaqFAB(),
+        floatingActionButtonLocation:
+            Directionality.of(context) == TextDirection.rtl
+                ? FloatingActionButtonLocation.startFloat
+                : FloatingActionButtonLocation.endFloat,
+        body: RefreshIndicator(
         onRefresh: _loadVendor,
         child: NestedScrollView(
           headerSliverBuilder: (ctx, innerBoxScrolled) => [
@@ -160,23 +182,76 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> with 
                     ])),
                     if (v['customer_id'] != null) ...[
                       const SizedBox(width: 12),
-                      ElevatedButton(
-                        onPressed: () => _toggleFollow(v['customer_id'] as String),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _isFollowing ? Colors.white24 : context.colors.primaryLight,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                          side: _isFollowing ? const BorderSide(color: Colors.white60) : null,
+                      Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                        Row(mainAxisSize: MainAxisSize.min, children: [
+                          // Follow / Unfollow button
+                          GestureDetector(
+                            onTap: () => _toggleFollow(v['customer_id'] as String),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: _isFollowing ? Colors.white.withValues(alpha: 0.15) : Colors.white,
+                                borderRadius: BorderRadius.circular(24),
+                                border: Border.all(
+                                  color: _isFollowing ? Colors.white60 : Colors.white,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                                Icon(
+                                  _isFollowing ? Icons.check_rounded : Icons.add_rounded,
+                                  color: _isFollowing ? Colors.white : context.colors.primary,
+                                  size: 13,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  _isFollowing
+                                      ? (Localizations.localeOf(context).languageCode == 'ar' ? 'متابَع' : 'Following')
+                                      : (Localizations.localeOf(context).languageCode == 'ar' ? 'متابعة' : 'Follow'),
+                                  style: TextStyle(
+                                    color: _isFollowing ? Colors.white : context.colors.primary,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ]),
+                            ),
+                          ),
+                          // Notification bell — only visible when following
+                          if (_isFollowing) ...[
+                            const SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: () => _toggleNotifications(v['customer_id'] as String),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                width: 36, height: 36,
+                                decoration: BoxDecoration(
+                                  color: _notificationsEnabled
+                                      ? Colors.white.withValues(alpha: 0.25)
+                                      : Colors.transparent,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.white60, width: 1.5),
+                                ),
+                                child: Icon(
+                                  _notificationsEnabled
+                                      ? Icons.notifications_active_rounded
+                                      : Icons.notifications_off_outlined,
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ]),
+                        const SizedBox(height: 4),
+                        Text(
+                          _followerCount > 0
+                              ? '$_followerCount ${Localizations.localeOf(context).languageCode == 'ar' ? 'متابع' : 'followers'}'
+                              : (Localizations.localeOf(context).languageCode == 'ar' ? 'لا متابعين' : 'No followers'),
+                          style: const TextStyle(color: Colors.white70, fontSize: 10),
                         ),
-                        child: Text(
-                          _isFollowing
-                              ? (Localizations.localeOf(context).languageCode == 'ar' ? 'متابع' : 'Following')
-                              : (Localizations.localeOf(context).languageCode == 'ar' ? 'متابعة' : 'Follow'),
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                        ),
-                      ),
+                      ]),
                     ],
                   ])),
                 ]),
@@ -208,8 +283,9 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> with 
           ]),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   // ─── PRODUCTS TAB ───────────────────────────────────────
   Widget _buildProductsTab() {

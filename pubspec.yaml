@@ -63,6 +63,15 @@ dependencies:
   file_picker: ^8.3.7
   share_plus: ^10.1.4
 
+  permission_handler: ^11.3.1
+  local_auth: ^2.3.0
+  package_info_plus: ^8.0.0
+  in_app_review: ^2.0.9
+  url_launcher: ^6.3.0
+  connectivity_plus: ^6.1.0
+  qr_flutter: ^4.1.0
+  google_fonts: ^6.2.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -73,11 +82,27 @@ dev_dependencies:
   isar_generator: ^3.1.0+1
   slang_build_runner: ^3.31.0
   freezed: ^2.4.4
+  flutter_launcher_icons: ^0.13.1
 
 flutter:
   uses-material-design: true
   assets:
     - assets/icons/google_logo.svg
+    - assets/images/logo.png
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logo.png"
+  adaptive_icon_background: "#000000"
+  adaptive_icon_foreground: "assets/images/logo.png"
+
+flutter_native_splash:
+  color: "#000000"
+  image: "assets/images/logo.png"
+  android_12:
+    color: "#000000"
+    image: "assets/images/logo.png"
 
 dependency_overrides:
   analyzer: 6.3.0
@@ -87,3 +112,4 @@ dependency_overrides:
   custom_lint_core: 0.6.0
   riverpod_analyzer_utils: 0.5.1
   freezed: 2.4.4
+  image_gallery_saver_plus: ^4.0.1

@@ -65,6 +65,50 @@ class FeedPostsNotifier extends _$FeedPostsNotifier {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() => _fetch(offset: 0));
   }
+
+  Future<void> votePost(String postId, int value) async {
+    final currentPosts = state.valueOrNull ?? [];
+    if (currentPosts.isEmpty) return;
+
+    state = AsyncData(currentPosts.map((post) {
+      if (post.id == postId) {
+        int oldVote = post.userVote;
+        int newVote = oldVote == value ? 0 : value;
+
+        int newUpvotes = post.upvotes;
+        int newDownvotes = post.downvotes;
+
+        if (oldVote == 1) {
+          newUpvotes = (newUpvotes - 1).clamp(0, 999999);
+        } else if (oldVote == -1) {
+          newDownvotes = (newDownvotes - 1).clamp(0, 999999);
+        }
+
+        if (newVote == 1) {
+          newUpvotes += 1;
+        } else if (newVote == -1) {
+          newDownvotes += 1;
+        }
+
+        int scoreDiff = newVote - oldVote;
+
+        return post.copyWith(
+          userVote: newVote,
+          upvotes: newUpvotes,
+          downvotes: newDownvotes,
+          score: post.score + scoreDiff,
+        );
+      }
+      return post;
+    }).toList());
+
+    try {
+      await ref.read(socialRepositoryProvider).votePost(postId, value);
+    } catch (_) {
+      // Revert on error
+      state = AsyncData(currentPosts);
+    }
+  }
 }
 
 @riverpod

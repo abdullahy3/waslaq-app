@@ -469,7 +469,7 @@ final notificationsProvider =
 
 typedef NotificationsRef
     = AutoDisposeFutureProviderRef<List<NotificationModel>>;
-String _$feedPostsNotifierHash() => r'07288c874d4d5fd7017725d618573c6168c947e5';
+String _$feedPostsNotifierHash() => r'55c3b2a5e3796da923630d272d8ebda6248f0614';
 
 abstract class _$FeedPostsNotifier
     extends BuildlessAutoDisposeAsyncNotifier<List<PostModel>> {

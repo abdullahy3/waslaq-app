@@ -8,13 +8,39 @@ import '../../../../shared/theme/app_colors.dart';
 import '../../../../i18n/strings.g.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
+import '../../../social/community/ui/screens/community_explore_screen.dart';
+import '../../../vendor/ui/screens/following_stores_screen.dart';
+import '../../../vendor/ui/screens/vendor_dashboard_screen.dart';
+import '../../../vendor/ui/screens/become_vendor_screen.dart';
 
 @RoutePage()
-class AccountScreen extends ConsumerWidget {
+class AccountScreen extends ConsumerStatefulWidget {
   const AccountScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AccountScreen> createState() => _AccountScreenState();
+}
+
+class _AccountScreenState extends ConsumerState<AccountScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Refresh profile ONCE when the screen mounts — not on every rebuild.
+    // addPostFrameCallback in a ConsumerWidget fires on every build,
+    // which caused 429 rate limit errors on the profile endpoint.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(authNotifierProvider).maybeWhen(
+        authenticated: (_, __, ___, ____, _____) {
+          ref.read(authNotifierProvider.notifier).refreshProfile();
+        },
+        orElse: () {},
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
 
     return authState.maybeWhen(
@@ -56,60 +82,77 @@ class _AuthenticatedView extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: context.colors.background,
         title: Text(t.account.title,
-            style: TextStyle(color: context.colors.textPrimary)),
+            style: TextStyle(
+                color: context.colors.textPrimary,
+                fontWeight: FontWeight.bold)),
         elevation: 0,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(0.5),
+          child: Container(height: 0.5, color: context.colors.border),
+        ),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         children: [
-          // Profile header
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: context.colors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                  color: context.colors.primary.withValues(alpha: 0.3)),
-            ),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 28,
-                  backgroundColor: context.colors.primary,
-                  backgroundImage: avatarUrl != null
-                      ? CachedNetworkImageProvider(avatarUrl!)
-                      : null,
-                  child: avatarUrl == null
-                      ? Text(
-                          name.substring(0, 1).toUpperCase(),
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold),
-                        )
-                      : null,
+
+          // ─── PROFILE CARD ─────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+            child: GestureDetector(
+              onTap: () => context.router.push(UserProfileRoute(userId: customerId)),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: context.colors.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: context.colors.border),
                 ),
-                SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(name,
-                          style: TextStyle(
-                              color: context.colors.textPrimary,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold)),
-                      Text(email,
-                          style: TextStyle(
-                              color: context.colors.textSecondary, fontSize: 13)),
-                    ],
-                  ),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 28,
+                      backgroundColor: context.colors.primary,
+                      backgroundImage: avatarUrl != null
+                          ? CachedNetworkImageProvider(avatarUrl!)
+                          : null,
+                      child: avatarUrl == null
+                          ? Text(
+                              name.substring(0, 1).toUpperCase(),
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold),
+                            )
+                          : null,
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(name,
+                              style: TextStyle(
+                                  color: context.colors.textPrimary,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
+                          Text(email,
+                              style: TextStyle(
+                                  color: context.colors.textSecondary,
+                                  fontSize: 13)),
+                        ],
+                      ),
+                    ),
+                    Icon(Icons.chevron_right,
+                        color: context.colors.textMuted, size: 18),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
+          // ─── SECTION: SHOPPING ────────────────────────────
+          _SectionHeader(label: t.account.section_shopping),
           _AccountTile(
             icon: Icons.shopping_bag_outlined,
             label: t.account.my_orders_label,
@@ -120,56 +163,75 @@ class _AuthenticatedView extends ConsumerWidget {
             label: t.account.saved_items_label,
             onTap: () => context.router.push(const SavedItemsRoute()),
           ),
+          const SizedBox(height: 8),
 
+          // ─── SECTION: COMMUNITY ───────────────────────────
+          _SectionHeader(label: t.account.section_community),
+          _AccountTile(
+            icon: Icons.article_outlined,
+            label: t.account.my_posts,
+            onTap: () => context.router.push(UserProfileRoute(userId: customerId)),
+          ),
+          _AccountTile(
+            icon: Icons.group_outlined,
+            label: t.account.section_communities,
+            onTap: () => context.router.push(const CommunityExploreRoute()),
+          ),
+          _AccountTile(
+            icon: Icons.store_outlined,
+            label: t.account.following_stores_label,
+            onTap: () => context.router.push(const FollowingStoresRoute()),
+          ),
+          const SizedBox(height: 8),
+
+          // ─── SECTION: VENDOR (conditional) ───────────────
           vendorCheck.when(
-            data: (isVendor) {
-              if (isVendor) {
-                return _AccountTile(
-                  icon: Icons.store_outlined,
-                  label: t.account.vendor_dashboard_label,
-                  onTap: () =>
-                      context.router.push(const VendorDashboardRoute()),
-                );
-              } else {
-                return _AccountTile(
-                  icon: Icons.store_outlined,
-                  label: t.account.become_vendor_label,
-                  onTap: () =>
-                      context.router.push(const BecomeVendorRoute()),
-                );
-              }
-            },
-            loading: () => Shimmer.fromColors(
-              baseColor: Colors.grey.shade900,
-              highlightColor: Colors.grey.shade800,
-              child: ListTile(
-                leading:
-                    const Icon(Icons.store_outlined, color: Colors.white),
-                title: Container(
-                    height: 16, width: double.infinity, color: Colors.white),
-              ),
+            data: (isVendor) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _SectionHeader(label: t.account.section_vendor),
+                if (isVendor)
+                  _AccountTile(
+                    icon: Icons.dashboard_outlined,
+                    label: t.account.vendor_dashboard_label,
+                    onTap: () => context.router.push(const VendorDashboardRoute()),
+                  )
+                else
+                  _AccountTile(
+                    icon: Icons.add_business_outlined,
+                    label: t.account.become_vendor_label,
+                    labelColor: context.colors.primary,
+                    iconColor: context.colors.primary,
+                    onTap: () => context.router.push(const BecomeVendorRoute()),
+                  ),
+                const SizedBox(height: 8),
+              ],
             ),
+            loading: () => const SizedBox(height: 8),
             error: (_, __) => const SizedBox.shrink(),
           ),
 
-          _AccountTile(
-            icon: Icons.message_outlined,
-            label: t.account.messages_label,
-            onTap: () => context.router.push(const MessagesRoute()),
-          ),
+          // ─── SECTION: SETTINGS ────────────────────────────
+          _SectionHeader(label: t.account.section_settings),
           _AccountTile(
             icon: Icons.notifications_outlined,
             label: t.account.notifications_label,
             onTap: () => context.router.push(const NotificationsRoute()),
           ),
           _AccountTile(
+            icon: Icons.chat_bubble_outline,
+            label: t.account.messages_label,
+            onTap: () => context.router.push(const MessagesRoute()),
+          ),
+          _AccountTile(
             icon: Icons.settings_outlined,
             label: t.account.settings_label,
             onTap: () => context.router.push(const SettingsRoute()),
           ),
-          SizedBox(height: 16),
-          const Divider(color: Colors.grey),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
+
+          // ─── SECTION: LEGAL ───────────────────────────────
+          _SectionHeader(label: t.account.section_legal),
           _AccountTile(
             icon: Icons.privacy_tip_outlined,
             label: t.account.privacy_policy_label,
@@ -180,20 +242,46 @@ class _AuthenticatedView extends ConsumerWidget {
             label: t.account.terms_label,
             onTap: () => context.router.push(const TermsRoute()),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 16),
+          Divider(color: context.colors.border, height: 1),
+          const SizedBox(height: 8),
+
+          // ─── SIGN OUT ─────────────────────────────────────
           _AccountTile(
             icon: Icons.logout,
             label: t.account.sign_out_label,
             iconColor: context.colors.error,
             labelColor: context.colors.error,
-            onTap: () async =>
-                ref.read(authNotifierProvider.notifier).signOut(),
+            onTap: () => ref.read(authNotifierProvider.notifier).signOut(),
           ),
+          const SizedBox(height: 24),
         ],
       ),
     );
   }
 }
+
+class _SectionHeader extends StatelessWidget {
+  final String label;
+  const _SectionHeader({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 4),
+      child: Text(
+        label.toUpperCase(),
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.2,
+          color: context.colors.textMuted,
+        ),
+      ),
+    );
+  }
+}
+
 
 class _AccountTile extends StatelessWidget {
   final IconData icon;

@@ -137,7 +137,7 @@ class _SavedProductsTab extends ConsumerWidget {
             crossAxisCount: 2,
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
-            childAspectRatio: 0.68,
+            childAspectRatio: 0.58,
           ),
           itemCount: saved.length,
           itemBuilder: (_, i) => ProductCard(product: saved[i]),
@@ -162,83 +162,113 @@ class _SavedPostsTab extends StatelessWidget {
         sub: t.saved_items.no_posts_sub,
       );
     }
-    return ListView.separated(
+    return GridView.builder(
       padding: const EdgeInsets.all(12),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        mainAxisExtent: 230,
+      ),
       itemCount: posts.length,
-      separatorBuilder: (_, __) => SizedBox(height: 10),
-      itemBuilder: (context, i) => _SavedPostTile(post: posts[i]),
+      itemBuilder: (context, i) => _SavedPostCard(post: posts[i]),
     );
   }
 }
 
-class _SavedPostTile extends StatelessWidget {
+class _SavedPostCard extends StatelessWidget {
   final SavedPostModel post;
-  const _SavedPostTile({required this.post});
+  const _SavedPostCard({required this.post});
 
   @override
   Widget build(BuildContext context) {
+    final hasImage = post.mediaUrls.isNotEmpty;
     return GestureDetector(
       onTap: () => context.router.push(PostDetailRoute(
         community: post.communitySlug,
         postId: post.id,
       )),
       child: Container(
-        padding: const EdgeInsets.all(14),
+        clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: context.colors.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: context.colors.border),
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (post.mediaUrls.isNotEmpty)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: CachedNetworkImage(
-                  imageUrl: post.mediaUrls.first,
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                  errorWidget: (_, __, ___) => Container(
-                    width: 60,
-                    height: 60,
-                    color: context.colors.surfaceVariant,
-                    child: Icon(Icons.image_outlined,
-                        color: context.colors.textMuted),
-                  ),
+            SizedBox(
+              height: 140,
+              child: hasImage
+                  ? CachedNetworkImage(
+                      imageUrl: post.mediaUrls.first,
+                      width: double.infinity,
+                      height: 140,
+                      fit: BoxFit.cover,
+                      errorWidget: (_, __, ___) => _mediaPlaceholder(context),
+                    )
+                  : _textPostHeader(context),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      post.title,
+                      style: TextStyle(
+                          color: context.colors.textPrimary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                          height: 1.25),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const Spacer(),
+                    Row(
+                      children: [
+                        Icon(Icons.bookmark,
+                            size: 12, color: context.colors.primary),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            'r/${post.communityName}',
+                            style: TextStyle(
+                                color: context.colors.primary,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            if (post.mediaUrls.isNotEmpty) SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    post.title,
-                    style: TextStyle(
-                        color: context.colors.textPrimary,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 6),
-                  Text(
-                    'r/${post.communityName}',
-                    style: TextStyle(
-                        color: context.colors.primary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500),
-                  ),
-                ],
-              ),
             ),
-            Icon(Icons.chevron_right,
-                color: context.colors.textMuted, size: 18),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _mediaPlaceholder(BuildContext context) {
+    return Container(
+      color: context.colors.surfaceVariant,
+      child: Icon(Icons.image_outlined, color: context.colors.textMuted),
+    );
+  }
+
+  Widget _textPostHeader(BuildContext context) {
+    return Container(
+      color: context.colors.primary.withValues(alpha: 0.08),
+      alignment: Alignment.center,
+      padding: const EdgeInsets.all(12),
+      child: Icon(Icons.forum_outlined,
+          size: 34, color: context.colors.primary.withValues(alpha: 0.55)),
     );
   }
 }
@@ -287,7 +317,7 @@ class _Skeleton extends StatelessWidget {
           crossAxisCount: 2,
           crossAxisSpacing: 10,
           mainAxisSpacing: 10,
-          childAspectRatio: 0.68,
+          childAspectRatio: 0.58,
         ),
         itemCount: 6,
         itemBuilder: (_, __) => Container(

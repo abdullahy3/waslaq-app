@@ -16,6 +16,11 @@ import '../../../../router/app_router.dart';
 import '../../../../i18n/strings.g.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../data/models/product_model.dart';
+import '../../../../core/api/social_client.dart';
+import '../../../social/data/models/social_models.dart';
+import '../../../social/providers/social_providers.dart';
+import '../../../social/post/providers/fab_context_provider.dart';
+import '../../../../shared/widgets/context_aware_scaffold.dart';
 
 @RoutePage()
 class ProductScreen extends ConsumerStatefulWidget {
@@ -37,6 +42,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
   List<dynamic> _reviews = [];
   List<dynamic> _questions = [];
   List<dynamic> _relatedProducts = [];
+  List<PostModel> _communityPosts = [];
   bool _extrasLoaded = false;
   // Review/Question form state
   bool _showReviewForm = false;
@@ -51,9 +57,24 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
   String? _reviewSuccess;
   String? _questionSuccess;
 
-  void _loadExtras(String productId) {
+  @override
+  void dispose() {
+    _reviewCommentCtrl.dispose();
+    _questionCtrl.dispose();
+    // Clear FAB context when leaving product screen
+    ref.read(fabContextProvider.notifier).clear();
+    super.dispose();
+  }
+
+  void _loadExtras(String productId, String productTitle) {
     if (_extrasLoaded) return;
     _extrasLoaded = true;
+    // Set FAB context so the sheet pre-attaches this product
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref.read(fabContextProvider.notifier).setProduct(productId, productTitle);
+      }
+    });
     // Load reviews
     MedusaClient.instance.get('/store/products/$productId/reviews').then((res) {
       if (mounted) setState(() => _reviews = res.data['reviews'] as List<dynamic>? ?? []);
@@ -70,6 +91,14 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
       final all = res.data['products'] as List<dynamic>? ?? [];
       if (mounted) setState(() => _relatedProducts = all.where((p) => p['id'] != productId).take(6).toList());
     }).catchError((_) {});
+    // Load community posts (global hot feed, 3 posts)
+    ref.read(socialRepositoryProvider).getPosts(
+      limit: 3,
+      offset: 0,
+      sort: 'hot',
+    ).then((posts) {
+      if (mounted) setState(() => _communityPosts = posts);
+    }).catchError((_) {});
   }
 
   @override
@@ -78,6 +107,11 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
 
     return Scaffold(
       backgroundColor: context.colors.background,
+      floatingActionButton: const WaslaqFAB(),
+      floatingActionButtonLocation:
+          Directionality.of(context) == TextDirection.rtl
+              ? FloatingActionButtonLocation.startFloat
+              : FloatingActionButtonLocation.endFloat,
       body: productAsync.when(
         loading: () => _buildSkeleton(),
         error: (e, _) => Center(
@@ -88,7 +122,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
           _selectedVariantId ??= product.variants.isNotEmpty
               ? product.variants.first.id
               : null;
-          _loadExtras(product.id);
+          _loadExtras(product.id, product.title);
           final selectedVariant = product.variants
               .where((v) => v.id == _selectedVariantId)
               .firstOrNull;
@@ -411,7 +445,25 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                         ),
                       ),
                     ],
-                    SizedBox(height: 100),
+                    SizedBox(height: 20),
+
+                    // ── Community Discussions ────────────────────────────────
+                    if (_communityPosts.isNotEmpty) ...[
+                      Divider(color: context.colors.border, height: 1),
+                      _CommunityDiscussionsBlock(
+                        posts: _communityPosts,
+                        onPostTap: (post) => context.router.push(
+                          PostDetailRoute(
+                            community: post.communitySlug.isNotEmpty
+                                ? post.communitySlug
+                                : 'all',
+                            postId: post.id,
+                          ),
+                        ),
+                        onSeeAll: () => context.router.push(const FeedRoute()),
+                      ),
+                    ],
+                    SizedBox(height: 80),
 
                     // ── Reviews Section ──────────────────────
                     Divider(color: context.colors.border, height: 1),
@@ -455,7 +507,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                               child: Text(_reviewError!, style: TextStyle(color: context.colors.error, fontSize: 11))),
                             SizedBox(height: 10),
                             Align(alignment: Alignment.centerRight, child: ElevatedButton(
-                              onPressed: _submittingReview ? null : () => _submitReview(product.id),
+                              onPressed: _submittingReview ? null : () => _submitReview(product),
                               style: ElevatedButton.styleFrom(backgroundColor: context.colors.primary, foregroundColor: Colors.white,
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
@@ -644,17 +696,17 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
     );
   }
 
-  Future<void> _submitReview(String productId) async {
+  Future<void> _submitReview(ProductModel product) async {
     if (_reviewRating < 1) { setState(() => _reviewError = t.product.please_select_rating); return; }
     setState(() { _submittingReview = true; _reviewError = null; _reviewSuccess = null; });
     try {
-      await MedusaClient.instance.post('/store/products/$productId/review', data: {
+      await MedusaClient.instance.post('/store/products/${product.id}/review', data: {
         'rating': _reviewRating, 'comment': _reviewCommentCtrl.text.trim(),
       });
       _reviewCommentCtrl.clear();
       setState(() { _reviewSuccess = t.product.review_submitted; _showReviewForm = false; _reviewRating = 5; });
       // Reload reviews
-      _extrasLoaded = false; _loadExtras(productId);
+      _extrasLoaded = false; _loadExtras(product.id, product.title);
     } catch (e) {
       final msg = e.toString();
       setState(() => _reviewError = msg.contains('purchased') ? t.product.must_purchase :
@@ -675,7 +727,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
       });
       _questionCtrl.clear();
       setState(() { _questionSuccess = t.product.question_submitted; _showQuestionForm = false; });
-      _extrasLoaded = false; _loadExtras(product.id);
+      _extrasLoaded = false; _loadExtras(product.id, product.title);
     } catch (e) {
       setState(() => _questionError = e.toString().contains('401') ? t.product.sign_in_to_ask : t.product.failed_submit_question);
     } finally { if (mounted) setState(() => _submittingQuestion = false); }
@@ -867,6 +919,168 @@ class _TrustRow extends StatelessWidget {
                   color: context.colors.textPrimary, fontSize: 12)),
         ),
       ],
+    );
+  }
+}
+
+// ── Community Discussions Block ───────────────────────────────────────────────
+
+class _CommunityDiscussionsBlock extends StatelessWidget {
+  final List<PostModel> posts;
+  final void Function(PostModel post) onPostTap;
+  final VoidCallback onSeeAll;
+
+  const _CommunityDiscussionsBlock({
+    required this.posts,
+    required this.onPostTap,
+    required this.onSeeAll,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+          child: Row(
+            children: [
+              Text(
+                t.product.community_discussions,
+                style: TextStyle(
+                  color: context.colors.textSecondary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: onSeeAll,
+                child: Text(
+                  t.common.view_all,
+                  style: TextStyle(
+                    color: context.colors.primary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        ...posts.take(2).map(
+          (post) => _CompactPostCard(
+            post: post,
+            onTap: () => onPostTap(post),
+          ),
+        ),
+        const SizedBox(height: 8),
+      ],
+    );
+  }
+}
+
+// ── Compact post card — lightweight, no voting ─────────────────────────────────
+
+class _CompactPostCard extends StatelessWidget {
+  final PostModel post;
+  final VoidCallback onTap;
+
+  const _CompactPostCard({required this.post, required this.onTap});
+
+  String _timeAgo(DateTime date) {
+    final diff = DateTime.now().difference(date);
+    if (diff.inDays > 365) return '${diff.inDays ~/ 365}y';
+    if (diff.inDays > 30) return '${diff.inDays ~/ 30}mo';
+    if (diff.inDays > 0) return '${diff.inDays}d';
+    if (diff.inHours > 0) return '${diff.inHours}h';
+    if (diff.inMinutes > 0) return '${diff.inMinutes}m';
+    return 'now';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: context.colors.surface,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: context.colors.border),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  if (post.communitySlug.isNotEmpty) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color:
+                            context.colors.primary.withValues(alpha: 0.10),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        'r/${post.communitySlug}',
+                        style: TextStyle(
+                          color: context.colors.primary,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                  ],
+                  Text(
+                    post.author?.displayName ?? '',
+                    style: TextStyle(
+                      color: context.colors.textMuted, fontSize: 10),
+                  ),
+                  const Spacer(),
+                  Text(
+                    _timeAgo(post.createdAt),
+                    style: TextStyle(
+                      color: context.colors.textMuted, fontSize: 10),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                post.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: context.colors.textPrimary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  height: 1.3,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  Icon(Icons.arrow_upward_rounded,
+                      size: 12, color: context.colors.textMuted),
+                  const SizedBox(width: 3),
+                  Text(
+                    '${post.upvotes}',
+                    style: TextStyle(
+                      color: context.colors.textMuted, fontSize: 11),
+                  ),
+                  const SizedBox(width: 10),
+                  Icon(Icons.chevron_right,
+                      size: 14, color: context.colors.textMuted),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

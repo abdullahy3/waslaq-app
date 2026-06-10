@@ -15,7 +15,15 @@
     "about_waslaq": "About Waslaq",
     "contact_us": "Contact Us",
     "feedback": "Feedback",
-    "create_community": "Create Community"
+    "create_community": "Create Community",
+    "explore": "Explore"
+  },
+  "explore": {
+    "products": "Products",
+    "communities": "Communities",
+    "stores": "Stores",
+    "browse_categories": "Browse Categories",
+    "popular_searches": "Popular Searches"
   },
   "auth": {
     "sign_in": "Sign In",
@@ -119,10 +127,19 @@
     "sign_in_welcome": "WaslaQ",
     "sign_in_desc": "Sign in to view your account,\norders, and messages.",
     "sign_in_btn": "Sign In",
-    "create_account_btn": "Create Account"
+    "create_account_btn": "Create Account",
+    "section_shopping": "Shopping",
+    "section_community": "Community",
+    "section_communities": "My Communities",
+    "section_vendor": "Vendor",
+    "section_settings": "Settings",
+    "section_legal": "Legal",
+    "following_stores_label": "Following Stores"
   },
   "product": {
     "add_to_cart": "Add to Cart",
+    "sold": "${count} sold",
+    "no_seller": "Local Seller",
     "buy_now": "Buy Now",
     "save": "Save",
     "saved": "Saved",
@@ -184,7 +201,8 @@
     "origin": "Origin",
     "no_description": "No description provided.",
     "price_on_request": "Price on Request",
-    "share_product": "Check out this product on WaslaQ: ${title}\n${url}"
+    "share_product": "Check out this product on WaslaQ: ${title}\n${url}",
+    "community_discussions": "Community Discussions"
   },
   "vendor": {
     "store": "Store",
@@ -235,6 +253,7 @@
     "no_questions_yet": "No questions yet",
     "awaiting_response": "Awaiting vendor response...",
     "no_reviews_yet": "No reviews yet",
+    "no_stores_yet": "No stores yet",
     "rating_out_of_five": "${rating}/5",
     "no_policies_yet": "No policies published yet",
     "shipping_policy": "Shipping Policy",
@@ -364,7 +383,8 @@
     "joined_checkmark": "Joined ✓",
     "error_loading_posts": "Error loading posts: ${error}",
     "explore_communities": "Explore Communities",
-    "no_communities_found": "No communities found"
+    "no_communities_found": "No communities found",
+    "error_loading": "Error loading"
   },
   "messages": {
     "messages": "Messages",
@@ -494,7 +514,9 @@
     "drawer_about": "About WaslaQ",
     "drawer_contact": "Contact Us",
     "drawer_feedback": "Feedback",
-    "drawer_legal": "LEGAL"
+    "drawer_legal": "LEGAL",
+    "trending_discussions": "Trending Discussions",
+    "more_products": "More Products"
   },
   "footer": {
     "privacy_policy": "Privacy Policy",
@@ -1704,5 +1726,14 @@
   "legal": {
     "privacy_policy_title": "Privacy Policy",
     "terms_title": "Terms of Service"
+  },
+  "create_post": {
+    "sheet_title": "What do you want to post?",
+    "general_post": "General Post",
+    "community_post": "Post in a Community",
+    "community_post_in": "Post in r/${slug}",
+    "share_product": "Share a Product",
+    "share_product_named": "Share: ${title}",
+    "ask_product": "Ask About a Product"
   }
 }

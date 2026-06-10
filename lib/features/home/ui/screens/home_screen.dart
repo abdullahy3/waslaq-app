@@ -18,6 +18,26 @@ import '../../../cart/providers/cart_provider.dart';
 import '../../../../core/api/social_client.dart';
 import '../../../../core/api/medusa_client.dart';
 import '../../../../i18n/strings.g.dart';
+import '../../../social/providers/social_providers.dart';
+import '../../../../shared/widgets/post_card.dart';
+import '../../../social/data/models/social_models.dart';
+import '../../../../core/notifications/notification_bus.dart';
+
+// ── Home-specific providers (small, fast fetches for the home feed) ──────────
+
+final _homeFeedPostsProvider = FutureProvider<List<PostModel>>((ref) async {
+  return ref.read(socialRepositoryProvider).getPosts(
+    limit: 3,
+    offset: 0,
+    sort: 'hot',
+  );
+});
+
+final _homeStoresProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  final res = await MedusaClient.instance.get('/store/vendors');
+  final vendors = res.data['vendors'] as List<dynamic>? ?? [];
+  return vendors.map((v) => v as Map<String, dynamic>).take(6).toList();
+});
 
 @RoutePage()
 class HomeScreen extends ConsumerWidget {
@@ -29,7 +49,6 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: context.colors.background,
-      drawer: const _WaslaqDrawer(),
       body: SafeArea(
         child: Column(
           children: [
@@ -38,28 +57,104 @@ class HomeScreen extends ConsumerWidget {
               child: RefreshIndicator(
                 color: context.colors.primary,
                 backgroundColor: context.colors.surface,
-                onRefresh: () => ref.refresh(productListProvider().future),
+                onRefresh: () async {
+                  ref.invalidate(productListProvider());
+                  ref.invalidate(_homeFeedPostsProvider);
+                  ref.invalidate(_homeStoresProvider);
+                },
                 child: CustomScrollView(
                   slivers: [
-                    const SliverToBoxAdapter(child: _HeroBanner()),
+                    // ─── Trust bar ──────────────────────────
                     const SliverToBoxAdapter(
                       child: Padding(
                         padding: EdgeInsets.fromLTRB(12, 12, 12, 0),
                         child: _TrustBar(),
                       ),
                     ),
-                    // Category pills — real categories from Medusa
+
+                    // ─── Category pills ──────────────────────
                     const SliverToBoxAdapter(
                       child: Padding(
                         padding: EdgeInsets.fromLTRB(12, 12, 12, 0),
                         child: _CategoryPills(),
                       ),
                     ),
+
+                    // ─── SECTION: Featured Products ──────────
+                    SliverToBoxAdapter(
+                      child: _HomeSectionHeader(
+                        title: t.home.featured_products,
+                        onSeeAll: () => context.router.push(StoreRoute()),
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: productsAsync.when(
+                        loading: () => SizedBox(
+                          height: 265,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            itemCount: 4,
+                            itemBuilder: (_, __) => Padding(
+                              padding: const EdgeInsets.only(right: 10),
+                              child: SizedBox(
+                                width: 150,
+                                child: const ProductCardSkeleton(),
+                              ),
+                            ),
+                          ),
+                        ),
+                        error: (_, __) => const SizedBox.shrink(),
+                        data: (products) {
+                          final featured = products.take(4).toList();
+                          if (featured.isEmpty) return const SizedBox.shrink();
+                          return SizedBox(
+                            height: 265,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              itemCount: featured.length,
+                              itemBuilder: (ctx, i) => Padding(
+                                padding: const EdgeInsets.only(right: 10),
+                                child: SizedBox(
+                                  width: 150,
+                                  child: ProductCard(product: featured[i]),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+
+                    // ─── SECTION: Trending Discussions ────────
+                    SliverToBoxAdapter(
+                      child: _HomeSectionHeader(
+                        title: t.home.trending_discussions,
+                        onSeeAll: () => context.router.push(const FeedRoute()),
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: _DiscussionsSection(),
+                    ),
+
+                    // ─── SECTION: Top Stores ──────────────────
+                    SliverToBoxAdapter(
+                      child: _HomeSectionHeader(
+                        title: t.home.top_stores,
+                        onSeeAll: () => context.router.push(const BrowseStoresRoute()),
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: _StoresSection(),
+                    ),
+
+                    // ─── SECTION: More Products (2-col grid) ─
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                        padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
                         child: Text(
-                          t.home.featured_products,
+                          t.home.more_products,
                           style: TextStyle(
                             color: context.colors.textPrimary,
                             fontSize: 16,
@@ -72,68 +167,49 @@ class HomeScreen extends ConsumerWidget {
                       loading: () => SliverGrid(
                         delegate: SliverChildBuilderDelegate(
                           (_, __) => const ProductCardSkeleton(),
-                          childCount: 8,
+                          childCount: 6,
                         ),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
                           crossAxisSpacing: 10,
                           mainAxisSpacing: 10,
-                          childAspectRatio: 0.68,
+                          childAspectRatio: 0.58,
                         ),
                       ),
                       error: (e, _) => SliverToBoxAdapter(
                         child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(height: 48),
-                              Icon(Icons.error_outline,
-                                  color: context.colors.error, size: 48),
-                              SizedBox(height: 16),
-                              Text(t.home.failed_load_products,
-                                  style: TextStyle(
-                                      color: context.colors.textPrimary,
-                                      fontSize: 16)),
-                              SizedBox(height: 12),
-                              ElevatedButton(
-                                onPressed: () =>
-                                    ref.refresh(productListProvider()),
-                                child: Text(t.common.retry),
-                              ),
-                            ],
+                          child: Padding(
+                            padding: const EdgeInsets.all(32),
+                            child: Text(
+                              t.home.failed_load_products,
+                              style: TextStyle(color: context.colors.textSecondary),
+                            ),
                           ),
                         ),
                       ),
-                      data: (products) => products.isEmpty
-                          ? SliverToBoxAdapter(
-                              child: Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(32),
-                                  child: Text(t.home.no_products_yet,
-                                      style: TextStyle(
-                                          color: context.colors.textSecondary)),
-                                ),
-                              ),
-                            )
-                          : SliverPadding(
-                              padding:
-                                  const EdgeInsets.fromLTRB(12, 0, 12, 24),
-                              sliver: SliverGrid(
-                                delegate: SliverChildBuilderDelegate(
-                                  (ctx, i) =>
-                                      ProductCard(product: products[i]),
-                                  childCount: products.length,
-                                ),
-                                gridDelegate:
-                                    const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  crossAxisSpacing: 10,
-                                  mainAxisSpacing: 10,
-                                  childAspectRatio: 0.68,
-                                ),
-                              ),
+                      data: (products) {
+                        // Skip first 4 (already shown in featured horizontal scroll)
+                        final remaining = products.skip(4).toList();
+                        if (remaining.isEmpty) {
+                          return const SliverToBoxAdapter(child: SizedBox(height: 24));
+                        }
+                        return SliverPadding(
+                          padding: const EdgeInsets.fromLTRB(12, 0, 12, 24),
+                          sliver: SliverGrid(
+                            delegate: SliverChildBuilderDelegate(
+                              (ctx, i) => ProductCard(product: remaining[i]),
+                              childCount: remaining.length,
                             ),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                              childAspectRatio: 0.58,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -349,6 +425,19 @@ class _CategoryPills extends ConsumerWidget {
     'sports-outdoors': Icons.sports_soccer_outlined,
   };
 
+  static const _shortNames = {
+    'pet-supplies': 'Pets',
+    'beauty-health': 'Beauty',
+    'tools-home-improvement': 'Tools',
+    'jewelry-accessories': 'Jewelry',
+    'sports-outdoors': 'Sports',
+    'baby-maternity': 'Baby',
+    'patio-lawn-garden': 'Garden',
+    'cell-phones-accessories': 'Phones',
+    'womens-clothing': 'Women',
+    'mens-clothing': 'Men',
+  };
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final categoriesAsync = ref.watch(categoriesProvider);
@@ -383,9 +472,12 @@ class _CategoryPills extends ConsumerWidget {
         }
         final cat = items[index];
         final icon = _icons[cat.handle] ?? Icons.category_outlined;
+        final shortName = lang == 'en'
+            ? (_shortNames[cat.handle] ?? cat.localizedName(lang))
+            : cat.localizedName(lang);
         return _CategoryPill(
           icon: icon,
-          name: cat.localizedName(lang),
+          name: shortName,
           onTap: () => context.router.push(
             CategoriesRoute(),
           ),
@@ -418,19 +510,21 @@ class _CategoryPill extends StatelessWidget {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: context.colors.surface,
+                color: context.colors.surfaceVariant,
                 shape: BoxShape.circle,
-                border: Border.all(color: context.colors.border),
+                border: Border.all(color: context.colors.border, width: 1.5),
               ),
-              child: Icon(icon, color: context.colors.primary, size: 24),
+              child: Icon(icon, color: context.colors.textPrimary, size: 22),
             ),
             SizedBox(height: 4),
             Text(
               name,
               style: TextStyle(
-                  color: context.colors.textSecondary, fontSize: 11),
+                  color: context.colors.textSecondary,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500),
               textAlign: TextAlign.center,
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
           ],
@@ -464,15 +558,13 @@ class _WaslaqTopNav extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
+                  // Bell — left
                   authState.maybeWhen(
-                    authenticated: (_, __, ___, ____, _____) => IconButton(
-                      icon: Icon(Icons.notifications_outlined,
-                          color: context.colors.textPrimary, size: 24),
-                      onPressed: () =>
-                          context.router.push(const NotificationsRoute()),
-                    ),
-                    orElse: () => SizedBox(width: 40),
+                    authenticated: (_, __, ___, ____, _____) =>
+                        const _BellIconWithBadge(),
+                    orElse: () => const SizedBox(width: 40),
                   ),
+                  // Brand — center
                   Expanded(
                     child: Center(
                       child: Text(
@@ -486,27 +578,58 @@ class _WaslaqTopNav extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  _AvatarDropdown(authState: authState),
+                  // Right: Wishlist & Cart horizontally aligned
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Wishlist (Heart)
+                      authState.maybeWhen(
+                        authenticated: (_, __, ___, ____, _____) => IconButton(
+                          icon: Icon(Icons.favorite_border,
+                              color: context.colors.textPrimary, size: 24),
+                          onPressed: () => context.router.push(const SavedItemsRoute()),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                        ),
+                        orElse: () => IconButton(
+                          icon: Icon(Icons.favorite_border,
+                              color: context.colors.textPrimary, size: 24),
+                          onPressed: () => context.router.push(const SignInRoute()),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      // Cart
+                      Consumer(
+                        builder: (context, ref, _) {
+                          final cartCount = ref.watch(cartItemCountProvider);
+                          return IconButton(
+                            icon: Badge(
+                              isLabelVisible: cartCount > 0,
+                              label: Text('$cartCount'),
+                              child: Icon(Icons.shopping_cart_outlined,
+                                  color: context.colors.textPrimary, size: 24),
+                            ),
+                            onPressed: () => context.router.push(const CartRoute()),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
           ),
           // ROW 2
           SizedBox(
-            height: 48,
+            height: 44,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Row(
                 children: [
-                  Builder(
-                    builder: (ctx) => IconButton(
-                      icon: Icon(Icons.menu, color: context.colors.textPrimary, size: 24),
-                      onPressed: () => Scaffold.of(ctx).openDrawer(),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-                    ),
-                  ),
-                  SizedBox(width: 4),
                   Expanded(
                     child: GestureDetector(
                       onTap: () => context.router.push(const SearchRoute()),
@@ -519,16 +642,15 @@ class _WaslaqTopNav extends ConsumerWidget {
                         ),
                         child: Row(
                           children: [
-                            SizedBox(width: 12),
+                            const SizedBox(width: 12),
                             Icon(Icons.search,
                                 color: context.colors.textSecondary, size: 18),
-                            SizedBox(width: 8),
+                            const SizedBox(width: 8),
                             Flexible(
                               child: Text(
                                 t.home.search_placeholder,
                                 style: TextStyle(
-                                    color: context.colors.textSecondary,
-                                    fontSize: 13),
+                                    color: context.colors.textSecondary, fontSize: 13),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
@@ -536,46 +658,6 @@ class _WaslaqTopNav extends ConsumerWidget {
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(width: 8),
-                  // Heart → Saved Items (auth-aware)
-                  authState.maybeWhen(
-                    authenticated: (_, __, ___, ____, _____) => IconButton(
-                      icon: Icon(Icons.favorite_border,
-                          color: context.colors.textSecondary, size: 22),
-                      onPressed: () =>
-                          context.router.push(const SavedItemsRoute()),
-                      padding: EdgeInsets.zero,
-                      constraints:
-                          const BoxConstraints(minWidth: 36, minHeight: 36),
-                    ),
-                    orElse: () => IconButton(
-                      icon: Icon(Icons.favorite_border,
-                          color: context.colors.textSecondary, size: 22),
-                      onPressed: () =>
-                          context.router.push(const SignInRoute()),
-                      padding: EdgeInsets.zero,
-                      constraints:
-                          const BoxConstraints(minWidth: 36, minHeight: 36),
-                    ),
-                  ),
-                  Consumer(
-                    builder: (context, ref, child) {
-                      final cartCount = ref.watch(cartItemCountProvider);
-                      return IconButton(
-                        icon: Badge(
-                          isLabelVisible: cartCount > 0,
-                          label: Text('$cartCount'),
-                          child: Icon(Icons.shopping_cart_outlined,
-                              color: context.colors.textSecondary, size: 22),
-                        ),
-                        onPressed: () =>
-                            context.router.push(const CartRoute()),
-                        padding: EdgeInsets.zero,
-                        constraints:
-                            const BoxConstraints(minWidth: 36, minHeight: 36),
-                      );
-                    },
                   ),
                 ],
               ),
@@ -652,18 +734,30 @@ class _WaslaqDrawerState extends ConsumerState<_WaslaqDrawer> {
       child: Column(children: [
         // STICKY HEADER
         Container(
-          padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 12, 20, 12),
+          height: MediaQuery.of(context).padding.top + 72,
+          padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top, 16, 0),
           decoration: BoxDecoration(border: Border(bottom: BorderSide(color: context.colors.border))),
           child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Text('WQ', style: TextStyle(color: context.colors.primary, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 2)),
+            GestureDetector(
+              onTap: () => _navRoute(const HomeRoute()),
+              behavior: HitTestBehavior.opaque,
+              child: Image.asset('assets/images/logo.png', height: 44, fit: BoxFit.contain),
+            ),
             if (isLoggedIn)
               authState.maybeWhen(
                 authenticated: (_, __, ___, avatarUrl, ____) => GestureDetector(
                   onTap: () => _navRoute(const AccountRoute()),
-                  child: CircleAvatar(
-                    radius: 18, backgroundColor: context.colors.primary,
-                    backgroundImage: avatarUrl != null ? CachedNetworkImageProvider(avatarUrl) : null,
-                    child: avatarUrl == null ? Icon(Icons.person, color: Colors.white, size: 18) : null,
+                  child: Container(
+                    padding: const EdgeInsets.all(1.5),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: context.colors.border),
+                    ),
+                    child: CircleAvatar(
+                      radius: 19, backgroundColor: context.colors.surfaceVariant,
+                      backgroundImage: avatarUrl != null ? CachedNetworkImageProvider(avatarUrl) : null,
+                      child: avatarUrl == null ? Icon(Icons.person, color: context.colors.textMuted, size: 20) : null,
+                    ),
                   ),
                 ),
                 orElse: () => SizedBox.shrink(),
@@ -691,11 +785,11 @@ class _WaslaqDrawerState extends ConsumerState<_WaslaqDrawer> {
 
           // ─── BROWSE ────────────────────────────────────────────
           _sectionLabel(t.home.drawer_browse),
-          _navItem(Icons.home_outlined, t.nav.home, () => _navRoute(const HomeRoute())),
-          _navItem(Icons.grid_view_outlined, t.nav.category, () => _navRoute(const CategoriesRoute())),
+          _navItem(Icons.home_outlined, t.nav.home, () => _navRoute(const HomeRoute()), activeName: 'HomeRoute'),
+          _navItem(Icons.grid_view_outlined, t.nav.category, () => _navRoute(const CategoriesRoute()), activeName: 'CategoriesRoute'),
           _navItem(Icons.trending_up, t.home.drawer_popular, null, disabled: true, badge: 'beta'),
           _navItem(Icons.newspaper_outlined, t.home.drawer_news, null, disabled: true, badge: 'beta'),
-          _navItem(Icons.favorite_border, t.nav.saved, () => isLoggedIn ? _navRoute(const SavedItemsRoute()) : _navRoute(const SignInRoute())),
+          _navItem(Icons.favorite_border, t.nav.saved, () => isLoggedIn ? _navRoute(const SavedItemsRoute()) : _navRoute(const SignInRoute()), activeName: 'SavedItemsRoute'),
           Divider(height: 1, indent: 16, endIndent: 16, color: context.colors.border),
 
           // ─── COMMUNITY (collapsible) ───────────────────────────
@@ -734,6 +828,7 @@ class _WaslaqDrawerState extends ConsumerState<_WaslaqDrawer> {
           if (_storesOpen) ...[
             _navItem(Icons.shopping_bag_outlined, t.vendor.store, () => _navRoute(StoreRoute())),
             _navItem(Icons.store_outlined, t.home.drawer_browse_stores, () => _navRoute(const BrowseStoresRoute())),
+            _navItem(Icons.favorite_border_rounded, 'Following Stores', () => _navRoute(const FollowingStoresRoute())),
             if (_isVendor && _vendorSlug != null)
               _navItem(Icons.store_outlined, t.home.drawer_my_store, () => _navRoute(VendorProfileRoute(slug: _vendorSlug!)), iconColor: context.colors.primary, labelColor: context.colors.primary)
             else if (isLoggedIn)
@@ -753,8 +848,8 @@ class _WaslaqDrawerState extends ConsumerState<_WaslaqDrawer> {
           // ─── ACCOUNT ───────────────────────────────────────────
           if (isLoggedIn) ...[
             _sectionLabel(t.home.drawer_account),
-            _navItem(Icons.settings_outlined, t.account.settings, () => _navRoute(const SettingsRoute())),
-            _navItem(Icons.notifications_none, t.account.notifications, () => _navRoute(const NotificationsRoute())),
+            _navItem(Icons.settings_outlined, t.account.settings, () => _navRoute(const SettingsRoute()), activeName: 'SettingsRoute'),
+            _navItem(Icons.notifications_none, t.account.notifications, () => _navRoute(const NotificationsRoute()), activeName: 'NotificationsRoute'),
             Divider(height: 1, indent: 16, endIndent: 16, color: context.colors.border),
           ],
 
@@ -808,16 +903,26 @@ class _WaslaqDrawerState extends ConsumerState<_WaslaqDrawer> {
       ])),
   );
 
-  Widget _navItem(IconData icon, String label, VoidCallback? onTap, {bool disabled = false, String? badge, Color? iconColor, Color? labelColor, bool small = false}) {
+  Widget _navItem(IconData icon, String label, VoidCallback? onTap, {bool disabled = false, String? badge, Color? iconColor, Color? labelColor, bool small = false, String? activeName}) {
+    final isActive = activeName != null && context.router.current.name == activeName;
+    final fg = isActive
+        ? context.colors.primary
+        : (disabled ? context.colors.textMuted : (labelColor ?? context.colors.textPrimary));
+    final ic = isActive
+        ? context.colors.primary
+        : (disabled ? context.colors.border : (iconColor ?? context.colors.textSecondary));
     return InkWell(
       onTap: disabled ? null : onTap,
-      child: Padding(
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 44),
+        alignment: Alignment.centerLeft,
+        color: isActive ? context.colors.primary.withValues(alpha: 0.10) : Colors.transparent,
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: small ? 8 : 10),
         child: Row(children: [
-          Icon(icon, size: 20, color: disabled ? context.colors.border : (iconColor ?? context.colors.textSecondary)),
+          Icon(icon, size: 20, color: ic),
           SizedBox(width: 12),
-          Text(label, style: TextStyle(fontSize: 14, color: disabled ? context.colors.textMuted : (labelColor ?? context.colors.textPrimary),
-              fontWeight: (iconColor != null || labelColor != null) ? FontWeight.w600 : FontWeight.normal)),
+          Text(label, style: TextStyle(fontSize: 14, color: fg,
+              fontWeight: (isActive || iconColor != null || labelColor != null) ? FontWeight.w600 : FontWeight.normal)),
           if (badge != null) ...[
             SizedBox(width: 8),
             Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -993,6 +1098,304 @@ class _LangBtn extends StatelessWidget {
               fontSize: 12,
               fontWeight: active ? FontWeight.bold : FontWeight.normal,
             )),
+      ),
+    );
+  }
+}
+
+// ── Home section header ────────────────────────────────────────────────────
+
+class _HomeSectionHeader extends StatelessWidget {
+  final String title;
+  final VoidCallback? onSeeAll;
+
+  const _HomeSectionHeader({required this.title, this.onSeeAll});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
+      child: Row(
+        children: [
+          Container(
+            width: 3,
+            height: 18,
+            decoration: BoxDecoration(
+              color: context.colors.primary.withOpacity(0.7),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            title,
+            style: TextStyle(
+              color: context.colors.textPrimary,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const Spacer(),
+          if (onSeeAll != null)
+            GestureDetector(
+              onTap: onSeeAll,
+              child: Text(
+                t.common.view_all,
+                style: TextStyle(
+                  color: context.colors.primary.withOpacity(0.8),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Discussions section — 2-3 PostCards from global hot feed ─────────────────
+
+class _DiscussionsSection extends ConsumerWidget {
+  const _DiscussionsSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final postsAsync = ref.watch(_homeFeedPostsProvider);
+
+    return postsAsync.when(
+      loading: () => Column(
+        children: List.generate(
+          2,
+          (_) => Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            child: Container(
+              height: 100,
+              decoration: BoxDecoration(
+                color: context.colors.surfaceVariant,
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ),
+      ),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (posts) {
+        if (posts.isEmpty) return const SizedBox.shrink();
+        final preview = posts.take(2).toList();
+        return Column(
+          children: preview
+              .map((post) => PostCard(
+                    post: post,
+                    onTap: () => context.router.push(
+                      PostDetailRoute(
+                        community: post.communitySlug.isNotEmpty
+                            ? post.communitySlug
+                            : 'all',
+                        postId: post.id,
+                      ),
+                    ),
+                    onAuthorTap: (userId) =>
+                        context.router.push(UserProfileRoute(userId: userId)),
+                    onVote: null,
+                  ))
+              .toList(),
+        );
+      },
+    );
+  }
+}
+
+// ── Stores section — horizontal scroll ───────────────────────────────────────
+
+class _StoresSection extends ConsumerWidget {
+  const _StoresSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final storesAsync = ref.watch(_homeStoresProvider);
+
+    return storesAsync.when(
+      loading: () => SizedBox(
+        height: 100,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          itemCount: 4,
+          itemBuilder: (_, __) => Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Container(
+              width: 80,
+              decoration: BoxDecoration(
+                color: context.colors.surfaceVariant,
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ),
+      ),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (stores) {
+        if (stores.isEmpty) return const SizedBox.shrink();
+        return SizedBox(
+          height: 108,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            itemCount: stores.length,
+            itemBuilder: (ctx, i) {
+              final v = stores[i];
+              final name = v['store_name'] as String? ?? 'Store';
+              final logo = v['logo_url'] as String?;
+              final slug = v['slug'] as String?;
+              final rating = double.tryParse('${v['avg_rating'] ?? 0}') ?? 0;
+
+              return GestureDetector(
+                onTap: () {
+                  if (slug != null) {
+                    context.router.push(VendorProfileRoute(slug: slug));
+                  }
+                },
+                child: Container(
+                  width: 80,
+                  margin: const EdgeInsets.only(right: 12),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: context.colors.primary,
+                          border: Border.all(color: context.colors.border),
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: logo != null
+                            ? CachedNetworkImage(
+                                imageUrl: logo,
+                                fit: BoxFit.cover,
+                                errorWidget: (_, __, ___) => Center(
+                                  child: Text(
+                                    name.isNotEmpty
+                                        ? name[0].toUpperCase()
+                                        : 'S',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Center(
+                                child: Text(
+                                  name.isNotEmpty ? name[0].toUpperCase() : 'S',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                              ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: context.colors.textPrimary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.star_rounded, color: Colors.amber, size: 11),
+                          const SizedBox(width: 2),
+                          Text(
+                            rating.toStringAsFixed(1),
+                            style: TextStyle(
+                              color: context.colors.textMuted,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ── Bell icon with unread-notification badge ─────────────────────────────────
+// Refreshes badge count:
+//   • Instantly on foreground FCM (via notification_bus.dart)
+//   • On app resume from background (WidgetsBindingObserver)
+//   • On navigation to/from NotificationsScreen (invalidate in that screen)
+
+class _BellIconWithBadge extends ConsumerStatefulWidget {
+  const _BellIconWithBadge();
+
+  @override
+  ConsumerState<_BellIconWithBadge> createState() => _BellIconWithBadgeState();
+}
+
+class _BellIconWithBadgeState extends ConsumerState<_BellIconWithBadge>
+    with WidgetsBindingObserver {
+
+  void _onNewNotification() {
+    if (mounted) ref.invalidate(notificationsProvider);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    addNotifRefreshListener(_onNewNotification);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    removeNotifRefreshListener(_onNewNotification);
+    super.dispose();
+  }
+
+  /// Refresh badge when app returns from background (e.g. user tapped push
+  /// notification from system tray — new notification may have arrived).
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && mounted) {
+      ref.invalidate(notificationsProvider);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final unreadCount = ref.watch(notificationsProvider).valueOrNull
+            ?.where((n) => !n.isRead)
+            .length ??
+        0;
+    return Badge(
+      isLabelVisible: unreadCount > 0,
+      label: Text('$unreadCount'),
+      backgroundColor: context.colors.error,
+      child: IconButton(
+        icon: Icon(Icons.notifications_outlined,
+            color: context.colors.textPrimary, size: 24),
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+        onPressed: () => context.router.push(const NotificationsRoute()),
       ),
     );
   }

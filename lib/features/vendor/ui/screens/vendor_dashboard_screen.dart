@@ -451,10 +451,14 @@ class _ProductsTabState extends ConsumerState<_ProductsTab> {
         if (!_showForm)
           Positioned(
             bottom: 20, right: 20,
-            child: FloatingActionButton(
+            child: FloatingActionButton.small(
               onPressed: () => setState(() => _showForm = true),
               backgroundColor: context.colors.primary,
-              child: const Icon(Icons.add, color: Colors.white),
+              foregroundColor: Colors.white,
+              elevation: 1.0,
+              highlightElevation: 1.5,
+              shape: const CircleBorder(),
+              child: const Icon(Icons.add, color: Colors.white, size: 18),
             ),
           ),
       ]),

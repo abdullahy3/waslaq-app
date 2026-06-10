@@ -48,6 +48,63 @@ class AccountRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [AccountSettingsScreen]
+class AccountSettingsRoute extends PageRouteInfo<void> {
+  const AccountSettingsRoute({List<PageRouteInfo>? children})
+      : super(
+          AccountSettingsRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'AccountSettingsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const AccountSettingsScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [AddressBookScreen]
+class AddressBookRoute extends PageRouteInfo<void> {
+  const AddressBookRoute({List<PageRouteInfo>? children})
+      : super(
+          AddressBookRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'AddressBookRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const AddressBookScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [AppInfoSettingsScreen]
+class AppInfoSettingsRoute extends PageRouteInfo<void> {
+  const AppInfoSettingsRoute({List<PageRouteInfo>? children})
+      : super(
+          AppInfoSettingsRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'AppInfoSettingsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const AppInfoSettingsScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [AppShellPage]
 class Shell extends PageRouteInfo<void> {
   const Shell({List<PageRouteInfo>? children})
@@ -62,6 +119,25 @@ class Shell extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const AppShellPage();
+    },
+  );
+}
+
+/// generated route for
+/// [AppearanceSettingsScreen]
+class AppearanceSettingsRoute extends PageRouteInfo<void> {
+  const AppearanceSettingsRoute({List<PageRouteInfo>? children})
+      : super(
+          AppearanceSettingsRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'AppearanceSettingsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const AppearanceSettingsScreen();
     },
   );
 }
@@ -299,19 +375,43 @@ class ContactRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [ContentSettingsScreen]
+class ContentSettingsRoute extends PageRouteInfo<void> {
+  const ContentSettingsRoute({List<PageRouteInfo>? children})
+      : super(
+          ContentSettingsRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'ContentSettingsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ContentSettingsScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [CreatePostScreen]
 class CreatePostRoute extends PageRouteInfo<CreatePostRouteArgs> {
   CreatePostRoute({
     Key? key,
     String? communitySlug,
+    String? prefilledProductId,
     List<PageRouteInfo>? children,
   }) : super(
           CreatePostRoute.name,
           args: CreatePostRouteArgs(
             key: key,
             communitySlug: communitySlug,
+            prefilledProductId: prefilledProductId,
           ),
-          rawQueryParams: {'community': communitySlug},
+          rawQueryParams: {
+            'community': communitySlug,
+            'productId': prefilledProductId,
+          },
           initialChildren: children,
         );
 
@@ -323,10 +423,13 @@ class CreatePostRoute extends PageRouteInfo<CreatePostRouteArgs> {
       final queryParams = data.queryParams;
       final args = data.argsAs<CreatePostRouteArgs>(
           orElse: () => CreatePostRouteArgs(
-              communitySlug: queryParams.optString('community')));
+                communitySlug: queryParams.optString('community'),
+                prefilledProductId: queryParams.optString('productId'),
+              ));
       return CreatePostScreen(
         key: args.key,
         communitySlug: args.communitySlug,
+        prefilledProductId: args.prefilledProductId,
       );
     },
   );
@@ -336,16 +439,38 @@ class CreatePostRouteArgs {
   const CreatePostRouteArgs({
     this.key,
     this.communitySlug,
+    this.prefilledProductId,
   });
 
   final Key? key;
 
   final String? communitySlug;
 
+  final String? prefilledProductId;
+
   @override
   String toString() {
-    return 'CreatePostRouteArgs{key: $key, communitySlug: $communitySlug}';
+    return 'CreatePostRouteArgs{key: $key, communitySlug: $communitySlug, prefilledProductId: $prefilledProductId}';
   }
+}
+
+/// generated route for
+/// [ExploreScreen]
+class ExploreRoute extends PageRouteInfo<void> {
+  const ExploreRoute({List<PageRouteInfo>? children})
+      : super(
+          ExploreRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'ExploreRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ExploreScreen();
+    },
+  );
 }
 
 /// generated route for
@@ -387,6 +512,25 @@ class FeedbackRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [FollowingStoresScreen]
+class FollowingStoresRoute extends PageRouteInfo<void> {
+  const FollowingStoresRoute({List<PageRouteInfo>? children})
+      : super(
+          FollowingStoresRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'FollowingStoresRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const FollowingStoresScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [HomeScreen]
 class HomeRoute extends PageRouteInfo<void> {
   const HomeRoute({List<PageRouteInfo>? children})
@@ -420,6 +564,25 @@ class MessagesRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const MessagesScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [NotificationSettingsScreen]
+class NotificationSettingsRoute extends PageRouteInfo<void> {
+  const NotificationSettingsRoute({List<PageRouteInfo>? children})
+      : super(
+          NotificationSettingsRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'NotificationSettingsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const NotificationSettingsScreen();
     },
   );
 }
@@ -599,6 +762,25 @@ class PrivacyPolicyRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [PrivacySettingsScreen]
+class PrivacySettingsRoute extends PageRouteInfo<void> {
+  const PrivacySettingsRoute({List<PageRouteInfo>? children})
+      : super(
+          PrivacySettingsRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'PrivacySettingsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const PrivacySettingsScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [ProductScreen]
 class ProductRoute extends PageRouteInfo<ProductRouteArgs> {
   ProductRoute({
@@ -645,6 +827,44 @@ class ProductRouteArgs {
   String toString() {
     return 'ProductRouteArgs{key: $key, id: $id}';
   }
+}
+
+/// generated route for
+/// [ProfileSettingsScreen]
+class ProfileSettingsRoute extends PageRouteInfo<void> {
+  const ProfileSettingsRoute({List<PageRouteInfo>? children})
+      : super(
+          ProfileSettingsRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'ProfileSettingsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ProfileSettingsScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [RefundDetailsScreen]
+class RefundDetailsRoute extends PageRouteInfo<void> {
+  const RefundDetailsRoute({List<PageRouteInfo>? children})
+      : super(
+          RefundDetailsRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'RefundDetailsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const RefundDetailsScreen();
+    },
+  );
 }
 
 /// generated route for
@@ -762,6 +982,25 @@ class SignUpRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [StorageSettingsScreen]
+class StorageSettingsRoute extends PageRouteInfo<void> {
+  const StorageSettingsRoute({List<PageRouteInfo>? children})
+      : super(
+          StorageSettingsRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'StorageSettingsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const StorageSettingsScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [StoreScreen]
 class StoreRoute extends PageRouteInfo<StoreRouteArgs> {
   StoreRoute({
@@ -806,6 +1045,25 @@ class StoreRouteArgs {
   String toString() {
     return 'StoreRouteArgs{key: $key, categoryId: $categoryId}';
   }
+}
+
+/// generated route for
+/// [SupportSettingsScreen]
+class SupportSettingsRoute extends PageRouteInfo<void> {
+  const SupportSettingsRoute({List<PageRouteInfo>? children})
+      : super(
+          SupportSettingsRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'SupportSettingsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const SupportSettingsScreen();
+    },
+  );
 }
 
 /// generated route for
@@ -947,4 +1205,23 @@ class VendorProfileRouteArgs {
   String toString() {
     return 'VendorProfileRouteArgs{key: $key, slug: $slug}';
   }
+}
+
+/// generated route for
+/// [VendorSettingsScreen]
+class VendorSettingsRoute extends PageRouteInfo<void> {
+  const VendorSettingsRoute({List<PageRouteInfo>? children})
+      : super(
+          VendorSettingsRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'VendorSettingsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const VendorSettingsScreen();
+    },
+  );
 }

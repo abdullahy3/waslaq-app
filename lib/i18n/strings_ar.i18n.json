@@ -10,12 +10,20 @@
     "stores": "المتاجر",
     "browse_all_stores": "تصفح جميع المتاجر",
     "my_store": "متجري",
-    "account": "الحساب",
+    "account": "حسابي",
     "info": "المعلومات",
     "about_waslaq": "عن واصلك",
     "contact_us": "اتصل بنا",
     "feedback": "ملاحظات",
-    "create_community": "إنشاء مجتمع"
+    "create_community": "إنشاء مجتمع",
+    "explore": "اكتشف"
+  },
+  "explore": {
+    "products": "المنتجات",
+    "communities": "المجتمعات",
+    "stores": "المتاجر",
+    "browse_categories": "تصفح الفئات",
+    "popular_searches": "عمليات البحث الشائعة"
   },
   "auth": {
     "sign_in": "تسجيل الدخول",
@@ -119,10 +127,19 @@
     "sign_in_desc": "سجّل الدخول للاطلاع على حسابك\nوطلباتك ورسائلك.",
     "sign_in_btn": "تسجيل الدخول",
     "create_account_btn": "إنشاء حساب",
-    "failed_load_orders": "فشل تحميل الطلبات"
+    "failed_load_orders": "فشل تحميل الطلبات",
+    "section_shopping": "التسوق",
+    "section_community": "المجتمع",
+    "section_communities": "مجتمعاتي",
+    "section_vendor": "البائع",
+    "section_settings": "الإعدادات",
+    "section_legal": "قانوني",
+    "following_stores_label": "المتاجر المتابعة"
   },
   "product": {
     "add_to_cart": "أضف إلى سلة التسوق",
+    "sold": "تم بيع ${count}",
+    "no_seller": "بائع محلي",
     "buy_now": "اشترِ الآن",
     "save": "حفظ",
     "saved": "تم الحفظ",
@@ -184,7 +201,8 @@
     "failed_submit_question": "فشل تقديم السؤال",
     "added_to_cart_success": "تمت الإضافة إلى العربة ✓",
     "failed_add_to_cart": "فشل الإضافة إلى العربة",
-    "share_product": "شاهد هذا المنتج على وصلك: ${title}\n${url}"
+    "share_product": "شاهد هذا المنتج على واصلك: ${title}\n${url}",
+    "community_discussions": "مناقشات المجتمع"
   },
   "vendor": {
     "store": "متجر",
@@ -235,6 +253,7 @@
     "no_questions_yet": "لا توجد أسئلة بعد",
     "awaiting_response": "في انتظار رد البائع...",
     "no_reviews_yet": "لا توجد تقييمات بعد",
+    "no_stores_yet": "لا توجد متاجر بعد",
     "rating_out_of_five": "${rating}/5",
     "no_policies_yet": "لم يتم نشر أي سياسات بعد",
     "shipping_policy": "سياسة الشحن",
@@ -364,7 +383,8 @@
     "joined_checkmark": "تم الانضمام ✓",
     "error_loading_posts": "خطأ في تحميل المنشورات: ${error}",
     "explore_communities": "استكشف المجتمعات",
-    "no_communities_found": "لم يتم العثور على مجتمعات"
+    "no_communities_found": "لم يتم العثور على مجتمعات",
+    "error_loading": "خطأ في التحميل"
   },
   "messages": {
     "messages": "الرسائل",
@@ -494,7 +514,9 @@
     "drawer_about": "حول WaslaQ",
     "drawer_contact": "اتصل بنا",
     "drawer_feedback": "ملاحظات",
-    "drawer_legal": "قانوني"
+    "drawer_legal": "قانوني",
+    "trending_discussions": "نقاشات رائجة",
+    "more_products": "المزيد من المنتجات"
   },
   "footer": {
     "privacy_policy": "سياسة الخصوصية",
@@ -1590,7 +1612,7 @@
     "hours_short": "${n}س",
     "minutes_short": "${n}د",
     "now_short": "الآن",
-    "share_post": "شاهد هذا المنشور على وصلك: ${title}\n${url}"
+    "share_post": "شاهد هذا المنشور على واصلك: ${title}\n${url}"
   },
   "store": {
     "title": "المتجر",
@@ -1704,5 +1726,14 @@
   "legal": {
     "privacy_policy_title": "سياسة الخصوصية",
     "terms_title": "شروط الخدمة"
+  },
+  "create_post": {
+    "sheet_title": "ماذا تريد أن تنشر؟",
+    "general_post": "منشور عام",
+    "community_post": "نشر داخل مجتمع",
+    "community_post_in": "نشر في r/${slug}",
+    "share_product": "مشاركة منتج",
+    "share_product_named": "مشاركة: ${title}",
+    "ask_product": "سؤال عن منتج"
   }
 }

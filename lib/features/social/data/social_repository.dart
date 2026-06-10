@@ -166,6 +166,40 @@ class SocialRepository {
     }
   }
 
+  Future<void> markAllNotificationsRead() async {
+    try {
+      await _socialClient.patch('/store/social/notifications');
+    } catch (_) {}
+  }
+
+  Future<List<Map<String, dynamic>>> getFollowingStores() async {
+    try {
+      final response = await _socialClient.get('/store/social/following-stores');
+      final stores = response.data['stores'] as List<dynamic>? ?? [];
+      return stores.cast<Map<String, dynamic>>();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<bool> toggleStoreFollow(String vendorCustomerId) async {
+    try {
+      final response = await _socialClient.post('/store/social/follow/$vendorCustomerId');
+      return response.data['following'] as bool? ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<bool> toggleStoreNotifications(String vendorCustomerId) async {
+    try {
+      final response = await _socialClient.patch('/store/social/follow/$vendorCustomerId');
+      return response.data['notificationsEnabled'] as bool? ?? true;
+    } catch (_) {
+      return true;
+    }
+  }
+
   Future<void> markNotificationRead(String notifId) async {
     try {
       await _socialClient.post('/store/social/notifications/$notifId/read');
@@ -175,6 +209,9 @@ class SocialRepository {
   }
 
   Exception _handleDioError(DioException e) {
+    if (e.error is AppException) {
+      return e.error as AppException;
+    }
     final message = (e.response?.data is Map)
         ? (e.response?.data as Map)['message']?.toString()
         : null;

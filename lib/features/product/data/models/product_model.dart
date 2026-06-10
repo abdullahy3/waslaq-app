@@ -13,6 +13,8 @@ class ProductModel {
   final String? categoryName;
   final ProductVendor? vendor;
   final bool isDigital;
+  final double? avgRating;
+  final int? soldCount;
 
   const ProductModel({
     required this.id,
@@ -26,6 +28,8 @@ class ProductModel {
     this.categoryName,
     this.vendor,
     this.isDigital = false,
+    this.avgRating,
+    this.soldCount,
   });
 
   /// Get lowest price across all variants.
@@ -68,6 +72,12 @@ class ProductModel {
         metadata?['is_digital'] == true ||
         metadata?['is_digital'] == 'true';
 
+    final avgRating = (json['avg_rating'] as num?)?.toDouble()
+        ?? (metadata?['avg_rating'] as num?)?.toDouble();
+    final soldCount = (json['sales_count'] as num?)?.toInt()
+        ?? (metadata?['sales_count'] as num?)?.toInt()
+        ?? (json['sold_count'] as num?)?.toInt();
+
     // Categories — first element from categories array
     final categories = json['categories'] as List?;
     final firstCat = categories?.isNotEmpty == true
@@ -86,6 +96,8 @@ class ProductModel {
       categoryName: firstCat?['name'] as String?,
       vendor: vendor,
       isDigital: isDigital,
+      avgRating: avgRating,
+      soldCount: soldCount,
     );
   }
 }

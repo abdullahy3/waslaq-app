@@ -219,6 +219,9 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                       onTap: () => context.pushRoute(PostDetailRoute(
                           community: post.communitySlug.isNotEmpty ? post.communitySlug : 'all', postId: post.id)),
                       onAuthorTap: (userId) => context.pushRoute(UserProfileRoute(userId: userId)),
+                      onVote: (direction) {
+                        ref.read(feedPostsNotifierProvider(sort: _sort).notifier).votePost(post.id, direction);
+                      },
                     );
                   },
                   childCount: posts.length + 1,
@@ -243,11 +246,6 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
           ],
         ),
       ),
-      floatingActionButton: isLoggedIn ? FloatingActionButton(
-        onPressed: () => context.router.push(CreatePostRoute()),
-        backgroundColor: context.colors.primary, elevation: 4,
-        child: const Icon(Icons.edit, color: Colors.white),
-      ) : null,
     );
   }
 

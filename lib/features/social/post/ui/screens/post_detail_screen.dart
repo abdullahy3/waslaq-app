@@ -240,29 +240,73 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                               // Footer / Vote row
                               Row(
                                 children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      ref.read(socialRepositoryProvider).votePost(post.id, 1);
-                                      ref.invalidate(postProvider(widget.postId));
-                                    },
-                                    child: Icon(Icons.keyboard_arrow_up, color: context.colors.textMuted, size: 24),
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    '${post.score}',
-                                    style: TextStyle(
-                                      color: post.score > 0 ? context.colors.upvote : post.score < 0 ? context.colors.downvote : context.colors.textMuted,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: context.colors.surfaceVariant,
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
-                                  ),
-                                  SizedBox(width: 8),
-                                  GestureDetector(
-                                    onTap: () {
-                                      ref.read(socialRepositoryProvider).votePost(post.id, -1);
-                                      ref.invalidate(postProvider(widget.postId));
-                                    },
-                                    child: Icon(Icons.keyboard_arrow_down, color: context.colors.textMuted, size: 24),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () async {
+                                            await ref.read(socialRepositoryProvider).votePost(post.id, 1);
+                                            ref.invalidate(postProvider(widget.postId));
+                                            ref.invalidate(feedPostsNotifierProvider);
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8),
+                                            child: Icon(
+                                              Icons.arrow_upward_rounded,
+                                              color: post.userVote == 1 ? context.colors.upvote : context.colors.textMuted,
+                                              size: 18,
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsetsDirectional.only(end: 8),
+                                          child: Text(
+                                            '${post.upvotes}',
+                                            style: TextStyle(
+                                              color: post.userVote == 1 ? context.colors.upvote : context.colors.textMuted,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          width: 1,
+                                          height: 14,
+                                          color: context.colors.textMuted.withValues(alpha: 0.2),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () async {
+                                            await ref.read(socialRepositoryProvider).votePost(post.id, -1);
+                                            ref.invalidate(postProvider(widget.postId));
+                                            ref.invalidate(feedPostsNotifierProvider);
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8),
+                                            child: Icon(
+                                              Icons.arrow_downward_rounded,
+                                              color: post.userVote == -1 ? context.colors.downvote : context.colors.textMuted,
+                                              size: 18,
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsetsDirectional.only(end: 10),
+                                          child: Text(
+                                            '${post.downvotes}',
+                                            style: TextStyle(
+                                              color: post.userVote == -1 ? context.colors.downvote : context.colors.textMuted,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                   SizedBox(width: 16),
                                   if (post.communitySlug.isNotEmpty)

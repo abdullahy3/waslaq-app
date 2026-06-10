@@ -4,11 +4,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../features/auth/ui/screens/sign_in_screen.dart';
 import '../features/auth/ui/screens/sign_up_screen.dart';
 import '../features/home/ui/screens/home_screen.dart';
+import '../features/home/ui/screens/explore_screen.dart';
 import '../features/home/ui/screens/search_screen.dart';
 import '../features/home/ui/screens/categories_screen.dart';
 import '../features/cart/ui/screens/cart_screen.dart';
 import '../features/account/ui/screens/account_screen.dart';
 import '../features/account/ui/screens/settings_screen.dart';
+import '../features/account/ui/screens/settings/profile_settings_screen.dart';
+import '../features/account/ui/screens/settings/account_settings_screen.dart';
+import '../features/account/ui/screens/settings/address_book_screen.dart';
+import '../features/account/ui/screens/settings/refund_details_screen.dart';
+import '../features/account/ui/screens/settings/privacy_settings_screen.dart';
+import '../features/account/ui/screens/settings/notification_settings_screen.dart';
+import '../features/account/ui/screens/settings/content_settings_screen.dart';
+import '../features/account/ui/screens/settings/appearance_settings_screen.dart';
+import '../features/account/ui/screens/settings/storage_settings_screen.dart';
+import '../features/account/ui/screens/settings/app_info_settings_screen.dart';
+import '../features/account/ui/screens/settings/support_settings_screen.dart';
+import '../features/account/ui/screens/settings/vendor_settings_screen.dart';
 import '../features/account/ui/screens/saved_items_screen.dart';
 import '../features/product/ui/screens/product_screen.dart';
 import '../features/social/community/ui/screens/community_screen.dart';
@@ -18,6 +31,7 @@ import '../features/social/post/ui/screens/post_detail_screen.dart';
 import '../features/social/post/ui/screens/create_post_screen.dart';
 import '../features/account/ui/screens/user_profile_screen.dart';
 import '../features/vendor/ui/screens/vendor_profile_screen.dart';
+import '../features/vendor/ui/screens/following_stores_screen.dart';
 import '../features/vendor/ui/screens/vendor_dashboard_screen.dart';
 import '../features/vendor/ui/screens/become_vendor_screen.dart';
 import '../features/home/ui/screens/store_screen.dart';
@@ -53,9 +67,9 @@ class AppRouter extends RootStackRouter {
       path: '/',
       children: [
         AutoRoute(page: HomeRoute.page, path: ''),
-        AutoRoute(page: CategoriesRoute.page, path: 'categories'),
-        AutoRoute(page: FeedRoute.page, path: 'community'),
+        AutoRoute(page: ExploreRoute.page, path: 'explore'),
         AutoRoute(page: MessagesRoute.page, path: 'messages'),
+        AutoRoute(page: AccountRoute.page, path: 'account'),
       ],
     ),
 
@@ -76,6 +90,7 @@ class AppRouter extends RootStackRouter {
 
     // Vendor
     AutoRoute(page: VendorProfileRoute.page, path: '/vendors/:slug'),
+    AutoRoute(page: FollowingStoresRoute.page, path: '/following-stores'),
     AutoRoute(page: BecomeVendorRoute.page, path: '/vendor/apply'),
     AutoRoute(page: StoreRoute.page, path: '/store'),
     AutoRoute(page: BrowseStoresRoute.page, path: '/vendors'),
@@ -93,6 +108,18 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: MessagesRoute.page, path: '/account/messages'),
     AutoRoute(page: OrdersRoute.page, path: '/account/orders'),
     AutoRoute(page: SettingsRoute.page, path: '/account/settings'),
+    AutoRoute(page: ProfileSettingsRoute.page, path: '/settings/profile'),
+    AutoRoute(page: AccountSettingsRoute.page, path: '/settings/account'),
+    AutoRoute(page: AddressBookRoute.page, path: '/settings/addresses'),
+    AutoRoute(page: RefundDetailsRoute.page, path: '/settings/refund'),
+    AutoRoute(page: PrivacySettingsRoute.page, path: '/settings/privacy'),
+    AutoRoute(page: NotificationSettingsRoute.page, path: '/settings/notifications'),
+    AutoRoute(page: ContentSettingsRoute.page, path: '/settings/content'),
+    AutoRoute(page: AppearanceSettingsRoute.page, path: '/settings/appearance'),
+    AutoRoute(page: StorageSettingsRoute.page, path: '/settings/storage'),
+    AutoRoute(page: AppInfoSettingsRoute.page, path: '/settings/app'),
+    AutoRoute(page: SupportSettingsRoute.page, path: '/settings/support'),
+    AutoRoute(page: VendorSettingsRoute.page, path: '/settings/vendor'),
     AutoRoute(page: VendorDashboardRoute.page, path: '/account/vendor'),
     AutoRoute(page: NotificationsRoute.page, path: '/notifications'),
     AutoRoute(page: SavedItemsRoute.page, path: '/account/saved'),

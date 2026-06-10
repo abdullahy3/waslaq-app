@@ -118,32 +118,15 @@ class _OrderTile extends StatelessWidget {
   final VoidCallback onTap;
   const _OrderTile({required this.order, required this.onTap});
 
-  Color _statusColor(BuildContext context) {
-    switch (order.status.toLowerCase()) {
-      case 'completed':
-      case 'fulfilled':
-      case 'captured':
-        return context.colors.success;
-      case 'cancelled':
-      case 'failed':
-      case 'rejected':
-        return context.colors.error;
-      case 'pending':
-      case 'not_fulfilled':
-      case 'partially_fulfilled':
-      case 'partially_captured':
-        return context.colors.warning;
-      case 'shipped':
-        return context.colors.primary;
-      default:
-        return context.colors.textMuted;
-    }
-  }
+  // Two-state vendor flow (mirrors web): 'shipped' => Delivered (green),
+  // anything else => Processing (amber).
+  bool get _delivered => order.fulfillmentStatus.toLowerCase() == 'shipped';
 
-  String _statusLabel() {
-    final s = order.status;
-    return s[0].toUpperCase() + s.substring(1);
-  }
+  Color _statusColor(BuildContext context) =>
+      _delivered ? context.colors.success : context.colors.warning;
+
+  String _statusLabel() =>
+      _delivered ? t.account.delivered : t.account.processing;
 
   String _timeAgo(BuildContext context) {
     final diff = DateTime.now().difference(order.createdAt);

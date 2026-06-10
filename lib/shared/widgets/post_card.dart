@@ -85,32 +85,32 @@ class PostCard extends ConsumerWidget {
                   ),
                   SizedBox(width: 6),
                   Text(post.author?.displayName ?? 'Unknown',
-                      style: TextStyle(color: context.colors.textSecondary, fontSize: 12, fontWeight: FontWeight.w600)),
+                      style: TextStyle(color: context.colors.textSecondary, fontSize: 11, fontWeight: FontWeight.w500)),
                 ]),
               ),
               SizedBox(width: 6),
               Text('·', style: TextStyle(color: context.colors.textMuted.withValues(alpha: 0.5), fontSize: 10)),
               SizedBox(width: 6),
               Text(_timeAgo(post.createdAt),
-                  style: TextStyle(color: context.colors.textMuted.withValues(alpha: 0.7), fontSize: 11)),
+                  style: TextStyle(color: context.colors.textMuted, fontSize: 10)),
             ]),
           ),
 
           // ─── TITLE ─────────────────────────────────
           Padding(
-            padding: const EdgeInsets.fromLTRB(14, 10, 14, 0),
+            padding: const EdgeInsets.fromLTRB(14, 8, 14, 0),
             child: Text(post.title,
-                style: TextStyle(color: context.colors.textPrimary, fontSize: 15, fontWeight: FontWeight.w700, height: 1.3),
+                style: TextStyle(color: context.colors.textPrimary, fontSize: 15, fontWeight: FontWeight.w800, height: 1.3),
                 maxLines: 3, overflow: TextOverflow.ellipsis),
           ),
 
           // ─── CONTENT PREVIEW ───────────────────────
           if (post.contentType == 'TEXT' && post.content.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.fromLTRB(14, 6, 14, 0),
+              padding: const EdgeInsets.fromLTRB(14, 5, 14, 0),
               child: Text(post.content,
-                  style: TextStyle(color: context.colors.textSecondary.withValues(alpha: 0.85), fontSize: 13, height: 1.45),
-                  maxLines: 3, overflow: TextOverflow.ellipsis),
+                  style: TextStyle(color: context.colors.textMuted, fontSize: 12, height: 1.4),
+                  maxLines: 2, overflow: TextOverflow.ellipsis),
             ),
 
           // ─── IMAGE ─────────────────────────────────
@@ -142,24 +142,49 @@ class PostCard extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(6, 8, 14, 8),
             child: Row(children: [
-              // Vote capsule
               Container(
                 decoration: BoxDecoration(
                   color: context.colors.surfaceVariant,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  _VoteButton(icon: Icons.arrow_upward_rounded, onTap: () => onVote?.call(1),
-                      color: post.score > 0 ? context.colors.upvote : context.colors.textMuted),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 2),
-                    child: Text('${post.score}',
-                        style: TextStyle(
-                          color: post.score > 0 ? context.colors.upvote : post.score < 0 ? context.colors.downvote : context.colors.textMuted,
-                          fontSize: 12, fontWeight: FontWeight.w800)),
+                  _VoteButton(
+                    icon: Icons.arrow_upward_rounded,
+                    onTap: () => onVote?.call(1),
+                    color: post.userVote == 1 ? context.colors.upvote : context.colors.textMuted,
                   ),
-                  _VoteButton(icon: Icons.arrow_downward_rounded, onTap: () => onVote?.call(-1),
-                      color: post.score < 0 ? context.colors.downvote : context.colors.textMuted),
+                  Padding(
+                    padding: const EdgeInsetsDirectional.only(end: 6),
+                    child: Text(
+                      '${post.upvotes}',
+                      style: TextStyle(
+                        color: post.userVote == 1 ? context.colors.upvote : context.colors.textMuted,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: 1,
+                    height: 12,
+                    color: context.colors.textMuted.withValues(alpha: 0.2),
+                  ),
+                  _VoteButton(
+                    icon: Icons.arrow_downward_rounded,
+                    onTap: () => onVote?.call(-1),
+                    color: post.userVote == -1 ? context.colors.downvote : context.colors.textMuted,
+                  ),
+                  Padding(
+                    padding: const EdgeInsetsDirectional.only(end: 8),
+                    child: Text(
+                      '${post.downvotes}',
+                      style: TextStyle(
+                        color: post.userVote == -1 ? context.colors.downvote : context.colors.textMuted,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
                 ]),
               ),
               SizedBox(width: 8),
@@ -218,7 +243,7 @@ class PostCard extends ConsumerWidget {
                 ),
                 error: (_, __) => GestureDetector(
                   onTap: () => ref.invalidate(savedItemsProvider),
-                  child: Icon(Icons.error_outline, color: context.colors.error, size: 20),
+                  child: Icon(Icons.bookmark_outline_rounded, color: context.colors.textMuted.withValues(alpha: 0.6), size: 20),
                 ),
               ),
             ]),

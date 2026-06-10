@@ -307,3 +307,31 @@ Report:
 3. APK build result
 4. Every file created or modified with its path
 5. Any corrections made and why
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 5 — PROFILE SETTINGS SCREEN & SOCIAL API TIMEOUTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PROBLEMS RESOLVED:
+1. API Latency Timeouts (AppException(null): Unknown error on /store/social/profiles/...)
+2. Expiration of social credentials JWT causing silent 401s
+3. LateInitializationError crashing the settings page into a blank/black screen on reload or account switch
+4. Keyboard/focus layout loop freezing the page when scrolling down on Android
+5. Stale display name ("User" fallback) and blank avatar icon on navbar/dashboard
+6. Overscroll stretch animation lockups on Samsung One UI devices during list scrolling
+
+IMPLEMENTED CHANGES:
+1. lib/core/api/social_client.dart
+   - Replicated the automated 401 JWT refresh/retry interceptor logic from MedusaClient. If a token expires, SocialClient now automatically refreshes the Firebase token and retries the request seamlessly.
+   - Mapped all timeout exception types (connectionTimeout, sendTimeout, receiveTimeout, etc.) to AppException.network(endpoint) instead of generic "Unknown error" with null status code.
+
+2. lib/features/account/ui/screens/settings/profile_settings_screen.dart
+   - Removed 'late' from _avatarStyle and _avatarSeed and assigned safe defaults ('big-smile', 'Felix') to avoid LateInitializationErrors if network loading fails.
+   - Wrapped the entire outer build tree inside a diagnostic try-catch block to render an "Initialization Crash Detected" screen with stack trace details instead of failing silently to a blank screen.
+   - Migrated the scroll container from SingleChildScrollView + Column to an optimized, native ListView for seamless hardware-accelerated viewport rendering.
+   - Added keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag to dismiss the software keyboard on scrolling.
+   - Set physics: const ClampingScrollPhysics() on both the main vertical ListView and the horizontal swatches ListView to bypass the Samsung One UI stretch overscroll glow effect which locks GPU rendering.
+   - Added `await ref.read(authNotifierProvider.notifier).refreshProfile()` inside _saveProfile so any saved profile changes (real first name, last name, and avatar style) immediately propagate to the global authentication state.
+
+3. lib/features/account/ui/screens/account_screen.dart
+   - Integrated a background profile sync trigger inside a post-frame callback in AccountScreen. When you open the Account tab, the app automatically fetches the latest user details in the background and replaces "user" placeholders with your real name and avatar style immediately.

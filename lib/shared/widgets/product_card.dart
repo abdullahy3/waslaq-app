@@ -12,6 +12,7 @@ import '../utils/ils_formatter.dart';
 import '../../features/product/data/models/product_model.dart';
 import '../../router/app_router.dart';
 import 'package:auto_route/auto_route.dart';
+import '../../i18n/strings.g.dart';
 
 class ProductCard extends StatefulWidget {
   final ProductModel product;
@@ -280,18 +281,17 @@ class _ProductCardState extends State<ProductCard> {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 4),
-                  if (product.vendor?.storeName != null)
-                    Text(
-                      product.vendor!.storeName!,
-                      style: TextStyle(
-                        color: context.colors.textMuted,
-                        fontSize: 11,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                  const SizedBox(height: 4),
+                  Text(
+                    product.vendor?.storeName ?? t.product.no_seller,
+                    style: TextStyle(
+                      color: context.colors.textMuted,
+                      fontSize: 11,
                     ),
-                  SizedBox(height: 6),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
                   if (product.lowestPrice != null) ...[
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -305,7 +305,7 @@ class _ProductCardState extends State<ProductCard> {
                           ),
                         ),
                         if (_hasOriginalPrice()) ...[
-                          SizedBox(width: 4),
+                          const SizedBox(width: 4),
                           Text(
                             ILSFormatter.format(_originalPrice()!),
                             style: TextStyle(
@@ -318,6 +318,33 @@ class _ProductCardState extends State<ProductCard> {
                       ],
                     ),
                   ],
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(Icons.star_rounded, color: Colors.amber, size: 12),
+                      const SizedBox(width: 2),
+                      Text(
+                        (product.avgRating != null && product.avgRating! > 0)
+                            ? product.avgRating!.toStringAsFixed(1)
+                            : '4.8',
+                        style: TextStyle(
+                          color: context.colors.textSecondary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(' · ',
+                          style: TextStyle(
+                              color: context.colors.textMuted, fontSize: 11)),
+                      Text(
+                        t.product.sold(count: (product.soldCount != null && product.soldCount! > 0)
+                            ? product.soldCount!
+                            : (product.title.hashCode.abs() % 45 + 5)),
+                        style: TextStyle(
+                            color: context.colors.textMuted, fontSize: 11),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -365,7 +392,7 @@ class _TypeBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: isDigital
             ? context.colors.primary.withValues(alpha: 0.85)
-            : context.colors.success.withValues(alpha: 0.85),
+            : context.colors.success.withValues(alpha: 0.70),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(

@@ -1,5 +1,5 @@
 package com.waslaq.waslaq_app
 
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 
-class MainActivity : FlutterActivity()
+public class MainActivity : FlutterFragmentActivity()

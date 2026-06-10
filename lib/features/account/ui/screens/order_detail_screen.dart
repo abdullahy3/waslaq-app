@@ -10,50 +10,14 @@ class OrderDetailScreen extends StatelessWidget {
   final OrderModel order;
   const OrderDetailScreen({super.key, required this.order});
 
-  Color _statusColor(BuildContext context, String s) {
-    switch (s.toLowerCase()) {
-      case 'completed':
-      case 'fulfilled':
-      case 'captured':
-        return context.colors.success;
-      case 'cancelled':
-      case 'failed':
-      case 'rejected':
-        return context.colors.error;
-      case 'pending':
-      case 'not_fulfilled':
-      case 'partially_fulfilled':
-      case 'partially_captured':
-        return context.colors.warning;
-      case 'shipped':
-        return context.colors.primary;
-      default:
-        return context.colors.textMuted;
-    }
-  }
+  // Vendor flow is two-state (mirrors web order-tracking):
+  //   vendor_sub_order.status 'shipped' => Delivered, anything else => Processing.
+  // Payment status is intentionally NOT shown — the web never surfaces it.
+  bool get _delivered => order.fulfillmentStatus.toLowerCase() == 'shipped';
 
-  Widget _statusBadge(BuildContext context, String label, String status) {
-    final color = _statusColor(context, status);
-    return Row(
-      children: [
-        Text(label,
-            style: TextStyle(color: context.colors.textSecondary, fontSize: 13)),
-        SizedBox(width: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Text(
-            status[0].toUpperCase() + status.substring(1),
-            style: TextStyle(
-                color: color, fontSize: 12, fontWeight: FontWeight.bold),
-          ),
-        ),
-      ],
-    );
-  }
+  // Timeline: Order Placed (0) -> Processing (1) -> Delivered (2).
+  // Delivered => step 2 (all filled); otherwise step 1 (Placed + Processing).
+  int get _currentStep => _delivered ? 2 : 1;
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +26,8 @@ class OrderDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(t.account.order_number(id: order.displayId.toString()),
             style: TextStyle(
-                color: context.colors.textPrimary, fontWeight: FontWeight.bold)),
+                color: context.colors.textPrimary,
+                fontWeight: FontWeight.bold)),
         backgroundColor: context.colors.background,
         iconTheme: IconThemeData(color: context.colors.textPrimary),
         elevation: 0,
@@ -74,55 +39,53 @@ class OrderDetailScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // ── Status card ─────────────────────────────────────────
+          // ── Header: placed date + status pill ───────────────────
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Text(
+                  '${t.account.placed} ${_formatDate(order.createdAt)}',
+                  style: TextStyle(
+                      color: context.colors.textSecondary, fontSize: 13),
+                ),
+              ),
+              _StatusPill(delivered: _delivered),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          // ── Order Progress stepper ──────────────────────────────
           _Card(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(t.account.order_status_title,
+                Text(t.account.order_progress,
                     style: TextStyle(
                         color: context.colors.textPrimary,
                         fontWeight: FontWeight.bold,
                         fontSize: 15)),
-                SizedBox(height: 12),
-                _statusBadge(context, t.account.order_label, order.status),
-                SizedBox(height: 8),
-                _statusBadge(context, t.account.payment_label, order.paymentStatus),
-                SizedBox(height: 8),
-                _statusBadge(context, t.account.fulfillment_label, order.fulfillmentStatus),
-                SizedBox(height: 12),
-                Divider(color: context.colors.border, height: 1),
-                SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(t.account.placed,
-                        style: TextStyle(
-                            color: context.colors.textSecondary, fontSize: 13)),
-                    Text(
-                      _formatDate(order.createdAt),
-                      style: TextStyle(
-                          color: context.colors.textPrimary, fontSize: 13),
-                    ),
-                  ],
-                ),
+                const SizedBox(height: 24),
+                _ProgressStepper(currentStep: _currentStep),
+                const SizedBox(height: 8),
               ],
             ),
           ),
 
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
 
-          // ── Items ───────────────────────────────────────────────
+          // ── Items + Total ───────────────────────────────────────
           _Card(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(t.account.items_count(count: order.items.length.toString()),
+                Text(t.account.items,
                     style: TextStyle(
                         color: context.colors.textPrimary,
                         fontWeight: FontWeight.bold,
                         fontSize: 15)),
-                SizedBox(height: 12),
+                const SizedBox(height: 16),
                 ...order.items.asMap().entries.map((entry) {
                   final i = entry.key;
                   final item = entry.value;
@@ -134,28 +97,25 @@ class OrderDetailScreen extends StatelessWidget {
                     ],
                   );
                 }),
-              ],
-            ),
-          ),
-
-          SizedBox(height: 16),
-
-          // ── Total ───────────────────────────────────────────────
-          _Card(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(t.account.total,
-                    style: TextStyle(
-                        color: context.colors.textPrimary,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16)),
-                Text(
-                  '₪${order.total.toStringAsFixed(2)}',
-                  style: TextStyle(
-                      color: context.colors.primary,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20),
+                const SizedBox(height: 16),
+                Divider(color: context.colors.border, height: 1),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(t.account.total,
+                        style: TextStyle(
+                            color: context.colors.textPrimary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16)),
+                    Text(
+                      '₪${order.total.toStringAsFixed(2)}',
+                      style: TextStyle(
+                          color: context.colors.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -170,6 +130,121 @@ class OrderDetailScreen extends StatelessWidget {
   String _formatDate(DateTime d) {
     final months = t.common.months;
     return '${d.day} ${months[d.month - 1]} ${d.year}';
+  }
+}
+
+// ─── Status pill (Delivered = green, Processing = amber) ──────────────────────
+
+class _StatusPill extends StatelessWidget {
+  final bool delivered;
+  const _StatusPill({required this.delivered});
+
+  @override
+  Widget build(BuildContext context) {
+    final color =
+        delivered ? context.colors.success : context.colors.warning;
+    final label = delivered ? t.account.delivered : t.account.processing;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style:
+            TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+}
+
+// ─── 3-step progress timeline ─────────────────────────────────────────────────
+
+class _ProgressStepper extends StatelessWidget {
+  final int currentStep; // 0..2
+  const _ProgressStepper({required this.currentStep});
+
+  @override
+  Widget build(BuildContext context) {
+    final steps = <(String, String)>[
+      ('🛒', t.account.order_placed),
+      ('⚙️', t.account.processing),
+      ('✅', t.account.delivered),
+    ];
+    const circle = 40.0;
+
+    return LayoutBuilder(
+      builder: (context, c) {
+        final w = c.maxWidth;
+        final trackLeft = (w / 3) / 2; // center of first circle (w/6)
+        final trackWidth = w - 2 * trackLeft; // span first->last circle center
+        final fillWidth = trackWidth * (currentStep / (steps.length - 1));
+
+        return Stack(
+          children: [
+            // background track (sits at vertical center of the circles)
+            Positioned(
+              left: trackLeft,
+              top: circle / 2 - 1,
+              child: Container(
+                  width: trackWidth, height: 2, color: context.colors.border),
+            ),
+            // filled track
+            Positioned(
+              left: trackLeft,
+              top: circle / 2 - 1,
+              child: Container(
+                  width: fillWidth,
+                  height: 2,
+                  color: context.colors.primary),
+            ),
+            Row(
+              children: List.generate(steps.length, (i) {
+                final done = i <= currentStep;
+                return Expanded(
+                  child: Column(
+                    children: [
+                      Container(
+                        width: circle,
+                        height: circle,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: done
+                              ? context.colors.primary
+                              : context.colors.surface,
+                          border: Border.all(
+                            color: done
+                                ? context.colors.primary
+                                : context.colors.border,
+                            width: 2,
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(steps[i].$1,
+                            style: const TextStyle(fontSize: 17)),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        steps[i].$2,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: done
+                              ? context.colors.primary
+                              : context.colors.textMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 
@@ -213,7 +288,7 @@ class _ItemRow extends StatelessWidget {
                 )
               : _placeholder(context),
         ),
-        SizedBox(width: 12),
+        const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -225,7 +300,7 @@ class _ItemRow extends StatelessWidget {
                       fontWeight: FontWeight.w500),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(t.account.qty_label(count: item.quantity.toString()),
                   style: TextStyle(
                       color: context.colors.textSecondary, fontSize: 12)),
@@ -233,7 +308,7 @@ class _ItemRow extends StatelessWidget {
           ),
         ),
         Text(
-          '₪${(item.unitPrice * item.quantity).toStringAsFixed(0)}',
+          '₪${(item.unitPrice * item.quantity).toStringAsFixed(2)}',
           style: TextStyle(
               color: context.colors.textPrimary,
               fontWeight: FontWeight.bold,
@@ -248,8 +323,8 @@ class _ItemRow extends StatelessWidget {
       width: 56,
       height: 56,
       color: context.colors.surfaceVariant,
-      child: Icon(Icons.image_outlined,
-          color: context.colors.textMuted, size: 24),
+      child:
+          Icon(Icons.image_outlined, color: context.colors.textMuted, size: 24),
     );
   }
 }

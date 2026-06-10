@@ -12,12 +12,16 @@ class CrashReporter {
         .setCrashlyticsCollectionEnabled(!kDebugMode);
 
     // Catch all uncaught Flutter framework errors
-    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    FlutterError.onError = (details) {
+      debugPrint('🚨 FLUTTER ERROR: ${details.exception}\n${details.stack}');
+      FirebaseCrashlytics.instance.recordFlutterFatalError(details);
+    };
 
     // Catch uncaught async errors outside Flutter framework
     PlatformDispatcher.instance.onError = (error, stack) {
+      debugPrint('🚨 UNCAUGHT ASYNC ERROR: $error\n$stack');
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-      return true;
+      return false; // Return false so it is also logged to standard output
     };
   }
 

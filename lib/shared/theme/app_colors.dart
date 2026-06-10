@@ -77,8 +77,8 @@ class AppColors {
     border:         Color(0xFFE5E7EB), // gray-200
 
     textPrimary:    Color(0xFF111827), // gray-900
-    textSecondary:  Color(0xFF6B7280), // gray-500
-    textMuted:      Color(0xFF9CA3AF), // gray-400
+    textSecondary:  Color(0xFF4B5563), // gray-600 — improved readability
+    textMuted:      Color(0xFF71717A), // zinc-500 — refined contrast
 
     error:          Color(0xFFEF4444),
     success:        Color(0xFF22C55E),

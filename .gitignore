@@ -56,3 +56,12 @@ firebase-debug.log
 
 # Temporary test files
 test_json.dart
+
+# Firebase config — contains API keys, never commit
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
+# Build reports and debug artifacts
+android/build/reports/
+deps.txt
+bug.md

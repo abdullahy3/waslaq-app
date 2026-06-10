@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 3224 (1612 per locale)
+/// Strings: 3278 (1639 per locale)
 ///
-/// Built on 2026-05-28 at 22:53 UTC
+/// Built on 2026-06-09 at 11:11 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -149,6 +149,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 
 	// Translations
 	late final _StringsNavEn nav = _StringsNavEn._(_root);
+	late final _StringsExploreEn explore = _StringsExploreEn._(_root);
 	late final _StringsAuthEn auth = _StringsAuthEn._(_root);
 	late final _StringsAccountEn account = _StringsAccountEn._(_root);
 	late final _StringsProductEn product = _StringsProductEn._(_root);
@@ -194,6 +195,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final _StringsNotificationsEn notifications = _StringsNotificationsEn._(_root);
 	late final _StringsSavedItemsEn saved_items = _StringsSavedItemsEn._(_root);
 	late final _StringsLegalEn legal = _StringsLegalEn._(_root);
+	late final _StringsCreatePostEn create_post = _StringsCreatePostEn._(_root);
 }
 
 // Path: nav
@@ -219,6 +221,21 @@ class _StringsNavEn {
 	String get contact_us => 'Contact Us';
 	String get feedback => 'Feedback';
 	String get create_community => 'Create Community';
+	String get explore => 'Explore';
+}
+
+// Path: explore
+class _StringsExploreEn {
+	_StringsExploreEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get products => 'Products';
+	String get communities => 'Communities';
+	String get stores => 'Stores';
+	String get browse_categories => 'Browse Categories';
+	String get popular_searches => 'Popular Searches';
 }
 
 // Path: auth
@@ -337,6 +354,13 @@ class _StringsAccountEn {
 	String get sign_in_desc => 'Sign in to view your account,\norders, and messages.';
 	String get sign_in_btn => 'Sign In';
 	String get create_account_btn => 'Create Account';
+	String get section_shopping => 'Shopping';
+	String get section_community => 'Community';
+	String get section_communities => 'My Communities';
+	String get section_vendor => 'Vendor';
+	String get section_settings => 'Settings';
+	String get section_legal => 'Legal';
+	String get following_stores_label => 'Following Stores';
 }
 
 // Path: product
@@ -347,6 +371,8 @@ class _StringsProductEn {
 
 	// Translations
 	String get add_to_cart => 'Add to Cart';
+	String sold({required Object count}) => '${count} sold';
+	String get no_seller => 'Local Seller';
 	String get buy_now => 'Buy Now';
 	String get save => 'Save';
 	String get saved => 'Saved';
@@ -409,6 +435,7 @@ class _StringsProductEn {
 	String get no_description => 'No description provided.';
 	String get price_on_request => 'Price on Request';
 	String share_product({required Object title, required Object url}) => 'Check out this product on WaslaQ: ${title}\n${url}';
+	String get community_discussions => 'Community Discussions';
 }
 
 // Path: vendor
@@ -466,6 +493,7 @@ class _StringsVendorEn {
 	String get no_questions_yet => 'No questions yet';
 	String get awaiting_response => 'Awaiting vendor response...';
 	String get no_reviews_yet => 'No reviews yet';
+	String get no_stores_yet => 'No stores yet';
 	String rating_out_of_five({required Object rating}) => '${rating}/5';
 	String get no_policies_yet => 'No policies published yet';
 	String get shipping_policy => 'Shipping Policy';
@@ -617,6 +645,7 @@ class _StringsCommunityEn {
 	String error_loading_posts({required Object error}) => 'Error loading posts: ${error}';
 	String get explore_communities => 'Explore Communities';
 	String get no_communities_found => 'No communities found';
+	String get error_loading => 'Error loading';
 }
 
 // Path: messages
@@ -768,6 +797,8 @@ class _StringsHomeEn {
 	String get drawer_contact => 'Contact Us';
 	String get drawer_feedback => 'Feedback';
 	String get drawer_legal => 'LEGAL';
+	String get trending_discussions => 'Trending Discussions';
+	String get more_products => 'More Products';
 }
 
 // Path: footer
@@ -2224,6 +2255,22 @@ class _StringsLegalEn {
 	String get terms_title => 'Terms of Service';
 }
 
+// Path: create_post
+class _StringsCreatePostEn {
+	_StringsCreatePostEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get sheet_title => 'What do you want to post?';
+	String get general_post => 'General Post';
+	String get community_post => 'Post in a Community';
+	String community_post_in({required Object slug}) => 'Post in r/${slug}';
+	String get share_product => 'Share a Product';
+	String share_product_named({required Object title}) => 'Share: ${title}';
+	String get ask_product => 'Ask About a Product';
+}
+
 // Path: <root>
 class _StringsAr implements Translations {
 	/// You can call this constructor and build your own translation instance of this locale.
@@ -2249,6 +2296,7 @@ class _StringsAr implements Translations {
 
 	// Translations
 	@override late final _StringsNavAr nav = _StringsNavAr._(_root);
+	@override late final _StringsExploreAr explore = _StringsExploreAr._(_root);
 	@override late final _StringsAuthAr auth = _StringsAuthAr._(_root);
 	@override late final _StringsAccountAr account = _StringsAccountAr._(_root);
 	@override late final _StringsProductAr product = _StringsProductAr._(_root);
@@ -2294,6 +2342,7 @@ class _StringsAr implements Translations {
 	@override late final _StringsNotificationsAr notifications = _StringsNotificationsAr._(_root);
 	@override late final _StringsSavedItemsAr saved_items = _StringsSavedItemsAr._(_root);
 	@override late final _StringsLegalAr legal = _StringsLegalAr._(_root);
+	@override late final _StringsCreatePostAr create_post = _StringsCreatePostAr._(_root);
 }
 
 // Path: nav
@@ -2313,12 +2362,27 @@ class _StringsNavAr implements _StringsNavEn {
 	@override String get stores => 'المتاجر';
 	@override String get browse_all_stores => 'تصفح جميع المتاجر';
 	@override String get my_store => 'متجري';
-	@override String get account => 'الحساب';
+	@override String get account => 'حسابي';
 	@override String get info => 'المعلومات';
 	@override String get about_waslaq => 'عن واصلك';
 	@override String get contact_us => 'اتصل بنا';
 	@override String get feedback => 'ملاحظات';
 	@override String get create_community => 'إنشاء مجتمع';
+	@override String get explore => 'اكتشف';
+}
+
+// Path: explore
+class _StringsExploreAr implements _StringsExploreEn {
+	_StringsExploreAr._(this._root);
+
+	@override final _StringsAr _root; // ignore: unused_field
+
+	// Translations
+	@override String get products => 'المنتجات';
+	@override String get communities => 'المجتمعات';
+	@override String get stores => 'المتاجر';
+	@override String get browse_categories => 'تصفح الفئات';
+	@override String get popular_searches => 'عمليات البحث الشائعة';
 }
 
 // Path: auth
@@ -2437,6 +2501,13 @@ class _StringsAccountAr implements _StringsAccountEn {
 	@override String get sign_in_btn => 'تسجيل الدخول';
 	@override String get create_account_btn => 'إنشاء حساب';
 	@override String get failed_load_orders => 'فشل تحميل الطلبات';
+	@override String get section_shopping => 'التسوق';
+	@override String get section_community => 'المجتمع';
+	@override String get section_communities => 'مجتمعاتي';
+	@override String get section_vendor => 'البائع';
+	@override String get section_settings => 'الإعدادات';
+	@override String get section_legal => 'قانوني';
+	@override String get following_stores_label => 'المتاجر المتابعة';
 }
 
 // Path: product
@@ -2447,6 +2518,8 @@ class _StringsProductAr implements _StringsProductEn {
 
 	// Translations
 	@override String get add_to_cart => 'أضف إلى سلة التسوق';
+	@override String sold({required Object count}) => 'تم بيع ${count}';
+	@override String get no_seller => 'بائع محلي';
 	@override String get buy_now => 'اشترِ الآن';
 	@override String get save => 'حفظ';
 	@override String get saved => 'تم الحفظ';
@@ -2508,7 +2581,8 @@ class _StringsProductAr implements _StringsProductEn {
 	@override String get failed_submit_question => 'فشل تقديم السؤال';
 	@override String get added_to_cart_success => 'تمت الإضافة إلى العربة ✓';
 	@override String get failed_add_to_cart => 'فشل الإضافة إلى العربة';
-	@override String share_product({required Object title, required Object url}) => 'شاهد هذا المنتج على وصلك: ${title}\n${url}';
+	@override String share_product({required Object title, required Object url}) => 'شاهد هذا المنتج على واصلك: ${title}\n${url}';
+	@override String get community_discussions => 'مناقشات المجتمع';
 }
 
 // Path: vendor
@@ -2566,6 +2640,7 @@ class _StringsVendorAr implements _StringsVendorEn {
 	@override String get no_questions_yet => 'لا توجد أسئلة بعد';
 	@override String get awaiting_response => 'في انتظار رد البائع...';
 	@override String get no_reviews_yet => 'لا توجد تقييمات بعد';
+	@override String get no_stores_yet => 'لا توجد متاجر بعد';
 	@override String rating_out_of_five({required Object rating}) => '${rating}/5';
 	@override String get no_policies_yet => 'لم يتم نشر أي سياسات بعد';
 	@override String get shipping_policy => 'سياسة الشحن';
@@ -2717,6 +2792,7 @@ class _StringsCommunityAr implements _StringsCommunityEn {
 	@override String error_loading_posts({required Object error}) => 'خطأ في تحميل المنشورات: ${error}';
 	@override String get explore_communities => 'استكشف المجتمعات';
 	@override String get no_communities_found => 'لم يتم العثور على مجتمعات';
+	@override String get error_loading => 'خطأ في التحميل';
 }
 
 // Path: messages
@@ -2868,6 +2944,8 @@ class _StringsHomeAr implements _StringsHomeEn {
 	@override String get drawer_contact => 'اتصل بنا';
 	@override String get drawer_feedback => 'ملاحظات';
 	@override String get drawer_legal => 'قانوني';
+	@override String get trending_discussions => 'نقاشات رائجة';
+	@override String get more_products => 'المزيد من المنتجات';
 }
 
 // Path: footer
@@ -4152,7 +4230,7 @@ class _StringsSocialAr implements _StringsSocialEn {
 	@override String hours_short({required Object n}) => '${n}س';
 	@override String minutes_short({required Object n}) => '${n}د';
 	@override String get now_short => 'الآن';
-	@override String share_post({required Object title, required Object url}) => 'شاهد هذا المنشور على وصلك: ${title}\n${url}';
+	@override String share_post({required Object title, required Object url}) => 'شاهد هذا المنشور على واصلك: ${title}\n${url}';
 }
 
 // Path: store
@@ -4324,6 +4402,22 @@ class _StringsLegalAr implements _StringsLegalEn {
 	@override String get terms_title => 'شروط الخدمة';
 }
 
+// Path: create_post
+class _StringsCreatePostAr implements _StringsCreatePostEn {
+	_StringsCreatePostAr._(this._root);
+
+	@override final _StringsAr _root; // ignore: unused_field
+
+	// Translations
+	@override String get sheet_title => 'ماذا تريد أن تنشر؟';
+	@override String get general_post => 'منشور عام';
+	@override String get community_post => 'نشر داخل مجتمع';
+	@override String community_post_in({required Object slug}) => 'نشر في r/${slug}';
+	@override String get share_product => 'مشاركة منتج';
+	@override String share_product_named({required Object title}) => 'مشاركة: ${title}';
+	@override String get ask_product => 'سؤال عن منتج';
+}
+
 /// Flat map(s) containing all translations.
 /// Only for edge cases! For simple maps, use the map function of this library.
 
@@ -4346,6 +4440,12 @@ extension on Translations {
 			case 'nav.contact_us': return 'Contact Us';
 			case 'nav.feedback': return 'Feedback';
 			case 'nav.create_community': return 'Create Community';
+			case 'nav.explore': return 'Explore';
+			case 'explore.products': return 'Products';
+			case 'explore.communities': return 'Communities';
+			case 'explore.stores': return 'Stores';
+			case 'explore.browse_categories': return 'Browse Categories';
+			case 'explore.popular_searches': return 'Popular Searches';
 			case 'auth.sign_in': return 'Sign In';
 			case 'auth.sign_up': return 'Create Account';
 			case 'auth.sign_out': return 'Sign Out';
@@ -4446,7 +4546,16 @@ extension on Translations {
 			case 'account.sign_in_desc': return 'Sign in to view your account,\norders, and messages.';
 			case 'account.sign_in_btn': return 'Sign In';
 			case 'account.create_account_btn': return 'Create Account';
+			case 'account.section_shopping': return 'Shopping';
+			case 'account.section_community': return 'Community';
+			case 'account.section_communities': return 'My Communities';
+			case 'account.section_vendor': return 'Vendor';
+			case 'account.section_settings': return 'Settings';
+			case 'account.section_legal': return 'Legal';
+			case 'account.following_stores_label': return 'Following Stores';
 			case 'product.add_to_cart': return 'Add to Cart';
+			case 'product.sold': return ({required Object count}) => '${count} sold';
+			case 'product.no_seller': return 'Local Seller';
 			case 'product.buy_now': return 'Buy Now';
 			case 'product.save': return 'Save';
 			case 'product.saved': return 'Saved';
@@ -4509,6 +4618,7 @@ extension on Translations {
 			case 'product.no_description': return 'No description provided.';
 			case 'product.price_on_request': return 'Price on Request';
 			case 'product.share_product': return ({required Object title, required Object url}) => 'Check out this product on WaslaQ: ${title}\n${url}';
+			case 'product.community_discussions': return 'Community Discussions';
 			case 'vendor.store': return 'Store';
 			case 'vendor.products': return 'Products';
 			case 'vendor.follow': return 'Follow';
@@ -4557,6 +4667,7 @@ extension on Translations {
 			case 'vendor.no_questions_yet': return 'No questions yet';
 			case 'vendor.awaiting_response': return 'Awaiting vendor response...';
 			case 'vendor.no_reviews_yet': return 'No reviews yet';
+			case 'vendor.no_stores_yet': return 'No stores yet';
 			case 'vendor.rating_out_of_five': return ({required Object rating}) => '${rating}/5';
 			case 'vendor.no_policies_yet': return 'No policies published yet';
 			case 'vendor.shipping_policy': return 'Shipping Policy';
@@ -4681,6 +4792,7 @@ extension on Translations {
 			case 'community.error_loading_posts': return ({required Object error}) => 'Error loading posts: ${error}';
 			case 'community.explore_communities': return 'Explore Communities';
 			case 'community.no_communities_found': return 'No communities found';
+			case 'community.error_loading': return 'Error loading';
 			case 'messages.messages': return 'Messages';
 			case 'messages.no_messages': return 'No messages yet';
 			case 'messages.type_message': return 'Type a message...';
@@ -4803,6 +4915,8 @@ extension on Translations {
 			case 'home.drawer_contact': return 'Contact Us';
 			case 'home.drawer_feedback': return 'Feedback';
 			case 'home.drawer_legal': return 'LEGAL';
+			case 'home.trending_discussions': return 'Trending Discussions';
+			case 'home.more_products': return 'More Products';
 			case 'footer.privacy_policy': return 'Privacy Policy';
 			case 'footer.terms_of_use': return 'Terms of Use';
 			case 'footer.refund_policy': return 'Refund & Return Policy';
@@ -5942,6 +6056,13 @@ extension on Translations {
 			case 'saved_items.could_not_load': return 'Could not load products';
 			case 'legal.privacy_policy_title': return 'Privacy Policy';
 			case 'legal.terms_title': return 'Terms of Service';
+			case 'create_post.sheet_title': return 'What do you want to post?';
+			case 'create_post.general_post': return 'General Post';
+			case 'create_post.community_post': return 'Post in a Community';
+			case 'create_post.community_post_in': return ({required Object slug}) => 'Post in r/${slug}';
+			case 'create_post.share_product': return 'Share a Product';
+			case 'create_post.share_product_named': return ({required Object title}) => 'Share: ${title}';
+			case 'create_post.ask_product': return 'Ask About a Product';
 			default: return null;
 		}
 	}
@@ -5960,12 +6081,18 @@ extension on _StringsAr {
 			case 'nav.stores': return 'المتاجر';
 			case 'nav.browse_all_stores': return 'تصفح جميع المتاجر';
 			case 'nav.my_store': return 'متجري';
-			case 'nav.account': return 'الحساب';
+			case 'nav.account': return 'حسابي';
 			case 'nav.info': return 'المعلومات';
 			case 'nav.about_waslaq': return 'عن واصلك';
 			case 'nav.contact_us': return 'اتصل بنا';
 			case 'nav.feedback': return 'ملاحظات';
 			case 'nav.create_community': return 'إنشاء مجتمع';
+			case 'nav.explore': return 'اكتشف';
+			case 'explore.products': return 'المنتجات';
+			case 'explore.communities': return 'المجتمعات';
+			case 'explore.stores': return 'المتاجر';
+			case 'explore.browse_categories': return 'تصفح الفئات';
+			case 'explore.popular_searches': return 'عمليات البحث الشائعة';
 			case 'auth.sign_in': return 'تسجيل الدخول';
 			case 'auth.sign_up': return 'إنشاء حساب';
 			case 'auth.sign_out': return 'تسجيل الخروج';
@@ -6066,7 +6193,16 @@ extension on _StringsAr {
 			case 'account.sign_in_btn': return 'تسجيل الدخول';
 			case 'account.create_account_btn': return 'إنشاء حساب';
 			case 'account.failed_load_orders': return 'فشل تحميل الطلبات';
+			case 'account.section_shopping': return 'التسوق';
+			case 'account.section_community': return 'المجتمع';
+			case 'account.section_communities': return 'مجتمعاتي';
+			case 'account.section_vendor': return 'البائع';
+			case 'account.section_settings': return 'الإعدادات';
+			case 'account.section_legal': return 'قانوني';
+			case 'account.following_stores_label': return 'المتاجر المتابعة';
 			case 'product.add_to_cart': return 'أضف إلى سلة التسوق';
+			case 'product.sold': return ({required Object count}) => 'تم بيع ${count}';
+			case 'product.no_seller': return 'بائع محلي';
 			case 'product.buy_now': return 'اشترِ الآن';
 			case 'product.save': return 'حفظ';
 			case 'product.saved': return 'تم الحفظ';
@@ -6128,7 +6264,8 @@ extension on _StringsAr {
 			case 'product.failed_submit_question': return 'فشل تقديم السؤال';
 			case 'product.added_to_cart_success': return 'تمت الإضافة إلى العربة ✓';
 			case 'product.failed_add_to_cart': return 'فشل الإضافة إلى العربة';
-			case 'product.share_product': return ({required Object title, required Object url}) => 'شاهد هذا المنتج على وصلك: ${title}\n${url}';
+			case 'product.share_product': return ({required Object title, required Object url}) => 'شاهد هذا المنتج على واصلك: ${title}\n${url}';
+			case 'product.community_discussions': return 'مناقشات المجتمع';
 			case 'vendor.store': return 'متجر';
 			case 'vendor.products': return 'المنتجات';
 			case 'vendor.follow': return 'تابع';
@@ -6177,6 +6314,7 @@ extension on _StringsAr {
 			case 'vendor.no_questions_yet': return 'لا توجد أسئلة بعد';
 			case 'vendor.awaiting_response': return 'في انتظار رد البائع...';
 			case 'vendor.no_reviews_yet': return 'لا توجد تقييمات بعد';
+			case 'vendor.no_stores_yet': return 'لا توجد متاجر بعد';
 			case 'vendor.rating_out_of_five': return ({required Object rating}) => '${rating}/5';
 			case 'vendor.no_policies_yet': return 'لم يتم نشر أي سياسات بعد';
 			case 'vendor.shipping_policy': return 'سياسة الشحن';
@@ -6301,6 +6439,7 @@ extension on _StringsAr {
 			case 'community.error_loading_posts': return ({required Object error}) => 'خطأ في تحميل المنشورات: ${error}';
 			case 'community.explore_communities': return 'استكشف المجتمعات';
 			case 'community.no_communities_found': return 'لم يتم العثور على مجتمعات';
+			case 'community.error_loading': return 'خطأ في التحميل';
 			case 'messages.messages': return 'الرسائل';
 			case 'messages.no_messages': return 'لا توجد رسائل حتى الآن';
 			case 'messages.type_message': return 'اكتب رسالة...';
@@ -6423,6 +6562,8 @@ extension on _StringsAr {
 			case 'home.drawer_contact': return 'اتصل بنا';
 			case 'home.drawer_feedback': return 'ملاحظات';
 			case 'home.drawer_legal': return 'قانوني';
+			case 'home.trending_discussions': return 'نقاشات رائجة';
+			case 'home.more_products': return 'المزيد من المنتجات';
 			case 'footer.privacy_policy': return 'سياسة الخصوصية';
 			case 'footer.terms_of_use': return 'شروط الاستخدام';
 			case 'footer.refund_policy': return 'سياسة الاسترداد والإرجاع';
@@ -7464,7 +7605,7 @@ extension on _StringsAr {
 			case 'social.hours_short': return ({required Object n}) => '${n}س';
 			case 'social.minutes_short': return ({required Object n}) => '${n}د';
 			case 'social.now_short': return 'الآن';
-			case 'social.share_post': return ({required Object title, required Object url}) => 'شاهد هذا المنشور على وصلك: ${title}\n${url}';
+			case 'social.share_post': return ({required Object title, required Object url}) => 'شاهد هذا المنشور على واصلك: ${title}\n${url}';
 			case 'store.title': return 'المتجر';
 			case 'store.all_categories': return 'الكل';
 			case 'store.products_count': return ({required Object count}) => '${count} منتج';
@@ -7562,6 +7703,13 @@ extension on _StringsAr {
 			case 'saved_items.could_not_load': return 'تعذّر تحميل المنتجات';
 			case 'legal.privacy_policy_title': return 'سياسة الخصوصية';
 			case 'legal.terms_title': return 'شروط الخدمة';
+			case 'create_post.sheet_title': return 'ماذا تريد أن تنشر؟';
+			case 'create_post.general_post': return 'منشور عام';
+			case 'create_post.community_post': return 'نشر داخل مجتمع';
+			case 'create_post.community_post_in': return ({required Object slug}) => 'نشر في r/${slug}';
+			case 'create_post.share_product': return 'مشاركة منتج';
+			case 'create_post.share_product_named': return ({required Object title}) => 'مشاركة: ${title}';
+			case 'create_post.ask_product': return 'سؤال عن منتج';
 			default: return null;
 		}
 	}
