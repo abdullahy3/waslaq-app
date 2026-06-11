@@ -1,4 +1,9 @@
-import 'dart:convert';
+enum PostCreationType {
+  general,        // auto community: r/general
+  community,      // user picks community (required)
+  productShare,   // product picker → any community
+  productQuestion // product picker → auto: r/product-questions
+}
 
 class CommunityModel {
   final String id, slug, name, title;
@@ -9,6 +14,8 @@ class CommunityModel {
   final DateTime createdAt;
   final bool isMember;
   final bool isCreator;
+  final String? iconUrl;
+  final String? bannerUrl;
 
   CommunityModel({
     required this.id,
@@ -22,6 +29,8 @@ class CommunityModel {
     required this.createdAt,
     required this.isMember,
     required this.isCreator,
+    this.iconUrl,
+    this.bannerUrl,
   });
 
   factory CommunityModel.fromJson(Map<String, dynamic> json) {
@@ -37,12 +46,15 @@ class CommunityModel {
       createdAt: DateTime.parse(json['createdAt'] as String),
       isMember: json['isMember'] as bool? ?? false,
       isCreator: json['isCreator'] as bool? ?? false,
+      iconUrl: json['iconUrl'] as String?,
+      bannerUrl: json['bannerUrl'] as String?,
     );
   }
 }
 
 class PostAuthor {
   final String customerId, username, displayName, avatarStyle, avatarSeed;
+  final String? avatarUrl;
 
   PostAuthor({
     required this.customerId,
@@ -50,6 +62,7 @@ class PostAuthor {
     required this.displayName,
     required this.avatarStyle,
     required this.avatarSeed,
+    this.avatarUrl,
   });
 
   factory PostAuthor.fromJson(Map<String, dynamic> json) {
@@ -59,6 +72,7 @@ class PostAuthor {
       displayName: json['displayName'] as String? ?? '',
       avatarStyle: json['avatarStyle'] as String? ?? '',
       avatarSeed: json['avatarSeed'] as String? ?? 'Felix',
+      avatarUrl: json['avatarUrl'] as String?,
     );
   }
 }
@@ -73,6 +87,7 @@ class PostModel {
   final DateTime createdAt;
   final PostAuthor? author;
   final List<String> mediaUrls;
+  final String? productId;
 
   PostModel({
     required this.id,
@@ -91,6 +106,7 @@ class PostModel {
     required this.createdAt,
     this.author,
     required this.mediaUrls,
+    this.productId,
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) {
@@ -120,6 +136,7 @@ class PostModel {
       createdAt: DateTime.parse(json['createdAt'] as String),
       author: json['author'] != null ? PostAuthor.fromJson(json['author'] as Map<String, dynamic>) : null,
       mediaUrls: mUrls,
+      productId: json['productId'] as String?,
     );
   }
 
@@ -140,6 +157,7 @@ class PostModel {
     DateTime? createdAt,
     PostAuthor? author,
     List<String>? mediaUrls,
+    String? productId,
   }) {
     return PostModel(
       id: id ?? this.id,
@@ -158,6 +176,7 @@ class PostModel {
       createdAt: createdAt ?? this.createdAt,
       author: author ?? this.author,
       mediaUrls: mediaUrls ?? this.mediaUrls,
+      productId: productId ?? this.productId,
     );
   }
 }
@@ -168,6 +187,7 @@ class CommentModel {
   final int depth, score;
   final DateTime createdAt;
   final PostAuthor? author;
+  final PostModel? post;
 
   CommentModel({
     required this.id,
@@ -179,6 +199,7 @@ class CommentModel {
     required this.score,
     required this.createdAt,
     this.author,
+    this.post,
   });
 
   factory CommentModel.fromJson(Map<String, dynamic> json) {
@@ -192,6 +213,7 @@ class CommentModel {
       score: json['score'] as int? ?? 0,
       createdAt: DateTime.parse(json['createdAt'] as String),
       author: json['author'] != null ? PostAuthor.fromJson(json['author'] as Map<String, dynamic>) : null,
+      post: json['post'] != null ? PostModel.fromJson(json['post'] as Map<String, dynamic>) : null,
     );
   }
 }
@@ -201,6 +223,8 @@ class UserProfileModel {
   final int followerCount;
   final bool isFollowing;
   final List<PostModel> recentPosts;
+  final List<CommentModel> recentComments;
+  final List<PostModel> mediaPosts;
   final String? avatarUrl, bannerUrl, bannerColor;
   final String? location, website, gender;
   final List<String> hobbies;
@@ -220,6 +244,8 @@ class UserProfileModel {
     required this.followerCount,
     required this.isFollowing,
     required this.recentPosts,
+    this.recentComments = const [],
+    this.mediaPosts = const [],
     this.avatarUrl,
     this.bannerUrl,
     this.bannerColor,
@@ -263,6 +289,12 @@ class UserProfileModel {
       vendorStoreName: json['vendorStoreName'] as String?,
       usernameChangedAt: json['usernameChangedAt'] != null ? DateTime.tryParse(json['usernameChangedAt'] as String) : null,
       recentPosts: (json['posts'] as List<dynamic>? ?? [])
+          .map((e) => PostModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      recentComments: (json['comments'] as List<dynamic>? ?? [])
+          .map((e) => CommentModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      mediaPosts: (json['mediaPosts'] as List<dynamic>? ?? [])
           .map((e) => PostModel.fromJson(e as Map<String, dynamic>))
           .toList(),
     );

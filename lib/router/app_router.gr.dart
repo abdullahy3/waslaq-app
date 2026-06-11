@@ -398,20 +398,21 @@ class ContentSettingsRoute extends PageRouteInfo<void> {
 class CreatePostRoute extends PageRouteInfo<CreatePostRouteArgs> {
   CreatePostRoute({
     Key? key,
+    PostCreationType type = PostCreationType.general,
+    String? preselectedCommunityId,
+    ProductModel? preselectedProduct,
     String? communitySlug,
-    String? prefilledProductId,
     List<PageRouteInfo>? children,
   }) : super(
           CreatePostRoute.name,
           args: CreatePostRouteArgs(
             key: key,
+            type: type,
+            preselectedCommunityId: preselectedCommunityId,
+            preselectedProduct: preselectedProduct,
             communitySlug: communitySlug,
-            prefilledProductId: prefilledProductId,
           ),
-          rawQueryParams: {
-            'community': communitySlug,
-            'productId': prefilledProductId,
-          },
+          rawQueryParams: {'community': communitySlug},
           initialChildren: children,
         );
 
@@ -423,13 +424,13 @@ class CreatePostRoute extends PageRouteInfo<CreatePostRouteArgs> {
       final queryParams = data.queryParams;
       final args = data.argsAs<CreatePostRouteArgs>(
           orElse: () => CreatePostRouteArgs(
-                communitySlug: queryParams.optString('community'),
-                prefilledProductId: queryParams.optString('productId'),
-              ));
+              communitySlug: queryParams.optString('community')));
       return CreatePostScreen(
         key: args.key,
+        type: args.type,
+        preselectedCommunityId: args.preselectedCommunityId,
+        preselectedProduct: args.preselectedProduct,
         communitySlug: args.communitySlug,
-        prefilledProductId: args.prefilledProductId,
       );
     },
   );
@@ -438,19 +439,25 @@ class CreatePostRoute extends PageRouteInfo<CreatePostRouteArgs> {
 class CreatePostRouteArgs {
   const CreatePostRouteArgs({
     this.key,
+    this.type = PostCreationType.general,
+    this.preselectedCommunityId,
+    this.preselectedProduct,
     this.communitySlug,
-    this.prefilledProductId,
   });
 
   final Key? key;
 
-  final String? communitySlug;
+  final PostCreationType type;
 
-  final String? prefilledProductId;
+  final String? preselectedCommunityId;
+
+  final ProductModel? preselectedProduct;
+
+  final String? communitySlug;
 
   @override
   String toString() {
-    return 'CreatePostRouteArgs{key: $key, communitySlug: $communitySlug, prefilledProductId: $prefilledProductId}';
+    return 'CreatePostRouteArgs{key: $key, type: $type, preselectedCommunityId: $preselectedCommunityId, preselectedProduct: $preselectedProduct, communitySlug: $communitySlug}';
   }
 }
 

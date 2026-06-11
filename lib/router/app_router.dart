@@ -29,6 +29,8 @@ import '../features/social/community/ui/screens/community_explore_screen.dart';
 import '../features/social/feed/ui/screens/feed_screen.dart';
 import '../features/social/post/ui/screens/post_detail_screen.dart';
 import '../features/social/post/ui/screens/create_post_screen.dart';
+import '../features/social/data/models/social_models.dart';
+import '../features/product/data/models/product_model.dart';
 import '../features/account/ui/screens/user_profile_screen.dart';
 import '../features/vendor/ui/screens/vendor_profile_screen.dart';
 import '../features/vendor/ui/screens/following_stores_screen.dart';

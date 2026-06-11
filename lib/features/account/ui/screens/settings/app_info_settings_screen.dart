@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:waslaq_app/i18n/strings.g.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -55,7 +56,7 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen> {
     return Scaffold(
       backgroundColor: context.colors.background,
       appBar: AppBar(
-        title: const Text('App Information', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(t.settings.appScreenTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: context.colors.background,
         iconTheme: IconThemeData(color: context.colors.textPrimary),
         elevation: 0,
@@ -76,7 +77,7 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen> {
           const SizedBox(height: 48),
 
           // ─── SHARE & RATE SECTION ───
-          _buildSectionHeader('Share & Feedback'),
+          _buildSectionHeader(t.settings.appShareSection),
           Card(
             color: context.colors.surface,
             shape: RoundedRectangleBorder(
@@ -114,7 +115,7 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen> {
           const SizedBox(height: 20),
 
           // ─── ABOUT SECTION ───
-          _buildSectionHeader('About'),
+          _buildSectionHeader(t.settings.appAboutSection),
           Card(
             color: context.colors.surface,
             shape: RoundedRectangleBorder(

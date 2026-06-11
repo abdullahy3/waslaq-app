@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 3278 (1639 per locale)
+/// Strings: 3854 (1927 per locale)
 ///
-/// Built on 2026-06-09 at 11:11 UTC
+/// Built on 2026-06-11 at 18:36 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -26,7 +26,7 @@ const AppLocale _baseLocale = AppLocale.en;
 /// - if (LocaleSettings.currentLocale == AppLocale.en) // locale check
 enum AppLocale with BaseAppLocale<AppLocale, Translations> {
 	en(languageCode: 'en', build: Translations.build),
-	ar(languageCode: 'ar', build: _StringsAr.build);
+	ar(languageCode: 'ar', build: StringsAr.build);
 
 	const AppLocale({required this.languageCode, this.scriptCode, this.countryCode, required this.build}); // ignore: unused_element
 
@@ -119,6 +119,7 @@ class AppLocaleUtils extends BaseAppLocaleUtils<AppLocale, Translations> {
 // translations
 
 // Path: <root>
+typedef StringsEn = Translations; // ignore: unused_element
 class Translations implements BaseTranslations<AppLocale, Translations> {
 	/// Returns the current translations of the given [context].
 	///
@@ -148,59 +149,59 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final Translations _root = this; // ignore: unused_field
 
 	// Translations
-	late final _StringsNavEn nav = _StringsNavEn._(_root);
-	late final _StringsExploreEn explore = _StringsExploreEn._(_root);
-	late final _StringsAuthEn auth = _StringsAuthEn._(_root);
-	late final _StringsAccountEn account = _StringsAccountEn._(_root);
-	late final _StringsProductEn product = _StringsProductEn._(_root);
-	late final _StringsVendorEn vendor = _StringsVendorEn._(_root);
-	late final _StringsCheckoutEn checkout = _StringsCheckoutEn._(_root);
-	late final _StringsCategoryEn category = _StringsCategoryEn._(_root);
-	late final _StringsCommunityEn community = _StringsCommunityEn._(_root);
-	late final _StringsMessagesEn messages = _StringsMessagesEn._(_root);
-	late final _StringsCommonEn common = _StringsCommonEn._(_root);
-	late final _StringsHomeEn home = _StringsHomeEn._(_root);
-	late final _StringsFooterEn footer = _StringsFooterEn._(_root);
-	late final _StringsCommunitySettingsEn community_settings = _StringsCommunitySettingsEn._(_root);
-	late final _StringsFeedbackEn feedback = _StringsFeedbackEn._(_root);
-	late final _StringsContactEn contact = _StringsContactEn._(_root);
-	late final _StringsAboutEn about = _StringsAboutEn._(_root);
-	late final _StringsDisutesEn disutes = _StringsDisutesEn._(_root);
-	late final _StringsUserProfileEn user_profile = _StringsUserProfileEn._(_root);
-	late final _StringsAccountDropdownEn account_dropdown = _StringsAccountDropdownEn._(_root);
-	late final _StringsVendorDashboardEn vendor_dashboard = _StringsVendorDashboardEn._(_root);
-	late final _StringsNotificationsSettingsEn notifications_settings = _StringsNotificationsSettingsEn._(_root);
-	late final _StringsSavedEn saved = _StringsSavedEn._(_root);
-	late final _StringsSearchEn search = _StringsSearchEn._(_root);
-	late final _StringsCartEn cart = _StringsCartEn._(_root);
-	late final _StringsSettingsEn settings = _StringsSettingsEn._(_root);
-	late final _StringsBecomeVendorEn become_vendor = _StringsBecomeVendorEn._(_root);
-	late final _StringsPrivacyEn privacy = _StringsPrivacyEn._(_root);
-	late final _StringsTermsEn terms = _StringsTermsEn._(_root);
-	late final _StringsRefundEn refund = _StringsRefundEn._(_root);
-	late final _StringsVendorFinancesEn vendor_finances = _StringsVendorFinancesEn._(_root);
-	late final _StringsVendorSettingsEn vendor_settings = _StringsVendorSettingsEn._(_root);
-	late final _StringsVendorPoliciesEn vendor_policies = _StringsVendorPoliciesEn._(_root);
-	late final _StringsDigitalVaultEn digital_vault = _StringsDigitalVaultEn._(_root);
-	late final _StringsVendorProductsEn vendor_products = _StringsVendorProductsEn._(_root);
-	late final _StringsVendorOrdersEn vendor_orders = _StringsVendorOrdersEn._(_root);
-	late final _StringsDisputeEn dispute = _StringsDisputeEn._(_root);
-	late final _StringsStoresEn stores = _StringsStoresEn._(_root);
-	late final _StringsSocialEn social = _StringsSocialEn._(_root);
-	late final _StringsStoreEn store = _StringsStoreEn._(_root);
-	late final _StringsVendorProfileEn vendor_profile = _StringsVendorProfileEn._(_root);
-	late final _StringsDrawerEn drawer = _StringsDrawerEn._(_root);
-	late final _StringsInfoEn info = _StringsInfoEn._(_root);
-	late final _StringsOrdersEn orders = _StringsOrdersEn._(_root);
-	late final _StringsNotificationsEn notifications = _StringsNotificationsEn._(_root);
-	late final _StringsSavedItemsEn saved_items = _StringsSavedItemsEn._(_root);
-	late final _StringsLegalEn legal = _StringsLegalEn._(_root);
-	late final _StringsCreatePostEn create_post = _StringsCreatePostEn._(_root);
+	late final StringsNavEn nav = StringsNavEn._(_root);
+	late final StringsExploreEn explore = StringsExploreEn._(_root);
+	late final StringsAuthEn auth = StringsAuthEn._(_root);
+	late final StringsAccountEn account = StringsAccountEn._(_root);
+	late final StringsProductEn product = StringsProductEn._(_root);
+	late final StringsVendorEn vendor = StringsVendorEn._(_root);
+	late final StringsCheckoutEn checkout = StringsCheckoutEn._(_root);
+	late final StringsCategoryEn category = StringsCategoryEn._(_root);
+	late final StringsCommunityEn community = StringsCommunityEn._(_root);
+	late final StringsMessagesEn messages = StringsMessagesEn._(_root);
+	late final StringsCommonEn common = StringsCommonEn._(_root);
+	late final StringsHomeEn home = StringsHomeEn._(_root);
+	late final StringsFooterEn footer = StringsFooterEn._(_root);
+	late final StringsCommunitySettingsEn community_settings = StringsCommunitySettingsEn._(_root);
+	late final StringsFeedbackEn feedback = StringsFeedbackEn._(_root);
+	late final StringsContactEn contact = StringsContactEn._(_root);
+	late final StringsAboutEn about = StringsAboutEn._(_root);
+	late final StringsDisutesEn disutes = StringsDisutesEn._(_root);
+	late final StringsUserProfileEn user_profile = StringsUserProfileEn._(_root);
+	late final StringsAccountDropdownEn account_dropdown = StringsAccountDropdownEn._(_root);
+	late final StringsVendorDashboardEn vendor_dashboard = StringsVendorDashboardEn._(_root);
+	late final StringsNotificationsSettingsEn notifications_settings = StringsNotificationsSettingsEn._(_root);
+	late final StringsSavedEn saved = StringsSavedEn._(_root);
+	late final StringsSearchEn search = StringsSearchEn._(_root);
+	late final StringsCartEn cart = StringsCartEn._(_root);
+	late final StringsSettingsEn settings = StringsSettingsEn._(_root);
+	late final StringsBecomeVendorEn become_vendor = StringsBecomeVendorEn._(_root);
+	late final StringsPrivacyEn privacy = StringsPrivacyEn._(_root);
+	late final StringsTermsEn terms = StringsTermsEn._(_root);
+	late final StringsRefundEn refund = StringsRefundEn._(_root);
+	late final StringsVendorFinancesEn vendor_finances = StringsVendorFinancesEn._(_root);
+	late final StringsVendorSettingsEn vendor_settings = StringsVendorSettingsEn._(_root);
+	late final StringsVendorPoliciesEn vendor_policies = StringsVendorPoliciesEn._(_root);
+	late final StringsDigitalVaultEn digital_vault = StringsDigitalVaultEn._(_root);
+	late final StringsVendorProductsEn vendor_products = StringsVendorProductsEn._(_root);
+	late final StringsVendorOrdersEn vendor_orders = StringsVendorOrdersEn._(_root);
+	late final StringsDisputeEn dispute = StringsDisputeEn._(_root);
+	late final StringsStoresEn stores = StringsStoresEn._(_root);
+	late final StringsSocialEn social = StringsSocialEn._(_root);
+	late final StringsStoreEn store = StringsStoreEn._(_root);
+	late final StringsVendorProfileEn vendor_profile = StringsVendorProfileEn._(_root);
+	late final StringsDrawerEn drawer = StringsDrawerEn._(_root);
+	late final StringsInfoEn info = StringsInfoEn._(_root);
+	late final StringsOrdersEn orders = StringsOrdersEn._(_root);
+	late final StringsNotificationsEn notifications = StringsNotificationsEn._(_root);
+	late final StringsSavedItemsEn saved_items = StringsSavedItemsEn._(_root);
+	late final StringsLegalEn legal = StringsLegalEn._(_root);
+	late final StringsCreatePostEn create_post = StringsCreatePostEn._(_root);
 }
 
 // Path: nav
-class _StringsNavEn {
-	_StringsNavEn._(this._root);
+class StringsNavEn {
+	StringsNavEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -225,8 +226,8 @@ class _StringsNavEn {
 }
 
 // Path: explore
-class _StringsExploreEn {
-	_StringsExploreEn._(this._root);
+class StringsExploreEn {
+	StringsExploreEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -236,11 +237,28 @@ class _StringsExploreEn {
 	String get stores => 'Stores';
 	String get browse_categories => 'Browse Categories';
 	String get popular_searches => 'Popular Searches';
+	String get all_communities => 'All Communities';
+	String get select_community => 'Select Community';
+	String get filter => 'Filter';
+	String get category => 'Category';
+	String get brand => 'Brand';
+	String get color => 'Color';
+	String get clear_filters => 'Clear Filters';
+	String get apply => 'Apply';
+	String get filter_by_community => 'By Community';
+	String get search_communities => 'Search communities...';
+	String get my_communities => 'My Communities';
+	String get no_communities_joined => 'You haven\'t joined any communities yet';
+	String get explore_communities => 'Explore Communities';
+	String get select_community_to_filter => 'Select a community to filter posts';
+	String get all_posts => 'All Posts';
+	String get private_join_required => 'Join this private community to select it';
+	String get public => 'Public';
 }
 
 // Path: auth
-class _StringsAuthEn {
-	_StringsAuthEn._(this._root);
+class StringsAuthEn {
+	StringsAuthEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -271,8 +289,8 @@ class _StringsAuthEn {
 }
 
 // Path: account
-class _StringsAccountEn {
-	_StringsAccountEn._(this._root);
+class StringsAccountEn {
+	StringsAccountEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -364,8 +382,8 @@ class _StringsAccountEn {
 }
 
 // Path: product
-class _StringsProductEn {
-	_StringsProductEn._(this._root);
+class StringsProductEn {
+	StringsProductEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -439,8 +457,8 @@ class _StringsProductEn {
 }
 
 // Path: vendor
-class _StringsVendorEn {
-	_StringsVendorEn._(this._root);
+class StringsVendorEn {
+	StringsVendorEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -503,8 +521,8 @@ class _StringsVendorEn {
 }
 
 // Path: checkout
-class _StringsCheckoutEn {
-	_StringsCheckoutEn._(this._root);
+class StringsCheckoutEn {
+	StringsCheckoutEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -565,8 +583,8 @@ class _StringsCheckoutEn {
 }
 
 // Path: category
-class _StringsCategoryEn {
-	_StringsCategoryEn._(this._root);
+class StringsCategoryEn {
+	StringsCategoryEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -581,8 +599,8 @@ class _StringsCategoryEn {
 }
 
 // Path: community
-class _StringsCommunityEn {
-	_StringsCommunityEn._(this._root);
+class StringsCommunityEn {
+	StringsCommunityEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -591,6 +609,8 @@ class _StringsCommunityEn {
 	String get join => 'Join';
 	String get joined => 'Joined';
 	String get leave => 'Leave';
+	String get leave_title => 'Leave Community';
+	String get leave_confirm => 'Are you sure you want to leave this community?';
 	String get create_post => 'Create Post';
 	String get post => 'Post';
 	String get comment => 'Comment';
@@ -649,8 +669,8 @@ class _StringsCommunityEn {
 }
 
 // Path: messages
-class _StringsMessagesEn {
-	_StringsMessagesEn._(this._root);
+class StringsMessagesEn {
+	StringsMessagesEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -688,8 +708,8 @@ class _StringsMessagesEn {
 }
 
 // Path: common
-class _StringsCommonEn {
-	_StringsCommonEn._(this._root);
+class StringsCommonEn {
+	StringsCommonEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -760,8 +780,8 @@ class _StringsCommonEn {
 }
 
 // Path: home
-class _StringsHomeEn {
-	_StringsHomeEn._(this._root);
+class StringsHomeEn {
+	StringsHomeEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -802,8 +822,8 @@ class _StringsHomeEn {
 }
 
 // Path: footer
-class _StringsFooterEn {
-	_StringsFooterEn._(this._root);
+class StringsFooterEn {
+	StringsFooterEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -823,8 +843,8 @@ class _StringsFooterEn {
 }
 
 // Path: community_settings
-class _StringsCommunitySettingsEn {
-	_StringsCommunitySettingsEn._(this._root);
+class StringsCommunitySettingsEn {
+	StringsCommunitySettingsEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -859,8 +879,8 @@ class _StringsCommunitySettingsEn {
 }
 
 // Path: feedback
-class _StringsFeedbackEn {
-	_StringsFeedbackEn._(this._root);
+class StringsFeedbackEn {
+	StringsFeedbackEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -876,8 +896,8 @@ class _StringsFeedbackEn {
 }
 
 // Path: contact
-class _StringsContactEn {
-	_StringsContactEn._(this._root);
+class StringsContactEn {
+	StringsContactEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -890,8 +910,8 @@ class _StringsContactEn {
 }
 
 // Path: about
-class _StringsAboutEn {
-	_StringsAboutEn._(this._root);
+class StringsAboutEn {
+	StringsAboutEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -915,8 +935,8 @@ class _StringsAboutEn {
 }
 
 // Path: disutes
-class _StringsDisutesEn {
-	_StringsDisutesEn._(this._root);
+class StringsDisutesEn {
+	StringsDisutesEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -928,8 +948,8 @@ class _StringsDisutesEn {
 }
 
 // Path: user_profile
-class _StringsUserProfileEn {
-	_StringsUserProfileEn._(this._root);
+class StringsUserProfileEn {
+	StringsUserProfileEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -950,8 +970,8 @@ class _StringsUserProfileEn {
 }
 
 // Path: account_dropdown
-class _StringsAccountDropdownEn {
-	_StringsAccountDropdownEn._(this._root);
+class StringsAccountDropdownEn {
+	StringsAccountDropdownEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -969,8 +989,8 @@ class _StringsAccountDropdownEn {
 }
 
 // Path: vendor_dashboard
-class _StringsVendorDashboardEn {
-	_StringsVendorDashboardEn._(this._root);
+class StringsVendorDashboardEn {
+	StringsVendorDashboardEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1091,8 +1111,8 @@ class _StringsVendorDashboardEn {
 }
 
 // Path: notifications_settings
-class _StringsNotificationsSettingsEn {
-	_StringsNotificationsSettingsEn._(this._root);
+class StringsNotificationsSettingsEn {
+	StringsNotificationsSettingsEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1107,8 +1127,8 @@ class _StringsNotificationsSettingsEn {
 }
 
 // Path: saved
-class _StringsSavedEn {
-	_StringsSavedEn._(this._root);
+class StringsSavedEn {
+	StringsSavedEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1123,8 +1143,8 @@ class _StringsSavedEn {
 }
 
 // Path: search
-class _StringsSearchEn {
-	_StringsSearchEn._(this._root);
+class StringsSearchEn {
+	StringsSearchEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1152,8 +1172,8 @@ class _StringsSearchEn {
 }
 
 // Path: cart
-class _StringsCartEn {
-	_StringsCartEn._(this._root);
+class StringsCartEn {
+	StringsCartEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1172,8 +1192,8 @@ class _StringsCartEn {
 }
 
 // Path: settings
-class _StringsSettingsEn {
-	_StringsSettingsEn._(this._root);
+class StringsSettingsEn {
+	StringsSettingsEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1256,11 +1276,273 @@ class _StringsSettingsEn {
 	String get save => 'Save';
 	String get saved_ok => 'Saved successfully';
 	String save_failed({required Object error}) => 'Failed to save: ${error}';
+	String get hub_profile => 'Profile';
+	String get hub_profile_sub => 'Avatar, bio, social links';
+	String get hub_account => 'Account & Security';
+	String get hub_account_sub => 'Email, password, biometric lock';
+	String get hub_address => 'Address Book';
+	String get hub_address_sub => 'Palestine delivery addresses';
+	String get hub_refund => 'Refund Details';
+	String get hub_refund_sub => 'Bank details for dispute refunds';
+	String get hub_privacy => 'Privacy & Safety';
+	String get hub_privacy_sub => 'Visibility, blocked users, follow requests';
+	String get hub_notifications => 'Notifications';
+	String get hub_notifications_sub => 'Push, orders, social alerts';
+	String get hub_content => 'Content & Feed';
+	String get hub_content_sub => 'Language filter, muted words';
+	String get hub_appearance => 'Appearance & Language';
+	String get hub_appearance_sub => 'Theme, language, font, accessibility';
+	String get hub_storage => 'Storage & Performance';
+	String get hub_storage_sub => 'Cache, data usage';
+	String get hub_vendor => 'Vendor Settings';
+	String get hub_vendor_sub => 'Vacation mode, delivery zones';
+	String get hub_app => 'App';
+	String get hub_app_sub => 'Share, rate, permissions, version';
+	String get hub_support => 'Support & Escrow';
+	String get hub_support_sub => 'Help, disputes, legal';
+	String get appearance_title => 'Appearance & Language';
+	String get lang_section => 'Language';
+	String get lang_app_label => 'App Language';
+	String get theme_section => 'Theme';
+	String get theme_light => 'Light Theme';
+	String get theme_dark => 'Dark Theme';
+	String get theme_system => 'Follow System';
+	String get text_size_section => 'Text Size';
+	String get text_adjust_label => 'Adjust Font Scale';
+	String get text_preview_label => 'Live Preview:';
+	String get text_small => 'Small';
+	String get text_normal => 'Normal';
+	String get text_large => 'Large';
+	String get text_xlarge => 'Extra Large';
+	String get arabic_font_section => 'Arabic Font';
+	String get font_default => 'System Default';
+	String get font_cairo => 'Cairo';
+	String get font_tajawal => 'Tajawal';
+	String get font_almarai => 'Almarai';
+	String get accessibility_section => 'Accessibility';
+	String get bold_text => 'Bold Text';
+	String get reduce_anim => 'Reduce Animations';
+	String get reduce_anim_sub => 'Recommended for older devices or motion sensitivity';
+	String get notif_push_enabled => 'Alerts are configured on this device';
+	String get notif_push_disabled => 'Alerts are disabled';
+	String get notif_enabled_chip => 'Enabled';
+	String get notif_disabled_chip => 'Disabled';
+	String get notif_open_settings_btn => 'Open Settings';
+	String get notif_social_section => 'Social Notifications';
+	String get notif_commerce_section => 'Commerce Notifications';
+	String get notif_community_label => 'Community Notifications';
+	String get notif_all => 'All';
+	String get notif_mentions_only => 'Mentions Only';
+	String get notif_off => 'Off';
+	String get notif_order_confirmed => 'Order Confirmed';
+	String get notif_order_shipped => 'Order Shipped';
+	String get notif_order_delivered => 'Order Delivered';
+	String get notif_refund_processed => 'Refund Processed';
+	String get notif_price_drop => 'Price Drop Alerts';
+	String get notif_back_in_stock => 'Back in Stock Alerts';
+	String get notif_vendor_section => 'Vendor Notifications';
+	String get notif_order_sound => 'New Order Alert Sound';
+	String get notif_order_sound_sub => 'Play a loud alert sound for every new order';
+	String get notif_daily_summary => 'Daily Sales Summary';
+	String get notif_daily_summary_sub => 'Get a morning summary of yesterday\'s sales';
+	String get notif_general_section => 'General & System';
+	String get notif_promotions_toggle => 'Promotions';
+	String get notif_login_alerts => 'Login Alerts';
+	String get notif_login_alerts_sub => 'Get notified when account signs in on new device';
+	String get notif_manage_channels => 'Open Notification Settings';
+	String get notif_manage_channels_sub => 'Manage notification channels for this app';
+	String get account_screen_title => 'Account & Security';
+	String get account_email_label => 'Email Address';
+	String get account_password_label => 'Password';
+	String get account_password_sub => 'Send a reset link to your email';
+	String get account_connected_label => 'Connected Accounts';
+	String get account_biometric => 'Biometric Lock';
+	String get account_biometric_sub => 'Require fingerprint or Face ID to open WaslaQ';
+	String get account_purchase_confirm => 'Purchase Confirmation';
+	String get account_purchase_confirm_sub => 'Require biometric before completing any purchase';
+	String get account_login_notif => 'Login Notifications';
+	String get account_login_notif_sub => 'Get notified when your account signs in from a new device';
+	String get privacy_screen_title => 'Privacy & Safety';
+	String get privacy_account_section => 'Account Privacy';
+	String get privacy_private_account => 'Private Account';
+	String get privacy_private_account_sub => 'Only approved followers can see your posts';
+	String get privacy_messaging_section => 'Messaging & Chat';
+	String get privacy_read_receipts => 'Read Receipts';
+	String get privacy_read_receipts_sub => 'Show read receipts (✓✓) in conversations';
+	String get privacy_activity_status => 'Show Activity Status';
+	String get privacy_blocked_section => 'Blocked Users';
+	String get privacy_follow_req_section => 'Follow Requests';
+	String get content_screen_title => 'Content & Feed';
+	String get content_feed_lang_section => 'Feed Language';
+	String get content_muted_section => 'Muted Keywords';
+	String get content_posts_section => 'Posts';
+	String get content_feed_section => 'Feed Behavior';
+	String get content_default_visibility => 'Default Post Visibility';
+	String get content_vendor_section => 'Vendor Settings';
+	String get storage_screen_title => 'Storage & Performance';
+	String get storage_image_section => 'Image Cache';
+	String get storage_recent_section => 'Recently Viewed';
+	String get storage_dev_section => 'Developer Settings';
+	String get support_screen_title => 'Support & Escrow';
+	String get support_help_section => 'Get Help';
+	String get support_legal_section => 'Legal';
+	String get support_escrow_section => 'Escrow & Disputes';
+	String get support_contact => 'Contact Support';
+	String get support_contact_sub => 'Talk to a WaslaQ support agent';
+	String get support_report_bug => 'Report a Bug';
+	String get support_report_sub => 'Help us improve the app by reporting issues';
+	String get support_terms => 'Terms of Use';
+	String get support_privacy_policy => 'Privacy Policy';
+	String get app_screen_title => 'App Information';
+	String get app_share_section => 'Share & Feedback';
+	String get app_about_section => 'About';
+	String get app_share_waslaq => 'Share WaslaQ';
+	String get app_share_sub => 'Tell your friends about the Palestinian marketplace';
+	String get app_rate => 'Rate WaslaQ';
+	String get app_rate_sub => 'Leave a review on the store';
+	String get app_permissions => 'App Permissions';
+	String get app_permissions_sub => 'Manage storage, camera, and notification permissions';
+	String get profile_screen_title => 'Profile Settings';
+	String get address_screen_title => 'Address Book';
+	String get refund_screen_title => 'Refund Details';
+	String get vendor_screen_title => 'Vendor Settings';
+	String get vendor_store_status_section => 'Store Status';
+	String get vendor_delivery_section => 'Delivery Zones';
+	String get vendor_notif_section => 'Notifications';
+	String get hubProfile => 'Profile';
+	String get hubProfileSub => 'Edit your profile information';
+	String get hubAccount => 'Account & Security';
+	String get hubAccountSub => 'Password, email and account settings';
+	String get hubAddress => 'Addresses';
+	String get hubAddressSub => 'Manage your delivery addresses';
+	String get hubRefund => 'Refund Details';
+	String get hubRefundSub => 'Bank account for refunds';
+	String get hubPrivacy => 'Privacy';
+	String get hubPrivacySub => 'Control who sees your content';
+	String get hubNotifications => 'Notifications';
+	String get hubNotificationsSub => 'Manage your notification preferences';
+	String get hubContent => 'Content';
+	String get hubContentSub => 'Language and content preferences';
+	String get hubAppearance => 'Appearance';
+	String get hubAppearanceSub => 'Theme and display settings';
+	String get hubStorage => 'Storage';
+	String get hubStorageSub => 'Cache and data management';
+	String get hubVendor => 'Vendor Settings';
+	String get hubVendorSub => 'Manage your store settings';
+	String get hubApp => 'App Info';
+	String get hubAppSub => 'Version and about';
+	String get hubSupport => 'Support';
+	String get hubSupportSub => 'Help and contact us';
+	String get deleteAccount => 'Delete Account';
+	String get permanentAction => 'This action is permanent and cannot be undone';
+	String get accountScreenTitle => 'Account & Security';
+	String get accountEmailLabel => 'Email Address';
+	String get notSet => 'Not set';
+	String get accountPasswordLabel => 'Password';
+	String get accountPasswordSub => 'Change your password';
+	String get resetLinkButton => 'Send Reset Link';
+	String get accountConnectedLabel => 'Connected Account';
+	String get accountBiometric => 'Biometric Login';
+	String get accountBiometricSub => 'Use fingerprint or face to sign in';
+	String get accountLoginNotif => 'Login Notifications';
+	String get accountLoginNotifSub => 'Get notified of new sign-ins';
+	String get accountPurchaseConfirm => 'Purchase Confirmation';
+	String get accountPurchaseConfirmSub => 'Require confirmation before purchasing';
+	String get addressScreenTitle => 'Addresses';
+	String get refundScreenTitle => 'Refund Details';
+	String get privacyScreenTitle => 'Privacy';
+	String get privacyAccountSection => 'Account Privacy';
+	String get privacyPrivateAccount => 'Private Account';
+	String get privacyPrivateAccountSub => 'Only approved followers see your posts';
+	String get privacyFollowReqSection => 'Follow Requests';
+	String get privacyActivityStatus => 'Activity Status';
+	String get privacyMessagingSection => 'Messaging';
+	String get privacyReadReceipts => 'Read Receipts';
+	String get privacyReadReceiptsSub => 'Let others know when you\'ve read their messages';
+	String get privacyBlockedSection => 'Blocked Users';
+	String get notifAll => 'All';
+	String get notifMentionsOnly => 'Mentions Only';
+	String get notifOff => 'Off';
+	String get notifEnabledChip => 'Enabled';
+	String get notifDisabledChip => 'Disabled';
+	String get notifPushEnabled => 'Push notifications are enabled';
+	String get notifPushDisabled => 'Push notifications are disabled';
+	String get notifOpenSettingsBtn => 'Open Settings';
+	String get notifGeneralSection => 'General';
+	String get notifSocialSection => 'Social';
+	String get notifCommerceSection => 'Shopping';
+	String get notifVendorSection => 'Vendor';
+	String get notifComments => 'Comments';
+	String get notifUpvotes => 'Upvotes';
+	String get notifMentions => 'Mentions';
+	String get notifNewFollowers => 'New Followers';
+	String get notifFollowRequests => 'Follow Requests';
+	String get notifLoginAlerts => 'Login Alerts';
+	String get notifLoginAlertsSub => 'Notify me of new sign-ins';
+	String get notifDailySummary => 'Daily Summary';
+	String get notifDailySummarySub => 'Get a daily digest of activity';
+	String get notifOrderConfirmed => 'Order Confirmed';
+	String get notifOrderShipped => 'Order Shipped';
+	String get notifOrderDelivered => 'Order Delivered';
+	String get notifRefundProcessed => 'Refund Processed';
+	String get notifBackInStock => 'Back in Stock';
+	String get notifPriceDrop => 'Price Drop';
+	String get notifPromotionsToggle => 'Promotions';
+	String get notifOrderSound => 'Order Sound';
+	String get notifOrderSoundSub => 'Play a sound for new orders';
+	String get notifManageChannels => 'Manage Channels';
+	String get notifManageChannelsSub => 'Control notification channels';
+	String get pushNotifications => 'Push Notifications';
+	String get contentScreenTitle => 'Content';
+	String get contentFeedSection => 'Feed';
+	String get contentFeedLangSection => 'Feed Language';
+	String get contentPostsSection => 'Posts';
+	String get contentMutedSection => 'Muted';
+	String get contentVendorSection => 'Vendors';
+	String get langSection => 'Language';
+	String get langAppLabel => 'App Language';
+	String get appearanceTitle => 'Appearance';
+	String get themeSection => 'Theme';
+	String get themeLight => 'Light';
+	String get themeDark => 'Dark';
+	String get themeSystem => 'System Default';
+	String get textSizeSection => 'Text Size';
+	String get textAdjustLabel => 'Adjust Text Size';
+	String get textPreviewLabel => 'Preview';
+	String get textSmall => 'Small';
+	String get textNormal => 'Normal';
+	String get textLarge => 'Large';
+	String get textXlarge => 'X-Large';
+	String get boldText => 'Bold Text';
+	String get reduceAnim => 'Reduce Animations';
+	String get reduceAnimSub => 'Minimize motion effects';
+	String get arabicFontSection => 'Arabic Font';
+	String get fontDefault => 'Default';
+	String get fontCairo => 'Cairo';
+	String get fontAlmarai => 'Almarai';
+	String get fontTajawal => 'Tajawal';
+	String get accessibilitySection => 'Accessibility';
+	String get storageScreenTitle => 'Storage';
+	String get storageImageSection => 'Images';
+	String get storageRecentSection => 'Recent';
+	String get storageDevSection => 'Developer';
+	String get vendorScreenTitle => 'Vendor Settings';
+	String get vendorStoreStatusSection => 'Store Status';
+	String get vendorDeliverySection => 'Delivery';
+	String get vendorNotifSection => 'Notifications';
+	String get appScreenTitle => 'App Info';
+	String get appAboutSection => 'About';
+	String get appShareSection => 'Share';
+	String get supportScreenTitle => 'Support';
+	String get supportHelpSection => 'Help';
+	String get supportEscrowSection => 'Escrow & Payments';
+	String get supportLegalSection => 'Legal';
+	String get notifCommunityLabel => 'Community Notifications';
 }
 
 // Path: become_vendor
-class _StringsBecomeVendorEn {
-	_StringsBecomeVendorEn._(this._root);
+class StringsBecomeVendorEn {
+	StringsBecomeVendorEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1329,8 +1611,8 @@ class _StringsBecomeVendorEn {
 }
 
 // Path: privacy
-class _StringsPrivacyEn {
-	_StringsPrivacyEn._(this._root);
+class StringsPrivacyEn {
+	StringsPrivacyEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1514,8 +1796,8 @@ class _StringsPrivacyEn {
 }
 
 // Path: terms
-class _StringsTermsEn {
-	_StringsTermsEn._(this._root);
+class StringsTermsEn {
+	StringsTermsEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1700,8 +1982,8 @@ class _StringsTermsEn {
 }
 
 // Path: refund
-class _StringsRefundEn {
-	_StringsRefundEn._(this._root);
+class StringsRefundEn {
+	StringsRefundEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1814,8 +2096,8 @@ class _StringsRefundEn {
 }
 
 // Path: vendor_finances
-class _StringsVendorFinancesEn {
-	_StringsVendorFinancesEn._(this._root);
+class StringsVendorFinancesEn {
+	StringsVendorFinancesEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1834,8 +2116,8 @@ class _StringsVendorFinancesEn {
 }
 
 // Path: vendor_settings
-class _StringsVendorSettingsEn {
-	_StringsVendorSettingsEn._(this._root);
+class StringsVendorSettingsEn {
+	StringsVendorSettingsEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1861,8 +2143,8 @@ class _StringsVendorSettingsEn {
 }
 
 // Path: vendor_policies
-class _StringsVendorPoliciesEn {
-	_StringsVendorPoliciesEn._(this._root);
+class StringsVendorPoliciesEn {
+	StringsVendorPoliciesEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1877,8 +2159,8 @@ class _StringsVendorPoliciesEn {
 }
 
 // Path: digital_vault
-class _StringsDigitalVaultEn {
-	_StringsDigitalVaultEn._(this._root);
+class StringsDigitalVaultEn {
+	StringsDigitalVaultEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1894,8 +2176,8 @@ class _StringsDigitalVaultEn {
 }
 
 // Path: vendor_products
-class _StringsVendorProductsEn {
-	_StringsVendorProductsEn._(this._root);
+class StringsVendorProductsEn {
+	StringsVendorProductsEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -1985,8 +2267,8 @@ class _StringsVendorProductsEn {
 }
 
 // Path: vendor_orders
-class _StringsVendorOrdersEn {
-	_StringsVendorOrdersEn._(this._root);
+class StringsVendorOrdersEn {
+	StringsVendorOrdersEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -2008,8 +2290,8 @@ class _StringsVendorOrdersEn {
 }
 
 // Path: dispute
-class _StringsDisputeEn {
-	_StringsDisputeEn._(this._root);
+class StringsDisputeEn {
+	StringsDisputeEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -2035,8 +2317,8 @@ class _StringsDisputeEn {
 }
 
 // Path: stores
-class _StringsStoresEn {
-	_StringsStoresEn._(this._root);
+class StringsStoresEn {
+	StringsStoresEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -2049,8 +2331,8 @@ class _StringsStoresEn {
 }
 
 // Path: social
-class _StringsSocialEn {
-	_StringsSocialEn._(this._root);
+class StringsSocialEn {
+	StringsSocialEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -2087,8 +2369,8 @@ class _StringsSocialEn {
 }
 
 // Path: store
-class _StringsStoreEn {
-	_StringsStoreEn._(this._root);
+class StringsStoreEn {
+	StringsStoreEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -2103,8 +2385,8 @@ class _StringsStoreEn {
 }
 
 // Path: vendor_profile
-class _StringsVendorProfileEn {
-	_StringsVendorProfileEn._(this._root);
+class StringsVendorProfileEn {
+	StringsVendorProfileEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -2126,8 +2408,8 @@ class _StringsVendorProfileEn {
 }
 
 // Path: drawer
-class _StringsDrawerEn {
-	_StringsDrawerEn._(this._root);
+class StringsDrawerEn {
+	StringsDrawerEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -2153,8 +2435,8 @@ class _StringsDrawerEn {
 }
 
 // Path: info
-class _StringsInfoEn {
-	_StringsInfoEn._(this._root);
+class StringsInfoEn {
+	StringsInfoEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -2195,8 +2477,8 @@ class _StringsInfoEn {
 }
 
 // Path: orders
-class _StringsOrdersEn {
-	_StringsOrdersEn._(this._root);
+class StringsOrdersEn {
+	StringsOrdersEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -2213,8 +2495,8 @@ class _StringsOrdersEn {
 }
 
 // Path: notifications
-class _StringsNotificationsEn {
-	_StringsNotificationsEn._(this._root);
+class StringsNotificationsEn {
+	StringsNotificationsEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -2226,8 +2508,8 @@ class _StringsNotificationsEn {
 }
 
 // Path: saved_items
-class _StringsSavedItemsEn {
-	_StringsSavedItemsEn._(this._root);
+class StringsSavedItemsEn {
+	StringsSavedItemsEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -2245,8 +2527,8 @@ class _StringsSavedItemsEn {
 }
 
 // Path: legal
-class _StringsLegalEn {
-	_StringsLegalEn._(this._root);
+class StringsLegalEn {
+	StringsLegalEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -2256,8 +2538,8 @@ class _StringsLegalEn {
 }
 
 // Path: create_post
-class _StringsCreatePostEn {
-	_StringsCreatePostEn._(this._root);
+class StringsCreatePostEn {
+	StringsCreatePostEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
@@ -2269,20 +2551,29 @@ class _StringsCreatePostEn {
 	String get share_product => 'Share a Product';
 	String share_product_named({required Object title}) => 'Share: ${title}';
 	String get ask_product => 'Ask About a Product';
+	String get select_community_title => 'Select Community';
+	String get search_communities => 'Search communities...';
+	String get show_more_communities => 'Show More Communities';
+	String get no_communities_found => 'No communities found';
+	String get private_community_locked => 'Private - Join to select';
+	String get create_community => 'Create a Community';
+	String get ai_assistant => 'AI Assistant';
 }
 
 // Path: <root>
-class _StringsAr implements Translations {
+class StringsAr extends Translations {
 	/// You can call this constructor and build your own translation instance of this locale.
 	/// Constructing via the enum [AppLocale.build] is preferred.
-	_StringsAr.build({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver})
+	StringsAr.build({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver})
 		: assert(overrides == null, 'Set "translation_overrides: true" in order to enable this feature.'),
 		  $meta = TranslationMetadata(
 		    locale: AppLocale.ar,
 		    overrides: overrides ?? {},
 		    cardinalResolver: cardinalResolver,
 		    ordinalResolver: ordinalResolver,
-		  ) {
+		  ),
+		  super.build(cardinalResolver: cardinalResolver, ordinalResolver: ordinalResolver) {
+		super.$meta.setFlatMapFunction($meta.getTranslation); // copy base translations to super.$meta
 		$meta.setFlatMapFunction(_flatMapFunction);
 	}
 
@@ -2290,66 +2581,66 @@ class _StringsAr implements Translations {
 	@override final TranslationMetadata<AppLocale, Translations> $meta;
 
 	/// Access flat map
-	@override dynamic operator[](String key) => $meta.getTranslation(key);
+	@override dynamic operator[](String key) => $meta.getTranslation(key) ?? super.$meta.getTranslation(key);
 
-	@override late final _StringsAr _root = this; // ignore: unused_field
+	@override late final StringsAr _root = this; // ignore: unused_field
 
 	// Translations
-	@override late final _StringsNavAr nav = _StringsNavAr._(_root);
-	@override late final _StringsExploreAr explore = _StringsExploreAr._(_root);
-	@override late final _StringsAuthAr auth = _StringsAuthAr._(_root);
-	@override late final _StringsAccountAr account = _StringsAccountAr._(_root);
-	@override late final _StringsProductAr product = _StringsProductAr._(_root);
-	@override late final _StringsVendorAr vendor = _StringsVendorAr._(_root);
-	@override late final _StringsCheckoutAr checkout = _StringsCheckoutAr._(_root);
-	@override late final _StringsCategoryAr category = _StringsCategoryAr._(_root);
-	@override late final _StringsCommunityAr community = _StringsCommunityAr._(_root);
-	@override late final _StringsMessagesAr messages = _StringsMessagesAr._(_root);
-	@override late final _StringsCommonAr common = _StringsCommonAr._(_root);
-	@override late final _StringsHomeAr home = _StringsHomeAr._(_root);
-	@override late final _StringsFooterAr footer = _StringsFooterAr._(_root);
-	@override late final _StringsCommunitySettingsAr community_settings = _StringsCommunitySettingsAr._(_root);
-	@override late final _StringsFeedbackAr feedback = _StringsFeedbackAr._(_root);
-	@override late final _StringsContactAr contact = _StringsContactAr._(_root);
-	@override late final _StringsAboutAr about = _StringsAboutAr._(_root);
-	@override late final _StringsDisutesAr disutes = _StringsDisutesAr._(_root);
-	@override late final _StringsUserProfileAr user_profile = _StringsUserProfileAr._(_root);
-	@override late final _StringsAccountDropdownAr account_dropdown = _StringsAccountDropdownAr._(_root);
-	@override late final _StringsVendorDashboardAr vendor_dashboard = _StringsVendorDashboardAr._(_root);
-	@override late final _StringsNotificationsSettingsAr notifications_settings = _StringsNotificationsSettingsAr._(_root);
-	@override late final _StringsSavedAr saved = _StringsSavedAr._(_root);
-	@override late final _StringsSearchAr search = _StringsSearchAr._(_root);
-	@override late final _StringsCartAr cart = _StringsCartAr._(_root);
-	@override late final _StringsSettingsAr settings = _StringsSettingsAr._(_root);
-	@override late final _StringsBecomeVendorAr become_vendor = _StringsBecomeVendorAr._(_root);
-	@override late final _StringsPrivacyAr privacy = _StringsPrivacyAr._(_root);
-	@override late final _StringsTermsAr terms = _StringsTermsAr._(_root);
-	@override late final _StringsRefundAr refund = _StringsRefundAr._(_root);
-	@override late final _StringsVendorFinancesAr vendor_finances = _StringsVendorFinancesAr._(_root);
-	@override late final _StringsVendorSettingsAr vendor_settings = _StringsVendorSettingsAr._(_root);
-	@override late final _StringsVendorPoliciesAr vendor_policies = _StringsVendorPoliciesAr._(_root);
-	@override late final _StringsDigitalVaultAr digital_vault = _StringsDigitalVaultAr._(_root);
-	@override late final _StringsVendorProductsAr vendor_products = _StringsVendorProductsAr._(_root);
-	@override late final _StringsVendorOrdersAr vendor_orders = _StringsVendorOrdersAr._(_root);
-	@override late final _StringsDisputeAr dispute = _StringsDisputeAr._(_root);
-	@override late final _StringsStoresAr stores = _StringsStoresAr._(_root);
-	@override late final _StringsSocialAr social = _StringsSocialAr._(_root);
-	@override late final _StringsStoreAr store = _StringsStoreAr._(_root);
-	@override late final _StringsVendorProfileAr vendor_profile = _StringsVendorProfileAr._(_root);
-	@override late final _StringsDrawerAr drawer = _StringsDrawerAr._(_root);
-	@override late final _StringsInfoAr info = _StringsInfoAr._(_root);
-	@override late final _StringsOrdersAr orders = _StringsOrdersAr._(_root);
-	@override late final _StringsNotificationsAr notifications = _StringsNotificationsAr._(_root);
-	@override late final _StringsSavedItemsAr saved_items = _StringsSavedItemsAr._(_root);
-	@override late final _StringsLegalAr legal = _StringsLegalAr._(_root);
-	@override late final _StringsCreatePostAr create_post = _StringsCreatePostAr._(_root);
+	@override late final StringsNavAr nav = StringsNavAr._(_root);
+	@override late final StringsExploreAr explore = StringsExploreAr._(_root);
+	@override late final StringsAuthAr auth = StringsAuthAr._(_root);
+	@override late final StringsAccountAr account = StringsAccountAr._(_root);
+	@override late final StringsProductAr product = StringsProductAr._(_root);
+	@override late final StringsVendorAr vendor = StringsVendorAr._(_root);
+	@override late final StringsCheckoutAr checkout = StringsCheckoutAr._(_root);
+	@override late final StringsCategoryAr category = StringsCategoryAr._(_root);
+	@override late final StringsCommunityAr community = StringsCommunityAr._(_root);
+	@override late final StringsMessagesAr messages = StringsMessagesAr._(_root);
+	@override late final StringsCommonAr common = StringsCommonAr._(_root);
+	@override late final StringsHomeAr home = StringsHomeAr._(_root);
+	@override late final StringsFooterAr footer = StringsFooterAr._(_root);
+	@override late final StringsCommunitySettingsAr community_settings = StringsCommunitySettingsAr._(_root);
+	@override late final StringsFeedbackAr feedback = StringsFeedbackAr._(_root);
+	@override late final StringsContactAr contact = StringsContactAr._(_root);
+	@override late final StringsAboutAr about = StringsAboutAr._(_root);
+	@override late final StringsDisutesAr disutes = StringsDisutesAr._(_root);
+	@override late final StringsUserProfileAr user_profile = StringsUserProfileAr._(_root);
+	@override late final StringsAccountDropdownAr account_dropdown = StringsAccountDropdownAr._(_root);
+	@override late final StringsVendorDashboardAr vendor_dashboard = StringsVendorDashboardAr._(_root);
+	@override late final StringsNotificationsSettingsAr notifications_settings = StringsNotificationsSettingsAr._(_root);
+	@override late final StringsSavedAr saved = StringsSavedAr._(_root);
+	@override late final StringsSearchAr search = StringsSearchAr._(_root);
+	@override late final StringsCartAr cart = StringsCartAr._(_root);
+	@override late final StringsSettingsAr settings = StringsSettingsAr._(_root);
+	@override late final StringsBecomeVendorAr become_vendor = StringsBecomeVendorAr._(_root);
+	@override late final StringsPrivacyAr privacy = StringsPrivacyAr._(_root);
+	@override late final StringsTermsAr terms = StringsTermsAr._(_root);
+	@override late final StringsRefundAr refund = StringsRefundAr._(_root);
+	@override late final StringsVendorFinancesAr vendor_finances = StringsVendorFinancesAr._(_root);
+	@override late final StringsVendorSettingsAr vendor_settings = StringsVendorSettingsAr._(_root);
+	@override late final StringsVendorPoliciesAr vendor_policies = StringsVendorPoliciesAr._(_root);
+	@override late final StringsDigitalVaultAr digital_vault = StringsDigitalVaultAr._(_root);
+	@override late final StringsVendorProductsAr vendor_products = StringsVendorProductsAr._(_root);
+	@override late final StringsVendorOrdersAr vendor_orders = StringsVendorOrdersAr._(_root);
+	@override late final StringsDisputeAr dispute = StringsDisputeAr._(_root);
+	@override late final StringsStoresAr stores = StringsStoresAr._(_root);
+	@override late final StringsSocialAr social = StringsSocialAr._(_root);
+	@override late final StringsStoreAr store = StringsStoreAr._(_root);
+	@override late final StringsVendorProfileAr vendor_profile = StringsVendorProfileAr._(_root);
+	@override late final StringsDrawerAr drawer = StringsDrawerAr._(_root);
+	@override late final StringsInfoAr info = StringsInfoAr._(_root);
+	@override late final StringsOrdersAr orders = StringsOrdersAr._(_root);
+	@override late final StringsNotificationsAr notifications = StringsNotificationsAr._(_root);
+	@override late final StringsSavedItemsAr saved_items = StringsSavedItemsAr._(_root);
+	@override late final StringsLegalAr legal = StringsLegalAr._(_root);
+	@override late final StringsCreatePostAr create_post = StringsCreatePostAr._(_root);
 }
 
 // Path: nav
-class _StringsNavAr implements _StringsNavEn {
-	_StringsNavAr._(this._root);
+class StringsNavAr extends StringsNavEn {
+	StringsNavAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get home => 'الرئيسية';
@@ -2372,10 +2663,10 @@ class _StringsNavAr implements _StringsNavEn {
 }
 
 // Path: explore
-class _StringsExploreAr implements _StringsExploreEn {
-	_StringsExploreAr._(this._root);
+class StringsExploreAr extends StringsExploreEn {
+	StringsExploreAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get products => 'المنتجات';
@@ -2383,13 +2674,30 @@ class _StringsExploreAr implements _StringsExploreEn {
 	@override String get stores => 'المتاجر';
 	@override String get browse_categories => 'تصفح الفئات';
 	@override String get popular_searches => 'عمليات البحث الشائعة';
+	@override String get all_communities => 'كل المجتمعات';
+	@override String get select_community => 'اختر مجتمع';
+	@override String get filter => 'تصفية';
+	@override String get category => 'الفئة';
+	@override String get brand => 'العلامة التجارية';
+	@override String get color => 'اللون';
+	@override String get clear_filters => 'مسح التصفية';
+	@override String get apply => 'تطبيق';
+	@override String get filter_by_community => 'حسب المجتمع';
+	@override String get search_communities => 'ابحث عن مجتمعات...';
+	@override String get my_communities => 'مجتمعاتي';
+	@override String get no_communities_joined => 'لم تنضم إلى أي مجتمع بعد';
+	@override String get explore_communities => 'استكشف المجتمعات';
+	@override String get select_community_to_filter => 'اختر مجتمعاً لتصفية المنشورات';
+	@override String get all_posts => 'كل المنشورات';
+	@override String get private_join_required => 'انضم لهذا المجتمع الخاص لاختياره';
+	@override String get public => 'عام';
 }
 
 // Path: auth
-class _StringsAuthAr implements _StringsAuthEn {
-	_StringsAuthAr._(this._root);
+class StringsAuthAr extends StringsAuthEn {
+	StringsAuthAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get sign_in => 'تسجيل الدخول';
@@ -2418,10 +2726,10 @@ class _StringsAuthAr implements _StringsAuthEn {
 }
 
 // Path: account
-class _StringsAccountAr implements _StringsAccountEn {
-	_StringsAccountAr._(this._root);
+class StringsAccountAr extends StringsAccountEn {
+	StringsAccountAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get my_orders => 'طلباتي';
@@ -2511,10 +2819,10 @@ class _StringsAccountAr implements _StringsAccountEn {
 }
 
 // Path: product
-class _StringsProductAr implements _StringsProductEn {
-	_StringsProductAr._(this._root);
+class StringsProductAr extends StringsProductEn {
+	StringsProductAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get add_to_cart => 'أضف إلى سلة التسوق';
@@ -2586,10 +2894,10 @@ class _StringsProductAr implements _StringsProductEn {
 }
 
 // Path: vendor
-class _StringsVendorAr implements _StringsVendorEn {
-	_StringsVendorAr._(this._root);
+class StringsVendorAr extends StringsVendorEn {
+	StringsVendorAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get store => 'متجر';
@@ -2650,10 +2958,10 @@ class _StringsVendorAr implements _StringsVendorEn {
 }
 
 // Path: checkout
-class _StringsCheckoutAr implements _StringsCheckoutEn {
-	_StringsCheckoutAr._(this._root);
+class StringsCheckoutAr extends StringsCheckoutEn {
+	StringsCheckoutAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get checkout => 'الخروج';
@@ -2712,10 +3020,10 @@ class _StringsCheckoutAr implements _StringsCheckoutEn {
 }
 
 // Path: category
-class _StringsCategoryAr implements _StringsCategoryEn {
-	_StringsCategoryAr._(this._root);
+class StringsCategoryAr extends StringsCategoryEn {
+	StringsCategoryAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get browse_categories => 'تصفح الفئات';
@@ -2728,16 +3036,18 @@ class _StringsCategoryAr implements _StringsCategoryEn {
 }
 
 // Path: community
-class _StringsCommunityAr implements _StringsCommunityEn {
-	_StringsCommunityAr._(this._root);
+class StringsCommunityAr extends StringsCommunityEn {
+	StringsCommunityAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get community => 'المجتمع';
 	@override String get join => 'انضم';
 	@override String get joined => 'انضم';
 	@override String get leave => 'مغادرة';
+	@override String get leave_title => 'مغادرة المجتمع';
+	@override String get leave_confirm => 'هل أنت متأكد من مغادرة هذا المجتمع؟';
 	@override String get create_post => 'إنشاء منشور';
 	@override String get post => 'منشور';
 	@override String get comment => 'تعليق';
@@ -2796,10 +3106,10 @@ class _StringsCommunityAr implements _StringsCommunityEn {
 }
 
 // Path: messages
-class _StringsMessagesAr implements _StringsMessagesEn {
-	_StringsMessagesAr._(this._root);
+class StringsMessagesAr extends StringsMessagesEn {
+	StringsMessagesAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get messages => 'الرسائل';
@@ -2835,10 +3145,10 @@ class _StringsMessagesAr implements _StringsMessagesEn {
 }
 
 // Path: common
-class _StringsCommonAr implements _StringsCommonEn {
-	_StringsCommonAr._(this._root);
+class StringsCommonAr extends StringsCommonEn {
+	StringsCommonAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get unknown_user => 'غير معروف';
@@ -2907,10 +3217,10 @@ class _StringsCommonAr implements _StringsCommonEn {
 }
 
 // Path: home
-class _StringsHomeAr implements _StringsHomeEn {
-	_StringsHomeAr._(this._root);
+class StringsHomeAr extends StringsHomeEn {
+	StringsHomeAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get hero_title => 'اكتشف. تواصل. تسوق.';
@@ -2949,10 +3259,10 @@ class _StringsHomeAr implements _StringsHomeEn {
 }
 
 // Path: footer
-class _StringsFooterAr implements _StringsFooterEn {
-	_StringsFooterAr._(this._root);
+class StringsFooterAr extends StringsFooterEn {
+	StringsFooterAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get privacy_policy => 'سياسة الخصوصية';
@@ -2970,10 +3280,10 @@ class _StringsFooterAr implements _StringsFooterEn {
 }
 
 // Path: community_settings
-class _StringsCommunitySettingsAr implements _StringsCommunitySettingsEn {
-	_StringsCommunitySettingsAr._(this._root);
+class StringsCommunitySettingsAr extends StringsCommunitySettingsEn {
+	StringsCommunitySettingsAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'إعدادات المجتمع';
@@ -3006,10 +3316,10 @@ class _StringsCommunitySettingsAr implements _StringsCommunitySettingsEn {
 }
 
 // Path: feedback
-class _StringsFeedbackAr implements _StringsFeedbackEn {
-	_StringsFeedbackAr._(this._root);
+class StringsFeedbackAr extends StringsFeedbackEn {
+	StringsFeedbackAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'إرسال ملاحظات';
@@ -3023,10 +3333,10 @@ class _StringsFeedbackAr implements _StringsFeedbackEn {
 }
 
 // Path: contact
-class _StringsContactAr implements _StringsContactEn {
-	_StringsContactAr._(this._root);
+class StringsContactAr extends StringsContactEn {
+	StringsContactAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'اتصل بنا';
@@ -3037,10 +3347,10 @@ class _StringsContactAr implements _StringsContactEn {
 }
 
 // Path: about
-class _StringsAboutAr implements _StringsAboutEn {
-	_StringsAboutAr._(this._root);
+class StringsAboutAr extends StringsAboutEn {
+	StringsAboutAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'نبذة عن WaslaQ';
@@ -3062,10 +3372,10 @@ class _StringsAboutAr implements _StringsAboutEn {
 }
 
 // Path: disutes
-class _StringsDisutesAr implements _StringsDisutesEn {
-	_StringsDisutesAr._(this._root);
+class StringsDisutesAr extends StringsDisutesEn {
+	StringsDisutesAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'نزاعاتي';
@@ -3075,10 +3385,10 @@ class _StringsDisutesAr implements _StringsDisutesEn {
 }
 
 // Path: user_profile
-class _StringsUserProfileAr implements _StringsUserProfileEn {
-	_StringsUserProfileAr._(this._root);
+class StringsUserProfileAr extends StringsUserProfileEn {
+	StringsUserProfileAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get followers => 'المتابعون';
@@ -3097,10 +3407,10 @@ class _StringsUserProfileAr implements _StringsUserProfileEn {
 }
 
 // Path: account_dropdown
-class _StringsAccountDropdownAr implements _StringsAccountDropdownEn {
-	_StringsAccountDropdownAr._(this._root);
+class StringsAccountDropdownAr extends StringsAccountDropdownEn {
+	StringsAccountDropdownAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get signed_in_as => 'تم تسجيل الدخول باسم';
@@ -3116,10 +3426,10 @@ class _StringsAccountDropdownAr implements _StringsAccountDropdownEn {
 }
 
 // Path: vendor_dashboard
-class _StringsVendorDashboardAr implements _StringsVendorDashboardEn {
-	_StringsVendorDashboardAr._(this._root);
+class StringsVendorDashboardAr extends StringsVendorDashboardEn {
+	StringsVendorDashboardAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'لوحة تحكم الموردين';
@@ -3238,10 +3548,10 @@ class _StringsVendorDashboardAr implements _StringsVendorDashboardEn {
 }
 
 // Path: notifications_settings
-class _StringsNotificationsSettingsAr implements _StringsNotificationsSettingsEn {
-	_StringsNotificationsSettingsAr._(this._root);
+class StringsNotificationsSettingsAr extends StringsNotificationsSettingsEn {
+	StringsNotificationsSettingsAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'الإشعارات';
@@ -3254,10 +3564,10 @@ class _StringsNotificationsSettingsAr implements _StringsNotificationsSettingsEn
 }
 
 // Path: saved
-class _StringsSavedAr implements _StringsSavedEn {
-	_StringsSavedAr._(this._root);
+class StringsSavedAr extends StringsSavedEn {
+	StringsSavedAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'العناصر المحفوظة';
@@ -3270,10 +3580,10 @@ class _StringsSavedAr implements _StringsSavedEn {
 }
 
 // Path: search
-class _StringsSearchAr implements _StringsSearchEn {
-	_StringsSearchAr._(this._root);
+class StringsSearchAr extends StringsSearchEn {
+	StringsSearchAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get no_results => 'لم يتم العثور على أي نتائج';
@@ -3299,10 +3609,10 @@ class _StringsSearchAr implements _StringsSearchEn {
 }
 
 // Path: cart
-class _StringsCartAr implements _StringsCartEn {
-	_StringsCartAr._(this._root);
+class StringsCartAr extends StringsCartEn {
+	StringsCartAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'عربة التسوق';
@@ -3319,10 +3629,10 @@ class _StringsCartAr implements _StringsCartEn {
 }
 
 // Path: settings
-class _StringsSettingsAr implements _StringsSettingsEn {
-	_StringsSettingsAr._(this._root);
+class StringsSettingsAr extends StringsSettingsEn {
+	StringsSettingsAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get profile_tab => 'الملف الشخصي';
@@ -3403,13 +3713,275 @@ class _StringsSettingsAr implements _StringsSettingsEn {
 	@override String get save => 'حفظ';
 	@override String get saved_ok => 'تم الحفظ بنجاح';
 	@override String save_failed({required Object error}) => 'فشل الحفظ: ${error}';
+	@override String get hub_profile => 'الملف الشخصي';
+	@override String get hub_profile_sub => 'الصورة الشخصية، نبذة، روابط التواصل';
+	@override String get hub_account => 'الحساب والأمان';
+	@override String get hub_account_sub => 'البريد الإلكتروني، كلمة المرور، القفل البيومتري';
+	@override String get hub_address => 'دفتر العناوين';
+	@override String get hub_address_sub => 'عناوين التوصيل في فلسطين';
+	@override String get hub_refund => 'تفاصيل الاسترداد';
+	@override String get hub_refund_sub => 'البيانات البنكية لاسترداد النزاعات';
+	@override String get hub_privacy => 'الخصوصية والسلامة';
+	@override String get hub_privacy_sub => 'الظهور، المحظورون، طلبات المتابعة';
+	@override String get hub_notifications => 'الإشعارات';
+	@override String get hub_notifications_sub => 'الدفع، الطلبات، التنبيهات الاجتماعية';
+	@override String get hub_content => 'المحتوى والخلاصة';
+	@override String get hub_content_sub => 'فلتر اللغة، الكلمات المكتومة';
+	@override String get hub_appearance => 'المظهر واللغة';
+	@override String get hub_appearance_sub => 'السمة، اللغة، الخط، إمكانية الوصول';
+	@override String get hub_storage => 'التخزين والأداء';
+	@override String get hub_storage_sub => 'الذاكرة المؤقتة، استخدام البيانات';
+	@override String get hub_vendor => 'إعدادات البائع';
+	@override String get hub_vendor_sub => 'وضع الإجازة، مناطق التوصيل';
+	@override String get hub_app => 'التطبيق';
+	@override String get hub_app_sub => 'مشاركة، تقييم، الصلاحيات، الإصدار';
+	@override String get hub_support => 'الدعم والضمان';
+	@override String get hub_support_sub => 'المساعدة، النزاعات، القانونية';
+	@override String get appearance_title => 'المظهر واللغة';
+	@override String get lang_section => 'اللغة';
+	@override String get lang_app_label => 'لغة التطبيق';
+	@override String get theme_section => 'السمة';
+	@override String get theme_light => 'السمة الفاتحة';
+	@override String get theme_dark => 'السمة الداكنة';
+	@override String get theme_system => 'اتباع النظام';
+	@override String get text_size_section => 'حجم النص';
+	@override String get text_adjust_label => 'ضبط حجم الخط';
+	@override String get text_preview_label => 'معاينة مباشرة:';
+	@override String get text_small => 'صغير';
+	@override String get text_normal => 'عادي';
+	@override String get text_large => 'كبير';
+	@override String get text_xlarge => 'كبير جداً';
+	@override String get arabic_font_section => 'الخط العربي';
+	@override String get font_default => 'الافتراضي';
+	@override String get font_cairo => 'Cairo';
+	@override String get font_tajawal => 'Tajawal';
+	@override String get font_almarai => 'Almarai';
+	@override String get accessibility_section => 'إمكانية الوصول';
+	@override String get bold_text => 'نص عريض';
+	@override String get reduce_anim => 'تقليل الحركات';
+	@override String get reduce_anim_sub => 'موصى به للأجهزة القديمة أو الحساسية للحركة';
+	@override String get notif_push_enabled => 'تم تكوين التنبيهات على هذا الجهاز';
+	@override String get notif_push_disabled => 'التنبيهات معطلة';
+	@override String get notif_enabled_chip => 'مفعّل';
+	@override String get notif_disabled_chip => 'معطّل';
+	@override String get notif_open_settings_btn => 'فتح الإعدادات';
+	@override String get notif_social_section => 'الإشعارات الاجتماعية';
+	@override String get notif_commerce_section => 'إشعارات التسوق';
+	@override String get notif_community_label => 'إشعارات المجتمع';
+	@override String get notif_all => 'الكل';
+	@override String get notif_mentions_only => 'الإشارات فقط';
+	@override String get notif_off => 'إيقاف';
+	@override String get notif_order_confirmed => 'تأكيد الطلب';
+	@override String get notif_order_shipped => 'شحن الطلب';
+	@override String get notif_order_delivered => 'تسليم الطلب';
+	@override String get notif_refund_processed => 'معالجة الاسترداد';
+	@override String get notif_price_drop => 'تنبيهات انخفاض السعر';
+	@override String get notif_back_in_stock => 'تنبيهات العودة للمخزون';
+	@override String get notif_vendor_section => 'إشعارات البائع';
+	@override String get notif_order_sound => 'صوت تنبيه الطلب الجديد';
+	@override String get notif_order_sound_sub => 'تشغيل صوت تنبيه عالٍ لكل طلب جديد';
+	@override String get notif_daily_summary => 'ملخص المبيعات اليومي';
+	@override String get notif_daily_summary_sub => 'احصل على ملخص صباحي لمبيعات أمس';
+	@override String get notif_general_section => 'عام والنظام';
+	@override String get notif_promotions_toggle => 'العروض الترويجية';
+	@override String get notif_login_alerts => 'تنبيهات تسجيل الدخول';
+	@override String get notif_login_alerts_sub => 'يُعلمك عند تسجيل الدخول من جهاز جديد';
+	@override String get notif_manage_channels => 'فتح إعدادات الإشعارات';
+	@override String get notif_manage_channels_sub => 'إدارة قنوات الإشعارات لهذا التطبيق';
+	@override String get account_screen_title => 'الحساب والأمان';
+	@override String get account_email_label => 'عنوان البريد الإلكتروني';
+	@override String get account_password_label => 'كلمة المرور';
+	@override String get account_password_sub => 'إرسال رابط إعادة تعيين إلى بريدك الإلكتروني';
+	@override String get account_connected_label => 'الحسابات المرتبطة';
+	@override String get account_biometric => 'القفل البيومتري';
+	@override String get account_biometric_sub => 'يتطلب بصمة الإصبع أو Face ID لفتح واصلك';
+	@override String get account_purchase_confirm => 'تأكيد الشراء';
+	@override String get account_purchase_confirm_sub => 'يتطلب بيانات بيومترية قبل إتمام أي عملية شراء';
+	@override String get account_login_notif => 'إشعارات تسجيل الدخول';
+	@override String get account_login_notif_sub => 'يُعلمك عند تسجيل الدخول من جهاز جديد';
+	@override String get privacy_screen_title => 'الخصوصية والسلامة';
+	@override String get privacy_account_section => 'خصوصية الحساب';
+	@override String get privacy_private_account => 'حساب خاص';
+	@override String get privacy_private_account_sub => 'يمكن فقط للمتابعين المعتمدين رؤية منشوراتك';
+	@override String get privacy_messaging_section => 'المراسلة والدردشة';
+	@override String get privacy_read_receipts => 'إيصالات القراءة';
+	@override String get privacy_read_receipts_sub => 'إظهار إيصالات القراءة (✓✓) في المحادثات';
+	@override String get privacy_activity_status => 'إظهار حالة النشاط';
+	@override String get privacy_blocked_section => 'المستخدمون المحظورون';
+	@override String get privacy_follow_req_section => 'طلبات المتابعة';
+	@override String get content_screen_title => 'المحتوى والخلاصة';
+	@override String get content_feed_lang_section => 'لغة الخلاصة';
+	@override String get content_muted_section => 'الكلمات المكتومة';
+	@override String get content_posts_section => 'المنشورات';
+	@override String get content_feed_section => 'سلوك الخلاصة';
+	@override String get content_default_visibility => 'ظهور المنشور الافتراضي';
+	@override String get content_vendor_section => 'إعدادات البائع';
+	@override String get storage_screen_title => 'التخزين والأداء';
+	@override String get storage_image_section => 'ذاكرة تخزين الصور';
+	@override String get storage_recent_section => 'المشاهدة مؤخراً';
+	@override String get storage_dev_section => 'إعدادات المطور';
+	@override String get support_screen_title => 'الدعم والضمان';
+	@override String get support_help_section => 'الحصول على المساعدة';
+	@override String get support_legal_section => 'القانونية';
+	@override String get support_escrow_section => 'الضمان والنزاعات';
+	@override String get support_contact => 'تواصل مع الدعم';
+	@override String get support_contact_sub => 'تحدث مع وكيل دعم واصلك';
+	@override String get support_report_bug => 'الإبلاغ عن خطأ';
+	@override String get support_report_sub => 'ساعدنا في تحسين التطبيق بالإبلاغ عن المشاكل';
+	@override String get support_terms => 'شروط الاستخدام';
+	@override String get support_privacy_policy => 'سياسة الخصوصية';
+	@override String get app_screen_title => 'معلومات التطبيق';
+	@override String get app_share_section => 'مشاركة وتقييم';
+	@override String get app_about_section => 'حول';
+	@override String get app_share_waslaq => 'شارك واصلك';
+	@override String get app_share_sub => 'أخبر أصدقاءك عن السوق الفلسطيني';
+	@override String get app_rate => 'قيّم واصلك';
+	@override String get app_rate_sub => 'اترك تقييماً في المتجر';
+	@override String get app_permissions => 'صلاحيات التطبيق';
+	@override String get app_permissions_sub => 'إدارة صلاحيات التخزين والكاميرا والإشعارات';
+	@override String get profile_screen_title => 'إعدادات الملف الشخصي';
+	@override String get address_screen_title => 'دفتر العناوين';
+	@override String get refund_screen_title => 'تفاصيل الاسترداد';
+	@override String get vendor_screen_title => 'إعدادات البائع';
+	@override String get vendor_store_status_section => 'حالة المتجر';
+	@override String get vendor_delivery_section => 'مناطق التوصيل';
+	@override String get vendor_notif_section => 'الإشعارات';
+	@override String get hubProfile => 'الملف الشخصي';
+	@override String get hubProfileSub => 'تعديل معلومات ملفك الشخصي';
+	@override String get hubAccount => 'الحساب والأمان';
+	@override String get hubAccountSub => 'كلمة المرور والبريد الإلكتروني وإعدادات الحساب';
+	@override String get hubAddress => 'العناوين';
+	@override String get hubAddressSub => 'إدارة عناوين التوصيل';
+	@override String get hubRefund => 'تفاصيل الاسترداد';
+	@override String get hubRefundSub => 'الحساب البنكي للمبالغ المستردة';
+	@override String get hubPrivacy => 'الخصوصية';
+	@override String get hubPrivacySub => 'تحكم بمن يرى محتواك';
+	@override String get hubNotifications => 'الإشعارات';
+	@override String get hubNotificationsSub => 'إدارة تفضيلات الإشعارات';
+	@override String get hubContent => 'المحتوى';
+	@override String get hubContentSub => 'اللغة وتفضيلات المحتوى';
+	@override String get hubAppearance => 'المظهر';
+	@override String get hubAppearanceSub => 'إعدادات السمة والعرض';
+	@override String get hubStorage => 'التخزين';
+	@override String get hubStorageSub => 'إدارة ذاكرة التخزين المؤقت والبيانات';
+	@override String get hubVendor => 'إعدادات المتجر';
+	@override String get hubVendorSub => 'إدارة إعدادات متجرك';
+	@override String get hubApp => 'معلومات التطبيق';
+	@override String get hubAppSub => 'الإصدار وحول التطبيق';
+	@override String get hubSupport => 'الدعم';
+	@override String get hubSupportSub => 'المساعدة والتواصل معنا';
+	@override String get deleteAccount => 'حذف الحساب';
+	@override String get permanentAction => 'هذه العملية نهائية ولا يمكن التراجع عنها';
+	@override String get accountScreenTitle => 'الحساب والأمان';
+	@override String get accountEmailLabel => 'البريد الإلكتروني';
+	@override String get notSet => 'غير محدد';
+	@override String get accountPasswordLabel => 'كلمة المرور';
+	@override String get accountPasswordSub => 'تغيير كلمة المرور';
+	@override String get resetLinkButton => 'إرسال رابط إعادة الضبط';
+	@override String get accountConnectedLabel => 'الحساب المرتبط';
+	@override String get accountBiometric => 'تسجيل الدخول البيومتري';
+	@override String get accountBiometricSub => 'استخدم بصمة الإصبع أو الوجه لتسجيل الدخول';
+	@override String get accountLoginNotif => 'إشعارات تسجيل الدخول';
+	@override String get accountLoginNotifSub => 'إشعاري بتسجيلات الدخول الجديدة';
+	@override String get accountPurchaseConfirm => 'تأكيد الشراء';
+	@override String get accountPurchaseConfirmSub => 'طلب تأكيد قبل الشراء';
+	@override String get addressScreenTitle => 'العناوين';
+	@override String get refundScreenTitle => 'تفاصيل الاسترداد';
+	@override String get privacyScreenTitle => 'الخصوصية';
+	@override String get privacyAccountSection => 'خصوصية الحساب';
+	@override String get privacyPrivateAccount => 'حساب خاص';
+	@override String get privacyPrivateAccountSub => 'فقط المتابعون المعتمدون يرون منشوراتك';
+	@override String get privacyFollowReqSection => 'طلبات المتابعة';
+	@override String get privacyActivityStatus => 'حالة النشاط';
+	@override String get privacyMessagingSection => 'المراسلة';
+	@override String get privacyReadReceipts => 'إيصالات القراءة';
+	@override String get privacyReadReceiptsSub => 'اسمح للآخرين بمعرفة متى قرأت رسائلهم';
+	@override String get privacyBlockedSection => 'المستخدمون المحظورون';
+	@override String get notifAll => 'الكل';
+	@override String get notifMentionsOnly => 'الإشارات فقط';
+	@override String get notifOff => 'إيقاف';
+	@override String get notifEnabledChip => 'مفعّل';
+	@override String get notifDisabledChip => 'معطّل';
+	@override String get notifPushEnabled => 'الإشعارات الفورية مفعّلة';
+	@override String get notifPushDisabled => 'الإشعارات الفورية معطّلة';
+	@override String get notifOpenSettingsBtn => 'فتح الإعدادات';
+	@override String get notifGeneralSection => 'عام';
+	@override String get notifSocialSection => 'اجتماعي';
+	@override String get notifCommerceSection => 'التسوق';
+	@override String get notifVendorSection => 'المتجر';
+	@override String get notifComments => 'التعليقات';
+	@override String get notifUpvotes => 'التصويتات';
+	@override String get notifMentions => 'الإشارات';
+	@override String get notifNewFollowers => 'متابعون جدد';
+	@override String get notifFollowRequests => 'طلبات المتابعة';
+	@override String get notifLoginAlerts => 'تنبيهات تسجيل الدخول';
+	@override String get notifLoginAlertsSub => 'إشعاري بتسجيلات الدخول الجديدة';
+	@override String get notifDailySummary => 'الملخص اليومي';
+	@override String get notifDailySummarySub => 'احصل على ملخص يومي للنشاط';
+	@override String get notifOrderConfirmed => 'تأكيد الطلب';
+	@override String get notifOrderShipped => 'شحن الطلب';
+	@override String get notifOrderDelivered => 'تسليم الطلب';
+	@override String get notifRefundProcessed => 'معالجة الاسترداد';
+	@override String get notifBackInStock => 'عودة للمخزون';
+	@override String get notifPriceDrop => 'انخفاض السعر';
+	@override String get notifPromotionsToggle => 'العروض الترويجية';
+	@override String get notifOrderSound => 'صوت الطلب';
+	@override String get notifOrderSoundSub => 'تشغيل صوت للطلبات الجديدة';
+	@override String get notifManageChannels => 'إدارة القنوات';
+	@override String get notifManageChannelsSub => 'التحكم في قنوات الإشعارات';
+	@override String get pushNotifications => 'الإشعارات الفورية';
+	@override String get contentScreenTitle => 'المحتوى';
+	@override String get contentFeedSection => 'الخلاصة';
+	@override String get contentFeedLangSection => 'لغة الخلاصة';
+	@override String get contentPostsSection => 'المنشورات';
+	@override String get contentMutedSection => 'المكتوم';
+	@override String get contentVendorSection => 'البائعون';
+	@override String get langSection => 'اللغة';
+	@override String get langAppLabel => 'لغة التطبيق';
+	@override String get appearanceTitle => 'المظهر';
+	@override String get themeSection => 'السمة';
+	@override String get themeLight => 'فاتح';
+	@override String get themeDark => 'داكن';
+	@override String get themeSystem => 'افتراضي النظام';
+	@override String get textSizeSection => 'حجم النص';
+	@override String get textAdjustLabel => 'ضبط حجم النص';
+	@override String get textPreviewLabel => 'معاينة';
+	@override String get textSmall => 'صغير';
+	@override String get textNormal => 'عادي';
+	@override String get textLarge => 'كبير';
+	@override String get textXlarge => 'كبير جداً';
+	@override String get boldText => 'نص عريض';
+	@override String get reduceAnim => 'تقليل الحركات';
+	@override String get reduceAnimSub => 'تقليل تأثيرات الحركة';
+	@override String get arabicFontSection => 'الخط العربي';
+	@override String get fontDefault => 'افتراضي';
+	@override String get fontCairo => 'القاهرة';
+	@override String get fontAlmarai => 'المراعي';
+	@override String get fontTajawal => 'تجوال';
+	@override String get accessibilitySection => 'إمكانية الوصول';
+	@override String get storageScreenTitle => 'التخزين';
+	@override String get storageImageSection => 'الصور';
+	@override String get storageRecentSection => 'الأخيرة';
+	@override String get storageDevSection => 'المطوّر';
+	@override String get vendorScreenTitle => 'إعدادات المتجر';
+	@override String get vendorStoreStatusSection => 'حالة المتجر';
+	@override String get vendorDeliverySection => 'التوصيل';
+	@override String get vendorNotifSection => 'الإشعارات';
+	@override String get appScreenTitle => 'معلومات التطبيق';
+	@override String get appAboutSection => 'حول';
+	@override String get appShareSection => 'مشاركة';
+	@override String get supportScreenTitle => 'الدعم';
+	@override String get supportHelpSection => 'المساعدة';
+	@override String get supportEscrowSection => 'الضمان والمدفوعات';
+	@override String get supportLegalSection => 'قانوني';
+	@override String get notifCommunityLabel => 'إشعارات المجتمع';
 }
 
 // Path: become_vendor
-class _StringsBecomeVendorAr implements _StringsBecomeVendorEn {
-	_StringsBecomeVendorAr._(this._root);
+class StringsBecomeVendorAr extends StringsBecomeVendorEn {
+	StringsBecomeVendorAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'انضم إلى قائمة الموردين';
@@ -3476,10 +4048,10 @@ class _StringsBecomeVendorAr implements _StringsBecomeVendorEn {
 }
 
 // Path: privacy
-class _StringsPrivacyAr implements _StringsPrivacyEn {
-	_StringsPrivacyAr._(this._root);
+class StringsPrivacyAr extends StringsPrivacyEn {
+	StringsPrivacyAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get page_title => 'سياسة الخصوصية';
@@ -3661,10 +4233,10 @@ class _StringsPrivacyAr implements _StringsPrivacyEn {
 }
 
 // Path: terms
-class _StringsTermsAr implements _StringsTermsEn {
-	_StringsTermsAr._(this._root);
+class StringsTermsAr extends StringsTermsEn {
+	StringsTermsAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get page_title => 'شروط الاستخدام';
@@ -3847,10 +4419,10 @@ class _StringsTermsAr implements _StringsTermsEn {
 }
 
 // Path: refund
-class _StringsRefundAr implements _StringsRefundEn {
-	_StringsRefundAr._(this._root);
+class StringsRefundAr extends StringsRefundEn {
+	StringsRefundAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get page_title => 'سياسة الاسترداد والإرجاع';
@@ -3961,10 +4533,10 @@ class _StringsRefundAr implements _StringsRefundEn {
 }
 
 // Path: vendor_finances
-class _StringsVendorFinancesAr implements _StringsVendorFinancesEn {
-	_StringsVendorFinancesAr._(this._root);
+class StringsVendorFinancesAr extends StringsVendorFinancesEn {
+	StringsVendorFinancesAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get ready_to_withdraw => 'جاهز للسحب';
@@ -3981,10 +4553,10 @@ class _StringsVendorFinancesAr implements _StringsVendorFinancesEn {
 }
 
 // Path: vendor_settings
-class _StringsVendorSettingsAr implements _StringsVendorSettingsEn {
-	_StringsVendorSettingsAr._(this._root);
+class StringsVendorSettingsAr extends StringsVendorSettingsEn {
+	StringsVendorSettingsAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get store_logo => 'شعار المتجر';
@@ -4008,10 +4580,10 @@ class _StringsVendorSettingsAr implements _StringsVendorSettingsEn {
 }
 
 // Path: vendor_policies
-class _StringsVendorPoliciesAr implements _StringsVendorPoliciesEn {
-	_StringsVendorPoliciesAr._(this._root);
+class StringsVendorPoliciesAr extends StringsVendorPoliciesEn {
+	StringsVendorPoliciesAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'سياسات المتجر';
@@ -4024,10 +4596,10 @@ class _StringsVendorPoliciesAr implements _StringsVendorPoliciesEn {
 }
 
 // Path: digital_vault
-class _StringsDigitalVaultAr implements _StringsDigitalVaultEn {
-	_StringsDigitalVaultAr._(this._root);
+class StringsDigitalVaultAr extends StringsDigitalVaultEn {
+	StringsDigitalVaultAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'الخزينة الرقمية';
@@ -4041,10 +4613,10 @@ class _StringsDigitalVaultAr implements _StringsDigitalVaultEn {
 }
 
 // Path: vendor_products
-class _StringsVendorProductsAr implements _StringsVendorProductsEn {
-	_StringsVendorProductsAr._(this._root);
+class StringsVendorProductsAr extends StringsVendorProductsEn {
+	StringsVendorProductsAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'منتجات متجرك';
@@ -4132,10 +4704,10 @@ class _StringsVendorProductsAr implements _StringsVendorProductsEn {
 }
 
 // Path: vendor_orders
-class _StringsVendorOrdersAr implements _StringsVendorOrdersEn {
-	_StringsVendorOrdersAr._(this._root);
+class StringsVendorOrdersAr extends StringsVendorOrdersEn {
+	StringsVendorOrdersAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'طلباتي';
@@ -4155,10 +4727,10 @@ class _StringsVendorOrdersAr implements _StringsVendorOrdersEn {
 }
 
 // Path: dispute
-class _StringsDisputeAr implements _StringsDisputeEn {
-	_StringsDisputeAr._(this._root);
+class StringsDisputeAr extends StringsDisputeEn {
+	StringsDisputeAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get back => 'العودة';
@@ -4182,10 +4754,10 @@ class _StringsDisputeAr implements _StringsDisputeEn {
 }
 
 // Path: stores
-class _StringsStoresAr implements _StringsStoresEn {
-	_StringsStoresAr._(this._root);
+class StringsStoresAr extends StringsStoresEn {
+	StringsStoresAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'تصفح المتاجر';
@@ -4196,10 +4768,10 @@ class _StringsStoresAr implements _StringsStoresEn {
 }
 
 // Path: social
-class _StringsSocialAr implements _StringsSocialEn {
-	_StringsSocialAr._(this._root);
+class StringsSocialAr extends StringsSocialEn {
+	StringsSocialAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get message_button => 'رسالة';
@@ -4234,10 +4806,10 @@ class _StringsSocialAr implements _StringsSocialEn {
 }
 
 // Path: store
-class _StringsStoreAr implements _StringsStoreEn {
-	_StringsStoreAr._(this._root);
+class StringsStoreAr extends StringsStoreEn {
+	StringsStoreAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'المتجر';
@@ -4250,10 +4822,10 @@ class _StringsStoreAr implements _StringsStoreEn {
 }
 
 // Path: vendor_profile
-class _StringsVendorProfileAr implements _StringsVendorProfileEn {
-	_StringsVendorProfileAr._(this._root);
+class StringsVendorProfileAr extends StringsVendorProfileEn {
+	StringsVendorProfileAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get products_tab => 'المنتجات ({count})';
@@ -4273,10 +4845,10 @@ class _StringsVendorProfileAr implements _StringsVendorProfileEn {
 }
 
 // Path: drawer
-class _StringsDrawerAr implements _StringsDrawerEn {
-	_StringsDrawerAr._(this._root);
+class StringsDrawerAr extends StringsDrawerEn {
+	StringsDrawerAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get browse => 'تصفح';
@@ -4300,10 +4872,10 @@ class _StringsDrawerAr implements _StringsDrawerEn {
 }
 
 // Path: info
-class _StringsInfoAr implements _StringsInfoEn {
-	_StringsInfoAr._(this._root);
+class StringsInfoAr extends StringsInfoEn {
+	StringsInfoAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get about_title => 'عن واصلك';
@@ -4342,10 +4914,10 @@ class _StringsInfoAr implements _StringsInfoEn {
 }
 
 // Path: orders
-class _StringsOrdersAr implements _StringsOrdersEn {
-	_StringsOrdersAr._(this._root);
+class StringsOrdersAr extends StringsOrdersEn {
+	StringsOrdersAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'طلباتي';
@@ -4360,10 +4932,10 @@ class _StringsOrdersAr implements _StringsOrdersEn {
 }
 
 // Path: notifications
-class _StringsNotificationsAr implements _StringsNotificationsEn {
-	_StringsNotificationsAr._(this._root);
+class StringsNotificationsAr extends StringsNotificationsEn {
+	StringsNotificationsAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'الإشعارات';
@@ -4373,10 +4945,10 @@ class _StringsNotificationsAr implements _StringsNotificationsEn {
 }
 
 // Path: saved_items
-class _StringsSavedItemsAr implements _StringsSavedItemsEn {
-	_StringsSavedItemsAr._(this._root);
+class StringsSavedItemsAr extends StringsSavedItemsEn {
+	StringsSavedItemsAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get title => 'العناصر المحفوظة';
@@ -4392,10 +4964,10 @@ class _StringsSavedItemsAr implements _StringsSavedItemsEn {
 }
 
 // Path: legal
-class _StringsLegalAr implements _StringsLegalEn {
-	_StringsLegalAr._(this._root);
+class StringsLegalAr extends StringsLegalEn {
+	StringsLegalAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get privacy_policy_title => 'سياسة الخصوصية';
@@ -4403,10 +4975,10 @@ class _StringsLegalAr implements _StringsLegalEn {
 }
 
 // Path: create_post
-class _StringsCreatePostAr implements _StringsCreatePostEn {
-	_StringsCreatePostAr._(this._root);
+class StringsCreatePostAr extends StringsCreatePostEn {
+	StringsCreatePostAr._(StringsAr root) : this._root = root, super._(root);
 
-	@override final _StringsAr _root; // ignore: unused_field
+	@override final StringsAr _root; // ignore: unused_field
 
 	// Translations
 	@override String get sheet_title => 'ماذا تريد أن تنشر؟';
@@ -4416,6 +4988,13 @@ class _StringsCreatePostAr implements _StringsCreatePostEn {
 	@override String get share_product => 'مشاركة منتج';
 	@override String share_product_named({required Object title}) => 'مشاركة: ${title}';
 	@override String get ask_product => 'سؤال عن منتج';
+	@override String get select_community_title => 'اختر مجتمعاً';
+	@override String get search_communities => 'ابحث عن مجتمعات...';
+	@override String get show_more_communities => 'عرض المزيد من المجتمعات';
+	@override String get no_communities_found => 'لم يتم العثور على مجتمعات';
+	@override String get private_community_locked => 'خاص - انضم للاختيار';
+	@override String get create_community => 'إنشاء مجتمع';
+	@override String get ai_assistant => 'المساعد الذكي (AI)';
 }
 
 /// Flat map(s) containing all translations.
@@ -4446,6 +5025,23 @@ extension on Translations {
 			case 'explore.stores': return 'Stores';
 			case 'explore.browse_categories': return 'Browse Categories';
 			case 'explore.popular_searches': return 'Popular Searches';
+			case 'explore.all_communities': return 'All Communities';
+			case 'explore.select_community': return 'Select Community';
+			case 'explore.filter': return 'Filter';
+			case 'explore.category': return 'Category';
+			case 'explore.brand': return 'Brand';
+			case 'explore.color': return 'Color';
+			case 'explore.clear_filters': return 'Clear Filters';
+			case 'explore.apply': return 'Apply';
+			case 'explore.filter_by_community': return 'By Community';
+			case 'explore.search_communities': return 'Search communities...';
+			case 'explore.my_communities': return 'My Communities';
+			case 'explore.no_communities_joined': return 'You haven\'t joined any communities yet';
+			case 'explore.explore_communities': return 'Explore Communities';
+			case 'explore.select_community_to_filter': return 'Select a community to filter posts';
+			case 'explore.all_posts': return 'All Posts';
+			case 'explore.private_join_required': return 'Join this private community to select it';
+			case 'explore.public': return 'Public';
 			case 'auth.sign_in': return 'Sign In';
 			case 'auth.sign_up': return 'Create Account';
 			case 'auth.sign_out': return 'Sign Out';
@@ -4738,6 +5334,8 @@ extension on Translations {
 			case 'community.join': return 'Join';
 			case 'community.joined': return 'Joined';
 			case 'community.leave': return 'Leave';
+			case 'community.leave_title': return 'Leave Community';
+			case 'community.leave_confirm': return 'Are you sure you want to leave this community?';
 			case 'community.create_post': return 'Create Post';
 			case 'community.post': return 'Post';
 			case 'community.comment': return 'Comment';
@@ -5248,6 +5846,268 @@ extension on Translations {
 			case 'settings.save': return 'Save';
 			case 'settings.saved_ok': return 'Saved successfully';
 			case 'settings.save_failed': return ({required Object error}) => 'Failed to save: ${error}';
+			case 'settings.hub_profile': return 'Profile';
+			case 'settings.hub_profile_sub': return 'Avatar, bio, social links';
+			case 'settings.hub_account': return 'Account & Security';
+			case 'settings.hub_account_sub': return 'Email, password, biometric lock';
+			case 'settings.hub_address': return 'Address Book';
+			case 'settings.hub_address_sub': return 'Palestine delivery addresses';
+			case 'settings.hub_refund': return 'Refund Details';
+			case 'settings.hub_refund_sub': return 'Bank details for dispute refunds';
+			case 'settings.hub_privacy': return 'Privacy & Safety';
+			case 'settings.hub_privacy_sub': return 'Visibility, blocked users, follow requests';
+			case 'settings.hub_notifications': return 'Notifications';
+			case 'settings.hub_notifications_sub': return 'Push, orders, social alerts';
+			case 'settings.hub_content': return 'Content & Feed';
+			case 'settings.hub_content_sub': return 'Language filter, muted words';
+			case 'settings.hub_appearance': return 'Appearance & Language';
+			case 'settings.hub_appearance_sub': return 'Theme, language, font, accessibility';
+			case 'settings.hub_storage': return 'Storage & Performance';
+			case 'settings.hub_storage_sub': return 'Cache, data usage';
+			case 'settings.hub_vendor': return 'Vendor Settings';
+			case 'settings.hub_vendor_sub': return 'Vacation mode, delivery zones';
+			case 'settings.hub_app': return 'App';
+			case 'settings.hub_app_sub': return 'Share, rate, permissions, version';
+			case 'settings.hub_support': return 'Support & Escrow';
+			case 'settings.hub_support_sub': return 'Help, disputes, legal';
+			case 'settings.appearance_title': return 'Appearance & Language';
+			case 'settings.lang_section': return 'Language';
+			case 'settings.lang_app_label': return 'App Language';
+			case 'settings.theme_section': return 'Theme';
+			case 'settings.theme_light': return 'Light Theme';
+			case 'settings.theme_dark': return 'Dark Theme';
+			case 'settings.theme_system': return 'Follow System';
+			case 'settings.text_size_section': return 'Text Size';
+			case 'settings.text_adjust_label': return 'Adjust Font Scale';
+			case 'settings.text_preview_label': return 'Live Preview:';
+			case 'settings.text_small': return 'Small';
+			case 'settings.text_normal': return 'Normal';
+			case 'settings.text_large': return 'Large';
+			case 'settings.text_xlarge': return 'Extra Large';
+			case 'settings.arabic_font_section': return 'Arabic Font';
+			case 'settings.font_default': return 'System Default';
+			case 'settings.font_cairo': return 'Cairo';
+			case 'settings.font_tajawal': return 'Tajawal';
+			case 'settings.font_almarai': return 'Almarai';
+			case 'settings.accessibility_section': return 'Accessibility';
+			case 'settings.bold_text': return 'Bold Text';
+			case 'settings.reduce_anim': return 'Reduce Animations';
+			case 'settings.reduce_anim_sub': return 'Recommended for older devices or motion sensitivity';
+			case 'settings.notif_push_enabled': return 'Alerts are configured on this device';
+			case 'settings.notif_push_disabled': return 'Alerts are disabled';
+			case 'settings.notif_enabled_chip': return 'Enabled';
+			case 'settings.notif_disabled_chip': return 'Disabled';
+			case 'settings.notif_open_settings_btn': return 'Open Settings';
+			case 'settings.notif_social_section': return 'Social Notifications';
+			case 'settings.notif_commerce_section': return 'Commerce Notifications';
+			case 'settings.notif_community_label': return 'Community Notifications';
+			case 'settings.notif_all': return 'All';
+			case 'settings.notif_mentions_only': return 'Mentions Only';
+			case 'settings.notif_off': return 'Off';
+			case 'settings.notif_order_confirmed': return 'Order Confirmed';
+			case 'settings.notif_order_shipped': return 'Order Shipped';
+			case 'settings.notif_order_delivered': return 'Order Delivered';
+			case 'settings.notif_refund_processed': return 'Refund Processed';
+			case 'settings.notif_price_drop': return 'Price Drop Alerts';
+			case 'settings.notif_back_in_stock': return 'Back in Stock Alerts';
+			case 'settings.notif_vendor_section': return 'Vendor Notifications';
+			case 'settings.notif_order_sound': return 'New Order Alert Sound';
+			case 'settings.notif_order_sound_sub': return 'Play a loud alert sound for every new order';
+			case 'settings.notif_daily_summary': return 'Daily Sales Summary';
+			case 'settings.notif_daily_summary_sub': return 'Get a morning summary of yesterday\'s sales';
+			case 'settings.notif_general_section': return 'General & System';
+			case 'settings.notif_promotions_toggle': return 'Promotions';
+			case 'settings.notif_login_alerts': return 'Login Alerts';
+			case 'settings.notif_login_alerts_sub': return 'Get notified when account signs in on new device';
+			case 'settings.notif_manage_channels': return 'Open Notification Settings';
+			case 'settings.notif_manage_channels_sub': return 'Manage notification channels for this app';
+			case 'settings.account_screen_title': return 'Account & Security';
+			case 'settings.account_email_label': return 'Email Address';
+			case 'settings.account_password_label': return 'Password';
+			case 'settings.account_password_sub': return 'Send a reset link to your email';
+			case 'settings.account_connected_label': return 'Connected Accounts';
+			case 'settings.account_biometric': return 'Biometric Lock';
+			case 'settings.account_biometric_sub': return 'Require fingerprint or Face ID to open WaslaQ';
+			case 'settings.account_purchase_confirm': return 'Purchase Confirmation';
+			case 'settings.account_purchase_confirm_sub': return 'Require biometric before completing any purchase';
+			case 'settings.account_login_notif': return 'Login Notifications';
+			case 'settings.account_login_notif_sub': return 'Get notified when your account signs in from a new device';
+			case 'settings.privacy_screen_title': return 'Privacy & Safety';
+			case 'settings.privacy_account_section': return 'Account Privacy';
+			case 'settings.privacy_private_account': return 'Private Account';
+			case 'settings.privacy_private_account_sub': return 'Only approved followers can see your posts';
+			case 'settings.privacy_messaging_section': return 'Messaging & Chat';
+			case 'settings.privacy_read_receipts': return 'Read Receipts';
+			case 'settings.privacy_read_receipts_sub': return 'Show read receipts (✓✓) in conversations';
+			case 'settings.privacy_activity_status': return 'Show Activity Status';
+			case 'settings.privacy_blocked_section': return 'Blocked Users';
+			case 'settings.privacy_follow_req_section': return 'Follow Requests';
+			case 'settings.content_screen_title': return 'Content & Feed';
+			case 'settings.content_feed_lang_section': return 'Feed Language';
+			case 'settings.content_muted_section': return 'Muted Keywords';
+			case 'settings.content_posts_section': return 'Posts';
+			case 'settings.content_feed_section': return 'Feed Behavior';
+			case 'settings.content_default_visibility': return 'Default Post Visibility';
+			case 'settings.content_vendor_section': return 'Vendor Settings';
+			case 'settings.storage_screen_title': return 'Storage & Performance';
+			case 'settings.storage_image_section': return 'Image Cache';
+			case 'settings.storage_recent_section': return 'Recently Viewed';
+			case 'settings.storage_dev_section': return 'Developer Settings';
+			case 'settings.support_screen_title': return 'Support & Escrow';
+			case 'settings.support_help_section': return 'Get Help';
+			case 'settings.support_legal_section': return 'Legal';
+			case 'settings.support_escrow_section': return 'Escrow & Disputes';
+			case 'settings.support_contact': return 'Contact Support';
+			case 'settings.support_contact_sub': return 'Talk to a WaslaQ support agent';
+			case 'settings.support_report_bug': return 'Report a Bug';
+			case 'settings.support_report_sub': return 'Help us improve the app by reporting issues';
+			case 'settings.support_terms': return 'Terms of Use';
+			case 'settings.support_privacy_policy': return 'Privacy Policy';
+			case 'settings.app_screen_title': return 'App Information';
+			case 'settings.app_share_section': return 'Share & Feedback';
+			case 'settings.app_about_section': return 'About';
+			case 'settings.app_share_waslaq': return 'Share WaslaQ';
+			case 'settings.app_share_sub': return 'Tell your friends about the Palestinian marketplace';
+			case 'settings.app_rate': return 'Rate WaslaQ';
+			case 'settings.app_rate_sub': return 'Leave a review on the store';
+			case 'settings.app_permissions': return 'App Permissions';
+			case 'settings.app_permissions_sub': return 'Manage storage, camera, and notification permissions';
+			case 'settings.profile_screen_title': return 'Profile Settings';
+			case 'settings.address_screen_title': return 'Address Book';
+			case 'settings.refund_screen_title': return 'Refund Details';
+			case 'settings.vendor_screen_title': return 'Vendor Settings';
+			case 'settings.vendor_store_status_section': return 'Store Status';
+			case 'settings.vendor_delivery_section': return 'Delivery Zones';
+			case 'settings.vendor_notif_section': return 'Notifications';
+			case 'settings.hubProfile': return 'Profile';
+			case 'settings.hubProfileSub': return 'Edit your profile information';
+			case 'settings.hubAccount': return 'Account & Security';
+			case 'settings.hubAccountSub': return 'Password, email and account settings';
+			case 'settings.hubAddress': return 'Addresses';
+			case 'settings.hubAddressSub': return 'Manage your delivery addresses';
+			case 'settings.hubRefund': return 'Refund Details';
+			case 'settings.hubRefundSub': return 'Bank account for refunds';
+			case 'settings.hubPrivacy': return 'Privacy';
+			case 'settings.hubPrivacySub': return 'Control who sees your content';
+			case 'settings.hubNotifications': return 'Notifications';
+			case 'settings.hubNotificationsSub': return 'Manage your notification preferences';
+			case 'settings.hubContent': return 'Content';
+			case 'settings.hubContentSub': return 'Language and content preferences';
+			case 'settings.hubAppearance': return 'Appearance';
+			case 'settings.hubAppearanceSub': return 'Theme and display settings';
+			case 'settings.hubStorage': return 'Storage';
+			case 'settings.hubStorageSub': return 'Cache and data management';
+			case 'settings.hubVendor': return 'Vendor Settings';
+			case 'settings.hubVendorSub': return 'Manage your store settings';
+			case 'settings.hubApp': return 'App Info';
+			case 'settings.hubAppSub': return 'Version and about';
+			case 'settings.hubSupport': return 'Support';
+			case 'settings.hubSupportSub': return 'Help and contact us';
+			case 'settings.deleteAccount': return 'Delete Account';
+			case 'settings.permanentAction': return 'This action is permanent and cannot be undone';
+			case 'settings.accountScreenTitle': return 'Account & Security';
+			case 'settings.accountEmailLabel': return 'Email Address';
+			case 'settings.notSet': return 'Not set';
+			case 'settings.accountPasswordLabel': return 'Password';
+			case 'settings.accountPasswordSub': return 'Change your password';
+			case 'settings.resetLinkButton': return 'Send Reset Link';
+			case 'settings.accountConnectedLabel': return 'Connected Account';
+			case 'settings.accountBiometric': return 'Biometric Login';
+			case 'settings.accountBiometricSub': return 'Use fingerprint or face to sign in';
+			case 'settings.accountLoginNotif': return 'Login Notifications';
+			case 'settings.accountLoginNotifSub': return 'Get notified of new sign-ins';
+			case 'settings.accountPurchaseConfirm': return 'Purchase Confirmation';
+			case 'settings.accountPurchaseConfirmSub': return 'Require confirmation before purchasing';
+			case 'settings.addressScreenTitle': return 'Addresses';
+			case 'settings.refundScreenTitle': return 'Refund Details';
+			case 'settings.privacyScreenTitle': return 'Privacy';
+			case 'settings.privacyAccountSection': return 'Account Privacy';
+			case 'settings.privacyPrivateAccount': return 'Private Account';
+			case 'settings.privacyPrivateAccountSub': return 'Only approved followers see your posts';
+			case 'settings.privacyFollowReqSection': return 'Follow Requests';
+			case 'settings.privacyActivityStatus': return 'Activity Status';
+			case 'settings.privacyMessagingSection': return 'Messaging';
+			case 'settings.privacyReadReceipts': return 'Read Receipts';
+			case 'settings.privacyReadReceiptsSub': return 'Let others know when you\'ve read their messages';
+			case 'settings.privacyBlockedSection': return 'Blocked Users';
+			case 'settings.notifAll': return 'All';
+			case 'settings.notifMentionsOnly': return 'Mentions Only';
+			case 'settings.notifOff': return 'Off';
+			case 'settings.notifEnabledChip': return 'Enabled';
+			case 'settings.notifDisabledChip': return 'Disabled';
+			case 'settings.notifPushEnabled': return 'Push notifications are enabled';
+			case 'settings.notifPushDisabled': return 'Push notifications are disabled';
+			case 'settings.notifOpenSettingsBtn': return 'Open Settings';
+			case 'settings.notifGeneralSection': return 'General';
+			case 'settings.notifSocialSection': return 'Social';
+			case 'settings.notifCommerceSection': return 'Shopping';
+			case 'settings.notifVendorSection': return 'Vendor';
+			case 'settings.notifComments': return 'Comments';
+			case 'settings.notifUpvotes': return 'Upvotes';
+			case 'settings.notifMentions': return 'Mentions';
+			case 'settings.notifNewFollowers': return 'New Followers';
+			case 'settings.notifFollowRequests': return 'Follow Requests';
+			case 'settings.notifLoginAlerts': return 'Login Alerts';
+			case 'settings.notifLoginAlertsSub': return 'Notify me of new sign-ins';
+			case 'settings.notifDailySummary': return 'Daily Summary';
+			case 'settings.notifDailySummarySub': return 'Get a daily digest of activity';
+			case 'settings.notifOrderConfirmed': return 'Order Confirmed';
+			case 'settings.notifOrderShipped': return 'Order Shipped';
+			case 'settings.notifOrderDelivered': return 'Order Delivered';
+			case 'settings.notifRefundProcessed': return 'Refund Processed';
+			case 'settings.notifBackInStock': return 'Back in Stock';
+			case 'settings.notifPriceDrop': return 'Price Drop';
+			case 'settings.notifPromotionsToggle': return 'Promotions';
+			case 'settings.notifOrderSound': return 'Order Sound';
+			case 'settings.notifOrderSoundSub': return 'Play a sound for new orders';
+			case 'settings.notifManageChannels': return 'Manage Channels';
+			case 'settings.notifManageChannelsSub': return 'Control notification channels';
+			case 'settings.pushNotifications': return 'Push Notifications';
+			case 'settings.contentScreenTitle': return 'Content';
+			case 'settings.contentFeedSection': return 'Feed';
+			case 'settings.contentFeedLangSection': return 'Feed Language';
+			case 'settings.contentPostsSection': return 'Posts';
+			case 'settings.contentMutedSection': return 'Muted';
+			case 'settings.contentVendorSection': return 'Vendors';
+			case 'settings.langSection': return 'Language';
+			case 'settings.langAppLabel': return 'App Language';
+			case 'settings.appearanceTitle': return 'Appearance';
+			case 'settings.themeSection': return 'Theme';
+			case 'settings.themeLight': return 'Light';
+			case 'settings.themeDark': return 'Dark';
+			case 'settings.themeSystem': return 'System Default';
+			case 'settings.textSizeSection': return 'Text Size';
+			case 'settings.textAdjustLabel': return 'Adjust Text Size';
+			case 'settings.textPreviewLabel': return 'Preview';
+			case 'settings.textSmall': return 'Small';
+			case 'settings.textNormal': return 'Normal';
+			case 'settings.textLarge': return 'Large';
+			case 'settings.textXlarge': return 'X-Large';
+			case 'settings.boldText': return 'Bold Text';
+			case 'settings.reduceAnim': return 'Reduce Animations';
+			case 'settings.reduceAnimSub': return 'Minimize motion effects';
+			case 'settings.arabicFontSection': return 'Arabic Font';
+			case 'settings.fontDefault': return 'Default';
+			case 'settings.fontCairo': return 'Cairo';
+			case 'settings.fontAlmarai': return 'Almarai';
+			case 'settings.fontTajawal': return 'Tajawal';
+			case 'settings.accessibilitySection': return 'Accessibility';
+			case 'settings.storageScreenTitle': return 'Storage';
+			case 'settings.storageImageSection': return 'Images';
+			case 'settings.storageRecentSection': return 'Recent';
+			case 'settings.storageDevSection': return 'Developer';
+			case 'settings.vendorScreenTitle': return 'Vendor Settings';
+			case 'settings.vendorStoreStatusSection': return 'Store Status';
+			case 'settings.vendorDeliverySection': return 'Delivery';
+			case 'settings.vendorNotifSection': return 'Notifications';
+			case 'settings.appScreenTitle': return 'App Info';
+			case 'settings.appAboutSection': return 'About';
+			case 'settings.appShareSection': return 'Share';
+			case 'settings.supportScreenTitle': return 'Support';
+			case 'settings.supportHelpSection': return 'Help';
+			case 'settings.supportEscrowSection': return 'Escrow & Payments';
+			case 'settings.supportLegalSection': return 'Legal';
+			case 'settings.notifCommunityLabel': return 'Community Notifications';
 			case 'become_vendor.title': return 'Become a Vendor';
 			case 'become_vendor.subtitle': return 'Join our platform and start selling your products.';
 			case 'become_vendor.benefit1': return 'Sell physical and digital products';
@@ -6063,12 +6923,19 @@ extension on Translations {
 			case 'create_post.share_product': return 'Share a Product';
 			case 'create_post.share_product_named': return ({required Object title}) => 'Share: ${title}';
 			case 'create_post.ask_product': return 'Ask About a Product';
+			case 'create_post.select_community_title': return 'Select Community';
+			case 'create_post.search_communities': return 'Search communities...';
+			case 'create_post.show_more_communities': return 'Show More Communities';
+			case 'create_post.no_communities_found': return 'No communities found';
+			case 'create_post.private_community_locked': return 'Private - Join to select';
+			case 'create_post.create_community': return 'Create a Community';
+			case 'create_post.ai_assistant': return 'AI Assistant';
 			default: return null;
 		}
 	}
 }
 
-extension on _StringsAr {
+extension on StringsAr {
 	dynamic _flatMapFunction(String path) {
 		switch (path) {
 			case 'nav.home': return 'الرئيسية';
@@ -6093,6 +6960,23 @@ extension on _StringsAr {
 			case 'explore.stores': return 'المتاجر';
 			case 'explore.browse_categories': return 'تصفح الفئات';
 			case 'explore.popular_searches': return 'عمليات البحث الشائعة';
+			case 'explore.all_communities': return 'كل المجتمعات';
+			case 'explore.select_community': return 'اختر مجتمع';
+			case 'explore.filter': return 'تصفية';
+			case 'explore.category': return 'الفئة';
+			case 'explore.brand': return 'العلامة التجارية';
+			case 'explore.color': return 'اللون';
+			case 'explore.clear_filters': return 'مسح التصفية';
+			case 'explore.apply': return 'تطبيق';
+			case 'explore.filter_by_community': return 'حسب المجتمع';
+			case 'explore.search_communities': return 'ابحث عن مجتمعات...';
+			case 'explore.my_communities': return 'مجتمعاتي';
+			case 'explore.no_communities_joined': return 'لم تنضم إلى أي مجتمع بعد';
+			case 'explore.explore_communities': return 'استكشف المجتمعات';
+			case 'explore.select_community_to_filter': return 'اختر مجتمعاً لتصفية المنشورات';
+			case 'explore.all_posts': return 'كل المنشورات';
+			case 'explore.private_join_required': return 'انضم لهذا المجتمع الخاص لاختياره';
+			case 'explore.public': return 'عام';
 			case 'auth.sign_in': return 'تسجيل الدخول';
 			case 'auth.sign_up': return 'إنشاء حساب';
 			case 'auth.sign_out': return 'تسجيل الخروج';
@@ -6385,6 +7269,8 @@ extension on _StringsAr {
 			case 'community.join': return 'انضم';
 			case 'community.joined': return 'انضم';
 			case 'community.leave': return 'مغادرة';
+			case 'community.leave_title': return 'مغادرة المجتمع';
+			case 'community.leave_confirm': return 'هل أنت متأكد من مغادرة هذا المجتمع؟';
 			case 'community.create_post': return 'إنشاء منشور';
 			case 'community.post': return 'منشور';
 			case 'community.comment': return 'تعليق';
@@ -6895,6 +7781,268 @@ extension on _StringsAr {
 			case 'settings.save': return 'حفظ';
 			case 'settings.saved_ok': return 'تم الحفظ بنجاح';
 			case 'settings.save_failed': return ({required Object error}) => 'فشل الحفظ: ${error}';
+			case 'settings.hub_profile': return 'الملف الشخصي';
+			case 'settings.hub_profile_sub': return 'الصورة الشخصية، نبذة، روابط التواصل';
+			case 'settings.hub_account': return 'الحساب والأمان';
+			case 'settings.hub_account_sub': return 'البريد الإلكتروني، كلمة المرور، القفل البيومتري';
+			case 'settings.hub_address': return 'دفتر العناوين';
+			case 'settings.hub_address_sub': return 'عناوين التوصيل في فلسطين';
+			case 'settings.hub_refund': return 'تفاصيل الاسترداد';
+			case 'settings.hub_refund_sub': return 'البيانات البنكية لاسترداد النزاعات';
+			case 'settings.hub_privacy': return 'الخصوصية والسلامة';
+			case 'settings.hub_privacy_sub': return 'الظهور، المحظورون، طلبات المتابعة';
+			case 'settings.hub_notifications': return 'الإشعارات';
+			case 'settings.hub_notifications_sub': return 'الدفع، الطلبات، التنبيهات الاجتماعية';
+			case 'settings.hub_content': return 'المحتوى والخلاصة';
+			case 'settings.hub_content_sub': return 'فلتر اللغة، الكلمات المكتومة';
+			case 'settings.hub_appearance': return 'المظهر واللغة';
+			case 'settings.hub_appearance_sub': return 'السمة، اللغة، الخط، إمكانية الوصول';
+			case 'settings.hub_storage': return 'التخزين والأداء';
+			case 'settings.hub_storage_sub': return 'الذاكرة المؤقتة، استخدام البيانات';
+			case 'settings.hub_vendor': return 'إعدادات البائع';
+			case 'settings.hub_vendor_sub': return 'وضع الإجازة، مناطق التوصيل';
+			case 'settings.hub_app': return 'التطبيق';
+			case 'settings.hub_app_sub': return 'مشاركة، تقييم، الصلاحيات، الإصدار';
+			case 'settings.hub_support': return 'الدعم والضمان';
+			case 'settings.hub_support_sub': return 'المساعدة، النزاعات، القانونية';
+			case 'settings.appearance_title': return 'المظهر واللغة';
+			case 'settings.lang_section': return 'اللغة';
+			case 'settings.lang_app_label': return 'لغة التطبيق';
+			case 'settings.theme_section': return 'السمة';
+			case 'settings.theme_light': return 'السمة الفاتحة';
+			case 'settings.theme_dark': return 'السمة الداكنة';
+			case 'settings.theme_system': return 'اتباع النظام';
+			case 'settings.text_size_section': return 'حجم النص';
+			case 'settings.text_adjust_label': return 'ضبط حجم الخط';
+			case 'settings.text_preview_label': return 'معاينة مباشرة:';
+			case 'settings.text_small': return 'صغير';
+			case 'settings.text_normal': return 'عادي';
+			case 'settings.text_large': return 'كبير';
+			case 'settings.text_xlarge': return 'كبير جداً';
+			case 'settings.arabic_font_section': return 'الخط العربي';
+			case 'settings.font_default': return 'الافتراضي';
+			case 'settings.font_cairo': return 'Cairo';
+			case 'settings.font_tajawal': return 'Tajawal';
+			case 'settings.font_almarai': return 'Almarai';
+			case 'settings.accessibility_section': return 'إمكانية الوصول';
+			case 'settings.bold_text': return 'نص عريض';
+			case 'settings.reduce_anim': return 'تقليل الحركات';
+			case 'settings.reduce_anim_sub': return 'موصى به للأجهزة القديمة أو الحساسية للحركة';
+			case 'settings.notif_push_enabled': return 'تم تكوين التنبيهات على هذا الجهاز';
+			case 'settings.notif_push_disabled': return 'التنبيهات معطلة';
+			case 'settings.notif_enabled_chip': return 'مفعّل';
+			case 'settings.notif_disabled_chip': return 'معطّل';
+			case 'settings.notif_open_settings_btn': return 'فتح الإعدادات';
+			case 'settings.notif_social_section': return 'الإشعارات الاجتماعية';
+			case 'settings.notif_commerce_section': return 'إشعارات التسوق';
+			case 'settings.notif_community_label': return 'إشعارات المجتمع';
+			case 'settings.notif_all': return 'الكل';
+			case 'settings.notif_mentions_only': return 'الإشارات فقط';
+			case 'settings.notif_off': return 'إيقاف';
+			case 'settings.notif_order_confirmed': return 'تأكيد الطلب';
+			case 'settings.notif_order_shipped': return 'شحن الطلب';
+			case 'settings.notif_order_delivered': return 'تسليم الطلب';
+			case 'settings.notif_refund_processed': return 'معالجة الاسترداد';
+			case 'settings.notif_price_drop': return 'تنبيهات انخفاض السعر';
+			case 'settings.notif_back_in_stock': return 'تنبيهات العودة للمخزون';
+			case 'settings.notif_vendor_section': return 'إشعارات البائع';
+			case 'settings.notif_order_sound': return 'صوت تنبيه الطلب الجديد';
+			case 'settings.notif_order_sound_sub': return 'تشغيل صوت تنبيه عالٍ لكل طلب جديد';
+			case 'settings.notif_daily_summary': return 'ملخص المبيعات اليومي';
+			case 'settings.notif_daily_summary_sub': return 'احصل على ملخص صباحي لمبيعات أمس';
+			case 'settings.notif_general_section': return 'عام والنظام';
+			case 'settings.notif_promotions_toggle': return 'العروض الترويجية';
+			case 'settings.notif_login_alerts': return 'تنبيهات تسجيل الدخول';
+			case 'settings.notif_login_alerts_sub': return 'يُعلمك عند تسجيل الدخول من جهاز جديد';
+			case 'settings.notif_manage_channels': return 'فتح إعدادات الإشعارات';
+			case 'settings.notif_manage_channels_sub': return 'إدارة قنوات الإشعارات لهذا التطبيق';
+			case 'settings.account_screen_title': return 'الحساب والأمان';
+			case 'settings.account_email_label': return 'عنوان البريد الإلكتروني';
+			case 'settings.account_password_label': return 'كلمة المرور';
+			case 'settings.account_password_sub': return 'إرسال رابط إعادة تعيين إلى بريدك الإلكتروني';
+			case 'settings.account_connected_label': return 'الحسابات المرتبطة';
+			case 'settings.account_biometric': return 'القفل البيومتري';
+			case 'settings.account_biometric_sub': return 'يتطلب بصمة الإصبع أو Face ID لفتح واصلك';
+			case 'settings.account_purchase_confirm': return 'تأكيد الشراء';
+			case 'settings.account_purchase_confirm_sub': return 'يتطلب بيانات بيومترية قبل إتمام أي عملية شراء';
+			case 'settings.account_login_notif': return 'إشعارات تسجيل الدخول';
+			case 'settings.account_login_notif_sub': return 'يُعلمك عند تسجيل الدخول من جهاز جديد';
+			case 'settings.privacy_screen_title': return 'الخصوصية والسلامة';
+			case 'settings.privacy_account_section': return 'خصوصية الحساب';
+			case 'settings.privacy_private_account': return 'حساب خاص';
+			case 'settings.privacy_private_account_sub': return 'يمكن فقط للمتابعين المعتمدين رؤية منشوراتك';
+			case 'settings.privacy_messaging_section': return 'المراسلة والدردشة';
+			case 'settings.privacy_read_receipts': return 'إيصالات القراءة';
+			case 'settings.privacy_read_receipts_sub': return 'إظهار إيصالات القراءة (✓✓) في المحادثات';
+			case 'settings.privacy_activity_status': return 'إظهار حالة النشاط';
+			case 'settings.privacy_blocked_section': return 'المستخدمون المحظورون';
+			case 'settings.privacy_follow_req_section': return 'طلبات المتابعة';
+			case 'settings.content_screen_title': return 'المحتوى والخلاصة';
+			case 'settings.content_feed_lang_section': return 'لغة الخلاصة';
+			case 'settings.content_muted_section': return 'الكلمات المكتومة';
+			case 'settings.content_posts_section': return 'المنشورات';
+			case 'settings.content_feed_section': return 'سلوك الخلاصة';
+			case 'settings.content_default_visibility': return 'ظهور المنشور الافتراضي';
+			case 'settings.content_vendor_section': return 'إعدادات البائع';
+			case 'settings.storage_screen_title': return 'التخزين والأداء';
+			case 'settings.storage_image_section': return 'ذاكرة تخزين الصور';
+			case 'settings.storage_recent_section': return 'المشاهدة مؤخراً';
+			case 'settings.storage_dev_section': return 'إعدادات المطور';
+			case 'settings.support_screen_title': return 'الدعم والضمان';
+			case 'settings.support_help_section': return 'الحصول على المساعدة';
+			case 'settings.support_legal_section': return 'القانونية';
+			case 'settings.support_escrow_section': return 'الضمان والنزاعات';
+			case 'settings.support_contact': return 'تواصل مع الدعم';
+			case 'settings.support_contact_sub': return 'تحدث مع وكيل دعم واصلك';
+			case 'settings.support_report_bug': return 'الإبلاغ عن خطأ';
+			case 'settings.support_report_sub': return 'ساعدنا في تحسين التطبيق بالإبلاغ عن المشاكل';
+			case 'settings.support_terms': return 'شروط الاستخدام';
+			case 'settings.support_privacy_policy': return 'سياسة الخصوصية';
+			case 'settings.app_screen_title': return 'معلومات التطبيق';
+			case 'settings.app_share_section': return 'مشاركة وتقييم';
+			case 'settings.app_about_section': return 'حول';
+			case 'settings.app_share_waslaq': return 'شارك واصلك';
+			case 'settings.app_share_sub': return 'أخبر أصدقاءك عن السوق الفلسطيني';
+			case 'settings.app_rate': return 'قيّم واصلك';
+			case 'settings.app_rate_sub': return 'اترك تقييماً في المتجر';
+			case 'settings.app_permissions': return 'صلاحيات التطبيق';
+			case 'settings.app_permissions_sub': return 'إدارة صلاحيات التخزين والكاميرا والإشعارات';
+			case 'settings.profile_screen_title': return 'إعدادات الملف الشخصي';
+			case 'settings.address_screen_title': return 'دفتر العناوين';
+			case 'settings.refund_screen_title': return 'تفاصيل الاسترداد';
+			case 'settings.vendor_screen_title': return 'إعدادات البائع';
+			case 'settings.vendor_store_status_section': return 'حالة المتجر';
+			case 'settings.vendor_delivery_section': return 'مناطق التوصيل';
+			case 'settings.vendor_notif_section': return 'الإشعارات';
+			case 'settings.hubProfile': return 'الملف الشخصي';
+			case 'settings.hubProfileSub': return 'تعديل معلومات ملفك الشخصي';
+			case 'settings.hubAccount': return 'الحساب والأمان';
+			case 'settings.hubAccountSub': return 'كلمة المرور والبريد الإلكتروني وإعدادات الحساب';
+			case 'settings.hubAddress': return 'العناوين';
+			case 'settings.hubAddressSub': return 'إدارة عناوين التوصيل';
+			case 'settings.hubRefund': return 'تفاصيل الاسترداد';
+			case 'settings.hubRefundSub': return 'الحساب البنكي للمبالغ المستردة';
+			case 'settings.hubPrivacy': return 'الخصوصية';
+			case 'settings.hubPrivacySub': return 'تحكم بمن يرى محتواك';
+			case 'settings.hubNotifications': return 'الإشعارات';
+			case 'settings.hubNotificationsSub': return 'إدارة تفضيلات الإشعارات';
+			case 'settings.hubContent': return 'المحتوى';
+			case 'settings.hubContentSub': return 'اللغة وتفضيلات المحتوى';
+			case 'settings.hubAppearance': return 'المظهر';
+			case 'settings.hubAppearanceSub': return 'إعدادات السمة والعرض';
+			case 'settings.hubStorage': return 'التخزين';
+			case 'settings.hubStorageSub': return 'إدارة ذاكرة التخزين المؤقت والبيانات';
+			case 'settings.hubVendor': return 'إعدادات المتجر';
+			case 'settings.hubVendorSub': return 'إدارة إعدادات متجرك';
+			case 'settings.hubApp': return 'معلومات التطبيق';
+			case 'settings.hubAppSub': return 'الإصدار وحول التطبيق';
+			case 'settings.hubSupport': return 'الدعم';
+			case 'settings.hubSupportSub': return 'المساعدة والتواصل معنا';
+			case 'settings.deleteAccount': return 'حذف الحساب';
+			case 'settings.permanentAction': return 'هذه العملية نهائية ولا يمكن التراجع عنها';
+			case 'settings.accountScreenTitle': return 'الحساب والأمان';
+			case 'settings.accountEmailLabel': return 'البريد الإلكتروني';
+			case 'settings.notSet': return 'غير محدد';
+			case 'settings.accountPasswordLabel': return 'كلمة المرور';
+			case 'settings.accountPasswordSub': return 'تغيير كلمة المرور';
+			case 'settings.resetLinkButton': return 'إرسال رابط إعادة الضبط';
+			case 'settings.accountConnectedLabel': return 'الحساب المرتبط';
+			case 'settings.accountBiometric': return 'تسجيل الدخول البيومتري';
+			case 'settings.accountBiometricSub': return 'استخدم بصمة الإصبع أو الوجه لتسجيل الدخول';
+			case 'settings.accountLoginNotif': return 'إشعارات تسجيل الدخول';
+			case 'settings.accountLoginNotifSub': return 'إشعاري بتسجيلات الدخول الجديدة';
+			case 'settings.accountPurchaseConfirm': return 'تأكيد الشراء';
+			case 'settings.accountPurchaseConfirmSub': return 'طلب تأكيد قبل الشراء';
+			case 'settings.addressScreenTitle': return 'العناوين';
+			case 'settings.refundScreenTitle': return 'تفاصيل الاسترداد';
+			case 'settings.privacyScreenTitle': return 'الخصوصية';
+			case 'settings.privacyAccountSection': return 'خصوصية الحساب';
+			case 'settings.privacyPrivateAccount': return 'حساب خاص';
+			case 'settings.privacyPrivateAccountSub': return 'فقط المتابعون المعتمدون يرون منشوراتك';
+			case 'settings.privacyFollowReqSection': return 'طلبات المتابعة';
+			case 'settings.privacyActivityStatus': return 'حالة النشاط';
+			case 'settings.privacyMessagingSection': return 'المراسلة';
+			case 'settings.privacyReadReceipts': return 'إيصالات القراءة';
+			case 'settings.privacyReadReceiptsSub': return 'اسمح للآخرين بمعرفة متى قرأت رسائلهم';
+			case 'settings.privacyBlockedSection': return 'المستخدمون المحظورون';
+			case 'settings.notifAll': return 'الكل';
+			case 'settings.notifMentionsOnly': return 'الإشارات فقط';
+			case 'settings.notifOff': return 'إيقاف';
+			case 'settings.notifEnabledChip': return 'مفعّل';
+			case 'settings.notifDisabledChip': return 'معطّل';
+			case 'settings.notifPushEnabled': return 'الإشعارات الفورية مفعّلة';
+			case 'settings.notifPushDisabled': return 'الإشعارات الفورية معطّلة';
+			case 'settings.notifOpenSettingsBtn': return 'فتح الإعدادات';
+			case 'settings.notifGeneralSection': return 'عام';
+			case 'settings.notifSocialSection': return 'اجتماعي';
+			case 'settings.notifCommerceSection': return 'التسوق';
+			case 'settings.notifVendorSection': return 'المتجر';
+			case 'settings.notifComments': return 'التعليقات';
+			case 'settings.notifUpvotes': return 'التصويتات';
+			case 'settings.notifMentions': return 'الإشارات';
+			case 'settings.notifNewFollowers': return 'متابعون جدد';
+			case 'settings.notifFollowRequests': return 'طلبات المتابعة';
+			case 'settings.notifLoginAlerts': return 'تنبيهات تسجيل الدخول';
+			case 'settings.notifLoginAlertsSub': return 'إشعاري بتسجيلات الدخول الجديدة';
+			case 'settings.notifDailySummary': return 'الملخص اليومي';
+			case 'settings.notifDailySummarySub': return 'احصل على ملخص يومي للنشاط';
+			case 'settings.notifOrderConfirmed': return 'تأكيد الطلب';
+			case 'settings.notifOrderShipped': return 'شحن الطلب';
+			case 'settings.notifOrderDelivered': return 'تسليم الطلب';
+			case 'settings.notifRefundProcessed': return 'معالجة الاسترداد';
+			case 'settings.notifBackInStock': return 'عودة للمخزون';
+			case 'settings.notifPriceDrop': return 'انخفاض السعر';
+			case 'settings.notifPromotionsToggle': return 'العروض الترويجية';
+			case 'settings.notifOrderSound': return 'صوت الطلب';
+			case 'settings.notifOrderSoundSub': return 'تشغيل صوت للطلبات الجديدة';
+			case 'settings.notifManageChannels': return 'إدارة القنوات';
+			case 'settings.notifManageChannelsSub': return 'التحكم في قنوات الإشعارات';
+			case 'settings.pushNotifications': return 'الإشعارات الفورية';
+			case 'settings.contentScreenTitle': return 'المحتوى';
+			case 'settings.contentFeedSection': return 'الخلاصة';
+			case 'settings.contentFeedLangSection': return 'لغة الخلاصة';
+			case 'settings.contentPostsSection': return 'المنشورات';
+			case 'settings.contentMutedSection': return 'المكتوم';
+			case 'settings.contentVendorSection': return 'البائعون';
+			case 'settings.langSection': return 'اللغة';
+			case 'settings.langAppLabel': return 'لغة التطبيق';
+			case 'settings.appearanceTitle': return 'المظهر';
+			case 'settings.themeSection': return 'السمة';
+			case 'settings.themeLight': return 'فاتح';
+			case 'settings.themeDark': return 'داكن';
+			case 'settings.themeSystem': return 'افتراضي النظام';
+			case 'settings.textSizeSection': return 'حجم النص';
+			case 'settings.textAdjustLabel': return 'ضبط حجم النص';
+			case 'settings.textPreviewLabel': return 'معاينة';
+			case 'settings.textSmall': return 'صغير';
+			case 'settings.textNormal': return 'عادي';
+			case 'settings.textLarge': return 'كبير';
+			case 'settings.textXlarge': return 'كبير جداً';
+			case 'settings.boldText': return 'نص عريض';
+			case 'settings.reduceAnim': return 'تقليل الحركات';
+			case 'settings.reduceAnimSub': return 'تقليل تأثيرات الحركة';
+			case 'settings.arabicFontSection': return 'الخط العربي';
+			case 'settings.fontDefault': return 'افتراضي';
+			case 'settings.fontCairo': return 'القاهرة';
+			case 'settings.fontAlmarai': return 'المراعي';
+			case 'settings.fontTajawal': return 'تجوال';
+			case 'settings.accessibilitySection': return 'إمكانية الوصول';
+			case 'settings.storageScreenTitle': return 'التخزين';
+			case 'settings.storageImageSection': return 'الصور';
+			case 'settings.storageRecentSection': return 'الأخيرة';
+			case 'settings.storageDevSection': return 'المطوّر';
+			case 'settings.vendorScreenTitle': return 'إعدادات المتجر';
+			case 'settings.vendorStoreStatusSection': return 'حالة المتجر';
+			case 'settings.vendorDeliverySection': return 'التوصيل';
+			case 'settings.vendorNotifSection': return 'الإشعارات';
+			case 'settings.appScreenTitle': return 'معلومات التطبيق';
+			case 'settings.appAboutSection': return 'حول';
+			case 'settings.appShareSection': return 'مشاركة';
+			case 'settings.supportScreenTitle': return 'الدعم';
+			case 'settings.supportHelpSection': return 'المساعدة';
+			case 'settings.supportEscrowSection': return 'الضمان والمدفوعات';
+			case 'settings.supportLegalSection': return 'قانوني';
+			case 'settings.notifCommunityLabel': return 'إشعارات المجتمع';
 			case 'become_vendor.title': return 'انضم إلى قائمة الموردين';
 			case 'become_vendor.subtitle': return 'انضم إلى منصتنا وابدأ في بيع منتجاتك.';
 			case 'become_vendor.benefit1': return 'بيع المنتجات المادية والرقمية';
@@ -7710,6 +8858,13 @@ extension on _StringsAr {
 			case 'create_post.share_product': return 'مشاركة منتج';
 			case 'create_post.share_product_named': return ({required Object title}) => 'مشاركة: ${title}';
 			case 'create_post.ask_product': return 'سؤال عن منتج';
+			case 'create_post.select_community_title': return 'اختر مجتمعاً';
+			case 'create_post.search_communities': return 'ابحث عن مجتمعات...';
+			case 'create_post.show_more_communities': return 'عرض المزيد من المجتمعات';
+			case 'create_post.no_communities_found': return 'لم يتم العثور على مجتمعات';
+			case 'create_post.private_community_locked': return 'خاص - انضم للاختيار';
+			case 'create_post.create_community': return 'إنشاء مجتمع';
+			case 'create_post.ai_assistant': return 'المساعد الذكي (AI)';
 			default: return null;
 		}
 	}

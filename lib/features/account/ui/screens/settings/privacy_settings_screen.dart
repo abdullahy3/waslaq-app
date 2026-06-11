@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:waslaq_app/i18n/strings.g.dart';
 import 'package:waslaq_app/shared/theme/app_colors.dart';
 import 'package:waslaq_app/core/auth/auth_notifier.dart';
 import 'package:waslaq_app/features/social/providers/social_providers.dart';
@@ -152,9 +153,9 @@ class _PrivacySettingsScreenState extends ConsumerState<PrivacySettingsScreen> {
                     decoration: BoxDecoration(color: context.colors.border, borderRadius: BorderRadius.circular(2)),
                   ),
                   const SizedBox(height: 16),
-                  const Align(
+                  Align(
                     alignment: Alignment.centerLeft,
-                    child: Text('Blocked Users', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    child: Text(t.settings.privacyBlockedSection, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                   ),
                   const SizedBox(height: 16),
                   Expanded(
@@ -207,6 +208,7 @@ class _PrivacySettingsScreenState extends ConsumerState<PrivacySettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final s = t.settings;
     final authState = ref.watch(authNotifierProvider);
     final customerId = authState.maybeWhen(
       authenticated: (id, _, __, ___, ____) => id,
@@ -222,7 +224,7 @@ class _PrivacySettingsScreenState extends ConsumerState<PrivacySettingsScreen> {
     return Scaffold(
       backgroundColor: context.colors.background,
       appBar: AppBar(
-        title: const Text('Privacy & Safety', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(s.privacyScreenTitle, style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: context.colors.background,
         iconTheme: IconThemeData(color: context.colors.textPrimary),
         elevation: 0,
@@ -233,7 +235,7 @@ class _PrivacySettingsScreenState extends ConsumerState<PrivacySettingsScreen> {
               padding: const EdgeInsets.all(16),
               children: [
                 // ─── ACCOUNT PRIVACY SECTION ───
-                _buildSectionHeader('Account Privacy'),
+                _buildSectionHeader(s.privacyAccountSection),
                 Card(
                   color: context.colors.surface,
                   shape: RoundedRectangleBorder(
@@ -244,8 +246,8 @@ class _PrivacySettingsScreenState extends ConsumerState<PrivacySettingsScreen> {
                     children: [
                       SwitchListTile(
                         activeColor: context.colors.primary,
-                        title: const Text('Private Account', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                        subtitle: const Text('Only approved followers can see your posts', style: TextStyle(fontSize: 12)),
+                        title: Text(s.privacyPrivateAccount, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                        subtitle: Text(s.privacyPrivateAccountSub, style: TextStyle(fontSize: 12)),
                         value: profileAsync.valueOrNull?.isPrivate ?? false,
                         onChanged: (val) => _updateProfilePrivacy(customerId, isPrivate: val),
                       ),
@@ -255,7 +257,7 @@ class _PrivacySettingsScreenState extends ConsumerState<PrivacySettingsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('Show ActivityStatus', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                            Text(s.privacyActivityStatus, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                             const SizedBox(height: 8),
                             SizedBox(
                               width: double.infinity,
@@ -289,7 +291,7 @@ class _PrivacySettingsScreenState extends ConsumerState<PrivacySettingsScreen> {
                 const SizedBox(height: 20),
 
                 // ─── MESSAGING & CHAT SECTION ───
-                _buildSectionHeader('Messaging & Chat'),
+                _buildSectionHeader(s.privacyMessagingSection),
                 if (_socialSettings != null)
                   Card(
                     color: context.colors.surface,
@@ -328,8 +330,8 @@ class _PrivacySettingsScreenState extends ConsumerState<PrivacySettingsScreen> {
                           SwitchListTile(
                             contentPadding: EdgeInsets.zero,
                             activeColor: context.colors.primary,
-                            title: const Text('Read Receipts', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                            subtitle: const Text('Show read receipts (✓✓) in conversations', style: TextStyle(fontSize: 12)),
+                            title: Text(s.privacyReadReceipts, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                            subtitle: Text(s.privacyReadReceiptsSub, style: TextStyle(fontSize: 12)),
                             value: _socialSettings!.readReceipts,
                             onChanged: (val) {
                               _updateSocialSettings(_socialSettings!.copyWith(readReceipts: val));
@@ -342,7 +344,7 @@ class _PrivacySettingsScreenState extends ConsumerState<PrivacySettingsScreen> {
                 const SizedBox(height: 20),
 
                 // ─── BLOCKED USERS SECTION ───
-                _buildSectionHeader('Blocked Users'),
+                _buildSectionHeader(s.privacyBlockedSection),
                 Card(
                   color: context.colors.surface,
                   shape: RoundedRectangleBorder(
@@ -373,7 +375,7 @@ class _PrivacySettingsScreenState extends ConsumerState<PrivacySettingsScreen> {
 
                 // ─── FOLLOW REQUESTS SECTION ───
                 if (_followRequests.isNotEmpty) ...[
-                  _buildSectionHeader('Follow Requests'),
+                  _buildSectionHeader(s.privacyFollowReqSection),
                   Card(
                     color: context.colors.surface,
                     shape: RoundedRectangleBorder(

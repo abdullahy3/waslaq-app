@@ -47,7 +47,6 @@ dependencies:
   flutter_local_notifications: ^17.2.4
 
   # Payments
-  webview_flutter: ^4.10.0
 
   # UI
   shimmer: ^3.0.0

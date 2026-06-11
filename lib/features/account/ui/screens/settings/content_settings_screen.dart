@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:waslaq_app/i18n/strings.g.dart';
 import 'package:waslaq_app/shared/theme/app_colors.dart';
 import 'package:waslaq_app/core/providers/preferences_provider.dart';
 import 'package:waslaq_app/features/vendor/providers/vendor_providers.dart';
@@ -103,7 +104,7 @@ class _ContentSettingsScreenState extends ConsumerState<ContentSettingsScreen> {
     return Scaffold(
       backgroundColor: context.colors.background,
       appBar: AppBar(
-        title: const Text('Content & Feed', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(t.settings.contentScreenTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: context.colors.background,
         iconTheme: IconThemeData(color: context.colors.textPrimary),
         elevation: 0,
@@ -112,7 +113,7 @@ class _ContentSettingsScreenState extends ConsumerState<ContentSettingsScreen> {
         padding: const EdgeInsets.all(16),
         children: [
           // ─── FEED LANGUAGE SECTION ───
-          _buildSectionHeader('Feed Language'),
+          _buildSectionHeader(t.settings.contentFeedLangSection),
           Card(
             color: context.colors.surface,
             shape: RoundedRectangleBorder(
@@ -151,7 +152,7 @@ class _ContentSettingsScreenState extends ConsumerState<ContentSettingsScreen> {
           const SizedBox(height: 20),
 
           // ─── MUTED KEYWORDS SECTION ───
-          _buildSectionHeader('Muted Keywords'),
+          _buildSectionHeader(t.settings.contentMutedSection),
           Card(
             color: context.colors.surface,
             shape: RoundedRectangleBorder(
@@ -222,7 +223,7 @@ class _ContentSettingsScreenState extends ConsumerState<ContentSettingsScreen> {
           const SizedBox(height: 20),
 
           // ─── POSTS SECTION ───
-          _buildSectionHeader('Posts'),
+          _buildSectionHeader(t.settings.contentPostsSection),
           Card(
             color: context.colors.surface,
             shape: RoundedRectangleBorder(
@@ -251,7 +252,7 @@ class _ContentSettingsScreenState extends ConsumerState<ContentSettingsScreen> {
           const SizedBox(height: 20),
 
           // ─── FEED BEHAVIOR SECTION ───
-          _buildSectionHeader('Feed Behavior'),
+          _buildSectionHeader(t.settings.contentFeedSection),
           Card(
             color: context.colors.surface,
             shape: RoundedRectangleBorder(
@@ -295,7 +296,7 @@ class _ContentSettingsScreenState extends ConsumerState<ContentSettingsScreen> {
 
           // ─── VENDOR VACATION MODE SECTION ───
           if (isVendor) ...[
-            _buildSectionHeader('Vendor Settings'),
+            _buildSectionHeader(t.settings.contentVendorSection),
             Card(
               color: context.colors.surface,
               shape: RoundedRectangleBorder(

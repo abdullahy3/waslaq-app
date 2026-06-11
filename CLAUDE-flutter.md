@@ -1,7 +1,7 @@
 # WaslaQ Flutter App — Claude Code Memory
 # Repo: ~/waslaq-app
 # Read ~/.claude/CLAUDE.md FIRST — this file is Flutter-specific additions only
-# Last updated: June 10, 2026
+# Last updated: June 11, 2026
 
 ---
 
@@ -242,6 +242,21 @@ ios/
 - Inventory display
 - Order detail (3-step stepper)
 - ADB wireless permanent connection
+- Ask About a Product defaults to r/product-questions (CreatePostScreen)
+- Always show 'Show more' button to search any public community (CreatePostScreen)
+- By Community filter dropdown beside Hot/New/Top (ExploreScreen)
+- Private community selection restriction enforced (CreatePostScreen & ExploreScreen)
+- Filter Button on Explorer Page's Stores Tab (resolves categories via `allCategoriesProvider` watched in `build()`)
+- Leave Community action (hits toggle `/join` endpoint instead of obsolete `/leave` endpoint)
+- Explore Page top search/filter header scroll physics (controlled by `SizeTransition` and `NotificationListener<UserScrollNotification>`)
+- Community Creation: 3-stage wizard screen (`CreateCommunityScreen`) accessible via the main FAB
+- AI Assistant: Chat interface (`AiAssistantScreen`) with context-aware URL fetching via `/store/social/assistant`
+- Floating FAB buttons: Configured buttons for Community Creation and AI Assistant in `ContextAwareScaffold`
+- Deep Links: Added intent filters for `waslaq.com` to open post details and resolve product handles dynamically in `ProductRepository`
+- App Rename: Renamed display name to `waslaq-واصلك` in AndroidManifest.xml
+
+## 🐛 Known Issues & Active Bugs (To Be Fixed Next)
+*(No active bugs remaining)*
 
 ## 🔲 Not Yet Tested / Pending
 - iOS production build + App Store submission

@@ -74,13 +74,23 @@ class CommunityExploreScreen extends ConsumerWidget {
   }
 }
 
-class _CommunityListTile extends ConsumerWidget {
+class _CommunityListTile extends ConsumerStatefulWidget {
   final CommunityModel community;
 
   const _CommunityListTile({required this.community});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_CommunityListTile> createState() => _CommunityListTileState();
+}
+
+class _CommunityListTileState extends ConsumerState<_CommunityListTile> {
+  bool _joining = false;
+  bool? _isMemberOverride;
+
+  @override
+  Widget build(BuildContext context) {
+    final community = widget.community;
+    final isMember = _isMemberOverride ?? community.isMember;
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       leading: CircleAvatar(
@@ -88,7 +98,7 @@ class _CommunityListTile extends ConsumerWidget {
         backgroundColor: context.colors.primary,
         child: Text(
           community.name.isNotEmpty ? community.name.substring(0, 1).toUpperCase() : '?',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
       title: Text(
@@ -109,7 +119,7 @@ class _CommunityListTile extends ConsumerWidget {
           ),
         ),
       ),
-      trailing: community.isMember
+      trailing: isMember
           ? Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
@@ -119,9 +129,20 @@ class _CommunityListTile extends ConsumerWidget {
               child: Text(t.community.joined, style: TextStyle(color: context.colors.textSecondary, fontSize: 12)),
             )
           : FilledButton(
-              onPressed: () async {
-                await ref.read(socialRepositoryProvider).joinCommunity(community.slug);
-                ref.invalidate(communitiesProvider);
+              onPressed: _joining ? null : () async {
+                setState(() {
+                  _joining = true;
+                  _isMemberOverride = true;
+                });
+                try {
+                  await ref.read(socialRepositoryProvider).joinCommunity(community.slug);
+                  ref.refresh(communitiesProvider);
+                  ref.refresh(communityProvider(community.slug));
+                } catch (e) {
+                  if (mounted) setState(() => _isMemberOverride = null);
+                } finally {
+                  if (mounted) setState(() => _joining = false);
+                }
               },
               style: FilledButton.styleFrom(
                 backgroundColor: context.colors.primary,
@@ -129,7 +150,9 @@ class _CommunityListTile extends ConsumerWidget {
                 minimumSize: const Size(60, 32),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
-              child: Text(t.community.join, style: const TextStyle(fontSize: 12)),
+              child: _joining
+                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                  : Text(t.community.join, style: const TextStyle(fontSize: 12)),
             ),
       onTap: () => context.pushRoute(CommunityRoute(communitySlug: community.slug)),
     );

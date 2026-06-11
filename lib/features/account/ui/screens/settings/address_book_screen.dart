@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:waslaq_app/i18n/strings.g.dart';
 import 'package:waslaq_app/shared/theme/app_colors.dart';
 import 'package:waslaq_app/features/account/data/models/address_model.dart';
 import 'package:waslaq_app/features/account/providers/account_providers.dart';
@@ -99,7 +100,7 @@ class _AddressBookScreenState extends ConsumerState<AddressBookScreen> {
     return Scaffold(
       backgroundColor: context.colors.background,
       appBar: AppBar(
-        title: const Text('Address Book', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(t.settings.addressScreenTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: context.colors.background,
         iconTheme: IconThemeData(color: context.colors.textPrimary),
         elevation: 0,

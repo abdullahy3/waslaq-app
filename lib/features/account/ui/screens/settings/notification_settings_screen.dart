@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:waslaq_app/i18n/strings.g.dart';
 import 'package:waslaq_app/shared/theme/app_colors.dart';
 import 'package:waslaq_app/core/providers/preferences_provider.dart';
 import 'package:waslaq_app/features/vendor/providers/vendor_providers.dart';
@@ -23,7 +24,6 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
 
   UserSocialSettingsModel? _socialSettings;
 
-  // Local state for social toggles not stored in backend settings schema
   bool _newFollowers = true;
   bool _commentsOnPosts = true;
   bool _upvotesOnPosts = true;
@@ -32,7 +32,6 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
   String _communityNotifications = 'All';
   bool _promotions = false;
 
-  // Local state for commerce client-side notifications
   bool _orderConfirmed = true;
   bool _orderShipped = true;
   bool _orderDelivered = true;
@@ -94,11 +93,12 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
   Widget build(BuildContext context) {
     final isVendor = ref.watch(isVendorProvider).valueOrNull ?? false;
     final isGranted = _notificationStatus == PermissionStatus.granted;
+    final s = t.settings;
 
     return Scaffold(
       backgroundColor: context.colors.background,
       appBar: AppBar(
-        title: const Text('Notifications', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(s.hubNotifications, style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: context.colors.background,
         iconTheme: IconThemeData(color: context.colors.textPrimary),
         elevation: 0,
@@ -125,10 +125,12 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Push Notifications', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                              Text(s.pushNotifications, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                               const SizedBox(height: 2),
-                              Text(isGranted ? 'Alerts are configured on this device' : 'Alerts are disabled',
-                                  style: TextStyle(color: context.colors.textSecondary, fontSize: 12)),
+                              Text(
+                                isGranted ? s.notifPushEnabled : s.notifPushDisabled,
+                                style: TextStyle(color: context.colors.textSecondary, fontSize: 12),
+                              ),
                             ],
                           ),
                         ),
@@ -136,8 +138,10 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                           const CircularProgressIndicator()
                         else ...[
                           Chip(
-                            label: Text(isGranted ? 'Enabled' : 'Disabled',
-                                style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                            label: Text(
+                              isGranted ? s.notifEnabledChip : s.notifDisabledChip,
+                              style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                            ),
                             backgroundColor: isGranted ? Colors.green : Colors.red,
                             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
@@ -145,7 +149,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                             const SizedBox(width: 8),
                             TextButton(
                               onPressed: openAppSettings,
-                              child: const Text('Open Settings', style: TextStyle(fontSize: 12)),
+                              child: Text(s.notifOpenSettingsBtn, style: TextStyle(fontSize: 12)),
                             ),
                           ],
                         ],
@@ -156,7 +160,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                 const SizedBox(height: 20),
 
                 // ─── SOCIAL SECTION ───
-                _buildSectionHeader('Social Notifications'),
+                _buildSectionHeader(s.notifSocialSection),
                 Card(
                   color: context.colors.surface,
                   shape: RoundedRectangleBorder(
@@ -167,50 +171,50 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                     children: [
                       SwitchListTile(
                         activeColor: context.colors.primary,
-                        title: const Text('New Followers', style: TextStyle(fontSize: 14)),
+                        title: Text(s.notifNewFollowers, style: TextStyle(fontSize: 14)),
                         value: _newFollowers,
                         onChanged: (val) => setState(() => _newFollowers = val),
                       ),
                       Divider(height: 1, color: context.colors.border),
                       SwitchListTile(
                         activeColor: context.colors.primary,
-                        title: const Text('Comments on Posts', style: TextStyle(fontSize: 14)),
+                        title: Text(s.notifComments, style: TextStyle(fontSize: 14)),
                         value: _commentsOnPosts,
                         onChanged: (val) => setState(() => _commentsOnPosts = val),
                       ),
                       Divider(height: 1, color: context.colors.border),
                       SwitchListTile(
                         activeColor: context.colors.primary,
-                        title: const Text('Upvotes on Posts', style: TextStyle(fontSize: 14)),
+                        title: Text(s.notifUpvotes, style: TextStyle(fontSize: 14)),
                         value: _upvotesOnPosts,
                         onChanged: (val) => setState(() => _upvotesOnPosts = val),
                       ),
                       Divider(height: 1, color: context.colors.border),
                       SwitchListTile(
                         activeColor: context.colors.primary,
-                        title: const Text('Mentions', style: TextStyle(fontSize: 14)),
+                        title: Text(s.notifMentions, style: TextStyle(fontSize: 14)),
                         value: _mentions,
                         onChanged: (val) => setState(() => _mentions = val),
                       ),
                       Divider(height: 1, color: context.colors.border),
                       SwitchListTile(
                         activeColor: context.colors.primary,
-                        title: const Text('Follow Requests', style: TextStyle(fontSize: 14)),
+                        title: Text(s.notifFollowRequests, style: TextStyle(fontSize: 14)),
                         value: _followRequests,
                         onChanged: (val) => setState(() => _followRequests = val),
                       ),
                       Divider(height: 1, color: context.colors.border),
                       ListTile(
-                        title: const Text('Community Notifications', style: TextStyle(fontSize: 14)),
+                        title: Text(s.notifCommunityLabel, style: TextStyle(fontSize: 14)),
                         trailing: DropdownButton<String>(
                           value: _communityNotifications,
                           dropdownColor: context.colors.surface,
                           style: TextStyle(color: context.colors.textPrimary),
                           underline: const SizedBox(),
-                          items: const [
-                            DropdownMenuItem(value: 'All', child: Text('All')),
-                            DropdownMenuItem(value: 'Mentions Only', child: Text('Mentions Only')),
-                            DropdownMenuItem(value: 'Off', child: Text('Off')),
+                          items: [
+                            DropdownMenuItem(value: 'All', child: Text(s.notifAll)),
+                            DropdownMenuItem(value: 'Mentions Only', child: Text(s.notifMentionsOnly)),
+                            DropdownMenuItem(value: 'Off', child: Text(s.notifOff)),
                           ],
                           onChanged: (val) {
                             if (val != null) setState(() => _communityNotifications = val);
@@ -223,7 +227,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                 const SizedBox(height: 20),
 
                 // ─── COMMERCE SECTION ───
-                _buildSectionHeader('Commerce Notifications (Client-side)'),
+                _buildSectionHeader(s.notifCommerceSection),
                 Card(
                   color: context.colors.surface,
                   shape: RoundedRectangleBorder(
@@ -234,28 +238,28 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                     children: [
                       SwitchListTile(
                         activeColor: context.colors.primary,
-                        title: const Text('Order Confirmed', style: TextStyle(fontSize: 14)),
+                        title: Text(s.notifOrderConfirmed, style: TextStyle(fontSize: 14)),
                         value: _orderConfirmed,
                         onChanged: (val) => setState(() => _orderConfirmed = val),
                       ),
                       Divider(height: 1, color: context.colors.border),
                       SwitchListTile(
                         activeColor: context.colors.primary,
-                        title: const Text('Order Shipped', style: TextStyle(fontSize: 14)),
+                        title: Text(s.notifOrderShipped, style: TextStyle(fontSize: 14)),
                         value: _orderShipped,
                         onChanged: (val) => setState(() => _orderShipped = val),
                       ),
                       Divider(height: 1, color: context.colors.border),
                       SwitchListTile(
                         activeColor: context.colors.primary,
-                        title: const Text('Order Delivered', style: TextStyle(fontSize: 14)),
+                        title: Text(s.notifOrderDelivered, style: TextStyle(fontSize: 14)),
                         value: _orderDelivered,
                         onChanged: (val) => setState(() => _orderDelivered = val),
                       ),
                       Divider(height: 1, color: context.colors.border),
                       SwitchListTile(
                         activeColor: context.colors.primary,
-                        title: const Text('Refund Processed', style: TextStyle(fontSize: 14)),
+                        title: Text(s.notifRefundProcessed, style: TextStyle(fontSize: 14)),
                         value: _refundProcessed,
                         onChanged: (val) => setState(() => _refundProcessed = val),
                       ),
@@ -263,7 +267,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                         Divider(height: 1, color: context.colors.border),
                         SwitchListTile(
                           activeColor: context.colors.primary,
-                          title: const Text('Price Drop Alerts (on saved items)', style: TextStyle(fontSize: 14)),
+                          title: Text(s.notifPriceDrop, style: TextStyle(fontSize: 14)),
                           value: _socialSettings!.priceDropAlerts,
                           onChanged: (val) {
                             _updateSocialSettings(_socialSettings!.copyWith(priceDropAlerts: val));
@@ -272,7 +276,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                         Divider(height: 1, color: context.colors.border),
                         SwitchListTile(
                           activeColor: context.colors.primary,
-                          title: const Text('Back in Stock Alerts', style: TextStyle(fontSize: 14)),
+                          title: Text(s.notifBackInStock, style: TextStyle(fontSize: 14)),
                           value: _socialSettings!.backInStockAlerts,
                           onChanged: (val) {
                             _updateSocialSettings(_socialSettings!.copyWith(backInStockAlerts: val));
@@ -286,7 +290,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
 
                 // ─── VENDOR SECTION ───
                 if (isVendor && _socialSettings != null) ...[
-                  _buildSectionHeader('Vendor Settings'),
+                  _buildSectionHeader(s.notifVendorSection),
                   Card(
                     color: context.colors.surface,
                     shape: RoundedRectangleBorder(
@@ -297,8 +301,8 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                       children: [
                         SwitchListTile(
                           activeColor: context.colors.primary,
-                          title: const Text('New Order Alert Sound', style: TextStyle(fontSize: 14)),
-                          subtitle: const Text('Play a loud alert sound for every new order', style: TextStyle(fontSize: 11)),
+                          title: Text(s.notifOrderSound, style: TextStyle(fontSize: 14)),
+                          subtitle: Text(s.notifOrderSoundSub, style: TextStyle(fontSize: 11)),
                           value: _socialSettings!.vendorNewOrderSound,
                           onChanged: (val) {
                             _updateSocialSettings(_socialSettings!.copyWith(vendorNewOrderSound: val));
@@ -307,8 +311,8 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                         Divider(height: 1, color: context.colors.border),
                         SwitchListTile(
                           activeColor: context.colors.primary,
-                          title: const Text('Daily Sales Summary', style: TextStyle(fontSize: 14)),
-                          subtitle: const Text('Get a morning summary of yesterday\'s sales', style: TextStyle(fontSize: 11)),
+                          title: Text(s.notifDailySummary, style: TextStyle(fontSize: 14)),
+                          subtitle: Text(s.notifDailySummarySub, style: TextStyle(fontSize: 11)),
                           value: _socialSettings!.vendorDailySummary,
                           onChanged: (val) {
                             _updateSocialSettings(_socialSettings!.copyWith(vendorDailySummary: val));
@@ -321,7 +325,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                 ],
 
                 // ─── GENERAL & SYSTEM SECTION ───
-                _buildSectionHeader('General & System'),
+                _buildSectionHeader(s.notifGeneralSection),
                 Card(
                   color: context.colors.surface,
                   shape: RoundedRectangleBorder(
@@ -332,7 +336,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                     children: [
                       SwitchListTile(
                         activeColor: context.colors.primary,
-                        title: const Text('Promotions', style: TextStyle(fontSize: 14)),
+                        title: Text(s.notifPromotionsToggle, style: TextStyle(fontSize: 14)),
                         value: _promotions,
                         onChanged: (val) => setState(() => _promotions = val),
                       ),
@@ -340,8 +344,8 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                         Divider(height: 1, color: context.colors.border),
                         SwitchListTile(
                           activeColor: context.colors.primary,
-                          title: const Text('Login Alerts', style: TextStyle(fontSize: 14)),
-                          subtitle: const Text('Get notified when account signs in on new device', style: TextStyle(fontSize: 11)),
+                          title: Text(s.notifLoginAlerts, style: TextStyle(fontSize: 14)),
+                          subtitle: Text(s.notifLoginAlertsSub, style: TextStyle(fontSize: 11)),
                           value: _socialSettings!.loginNotifications,
                           onChanged: (val) {
                             _updateSocialSettings(_socialSettings!.copyWith(loginNotifications: val));
@@ -351,8 +355,8 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                       Divider(height: 1, color: context.colors.border),
                       ListTile(
                         leading: Icon(Icons.settings_suggest_outlined, color: context.colors.primary),
-                        title: const Text('Open Notification Settings', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                        subtitle: const Text('Manage notification channels for this app', style: TextStyle(fontSize: 11)),
+                        title: Text(s.notifManageChannels, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                        subtitle: Text(s.notifManageChannelsSub, style: TextStyle(fontSize: 11)),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: openAppSettings,
                       ),

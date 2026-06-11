@@ -138,24 +138,41 @@ class ProductRepository {
     });
   }
 
-  /// Fetch a single product by ID. Mirrors GET /store/products/:id.
+  /// Fetch a single product by ID or handle. Mirrors GET /store/products/:id.
   static Future<ProductModel> getProductById(String id) async {
+    final bool isId = id.startsWith('prod_');
+    final String path = isId ? '/store/products/$id' : '/store/products';
+    final queryParams = {
+      'fields':
+          '*variants,*variants.calculated_price,*images,*categories,+metadata',
+      'region_id': 'reg_01KQ6035AK6FMA4R1XJ76RTPGH',
+      if (!isId) 'handle': id,
+    };
+
     final response = await MedusaClient.instance.get(
-      '/store/products/$id',
-      queryParameters: {
-        'fields':
-            '*variants,*variants.calculated_price,*images,*categories,+metadata',
-        'region_id': 'reg_01KQ6035AK6FMA4R1XJ76RTPGH',
-      },
+      path,
+      queryParameters: queryParams,
     );
-    final productJson = Map<String, dynamic>.from(response.data['product'] as Map);
+
+    final Map<String, dynamic> productJson;
+    if (isId) {
+      productJson = Map<String, dynamic>.from(response.data['product'] as Map);
+    } else {
+      final list = response.data['products'] as List;
+      if (list.isEmpty) {
+        throw Exception('Product not found by handle: $id');
+      }
+      productJson = Map<String, dynamic>.from(list.first as Map);
+    }
+
+    final String realId = productJson['id'] as String;
     try {
-      final vendorResponse = await MedusaClient.instance.get('/store/products/$id/vendor');
+      final vendorResponse = await MedusaClient.instance.get('/store/products/$realId/vendor');
       if (vendorResponse.data != null && vendorResponse.data['vendor'] != null) {
         productJson['vendor'] = vendorResponse.data['vendor'];
       }
     } catch (e, st) {
-      CrashReporter.reportError(e, st, reason: 'Failed to fetch vendor for product $id');
+      CrashReporter.reportError(e, st, reason: 'Failed to fetch vendor for product $realId');
     }
     return ProductModel.fromJson(productJson);
   }
@@ -247,4 +264,44 @@ class ProductRepository {
       );
     });
   }
+
+  /// Fetch products with total count for paginated store grid.
+  static Future<ProductsResponse> getProductsPaginated({
+    int limit = 20,
+    int offset = 0,
+    String? categoryId,
+    String? query,
+    String? order,
+  }) async {
+    final queryParams = <String, dynamic>{
+      'limit': limit,
+      'offset': offset,
+      'fields':
+          '*variants,*variants.calculated_price,*images,*categories,+metadata',
+      'region_id': 'reg_01KQ6035AK6FMA4R1XJ76RTPGH',
+      if (categoryId != null) 'category_id[]': categoryId,
+      if (query != null) 'q': query,
+      if (order != null) 'order': order,
+    };
+
+    final response = await MedusaClient.instance.get(
+      '/store/products',
+      queryParameters: queryParams,
+    );
+
+    final rawList = response.data['products'] as List;
+    final products = rawList
+        .map((p) => ProductModel.fromJson(p as Map<String, dynamic>))
+        .toList();
+    final count = response.data['count'] as int? ?? 0;
+
+    return ProductsResponse(products: products, count: count);
+  }
+}
+
+class ProductsResponse {
+  final List<ProductModel> products;
+  final int count;
+
+  ProductsResponse({required this.products, required this.count});
 }

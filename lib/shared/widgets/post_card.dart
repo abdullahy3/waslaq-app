@@ -197,7 +197,7 @@ class PostCard extends ConsumerWidget {
                 label: t.social.share_button,
                 onTap: () {
                   final community = post.communitySlug.isNotEmpty ? post.communitySlug : 'all';
-                  final url = 'https://waslaq.com/c/$community/posts/${post.id}';
+                  final url = 'https://waslaq.com/r/$community/comments/${post.id}';
                   Share.share(t.social.share_post(title: post.title, url: url));
                 },
               ),

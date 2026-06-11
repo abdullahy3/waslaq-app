@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:waslaq_app/i18n/strings.g.dart';
 import 'package:waslaq_app/shared/theme/app_colors.dart';
 import 'package:waslaq_app/router/app_router.dart';
 import 'package:waslaq_app/features/account/providers/account_providers.dart';
@@ -20,7 +21,7 @@ class SupportSettingsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: context.colors.background,
       appBar: AppBar(
-        title: const Text('Support & Escrow', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(t.settings.supportScreenTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: context.colors.background,
         iconTheme: IconThemeData(color: context.colors.textPrimary),
         elevation: 0,
@@ -29,7 +30,7 @@ class SupportSettingsScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(16),
         children: [
           // ─── GET HELP SECTION ───
-          _buildSectionHeader(context, 'Get Help'),
+          _buildSectionHeader(context, t.settings.supportHelpSection),
           Card(
             color: context.colors.surface,
             shape: RoundedRectangleBorder(
@@ -59,7 +60,7 @@ class SupportSettingsScreen extends ConsumerWidget {
           const SizedBox(height: 20),
 
           // ─── LEGAL SECTION ───
-          _buildSectionHeader(context, 'Legal'),
+          _buildSectionHeader(context, t.settings.supportLegalSection),
           Card(
             color: context.colors.surface,
             shape: RoundedRectangleBorder(
@@ -94,7 +95,7 @@ class SupportSettingsScreen extends ConsumerWidget {
           const SizedBox(height: 20),
 
           // ─── ESCROW & DISPUTES SECTION ───
-          _buildSectionHeader(context, 'Escrow & Disputes'),
+          _buildSectionHeader(context, t.settings.supportEscrowSection),
           Card(
             color: context.colors.primary,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

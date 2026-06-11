@@ -133,6 +133,15 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
     return const Color(0xFF6D28D9);
   }
 
+  String _getTimeAgo(DateTime date) {
+    final diff = DateTime.now().difference(date);
+    if (diff.inDays > 365) return t.social.years_short(n: diff.inDays ~/ 365);
+    if (diff.inDays > 0) return t.social.days_short(n: diff.inDays);
+    if (diff.inHours > 0) return t.social.hours_short(n: diff.inHours);
+    if (diff.inMinutes > 0) return t.social.minutes_short(n: diff.inMinutes);
+    return t.social.now_short;
+  }
+
   @override
   Widget build(BuildContext context) {
     final profileAsync = ref.watch(userProfileProvider(widget.userId));
@@ -506,15 +515,197 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                           },
                         ),
                   // Replies
-                  Center(
-                      child: Text(t.user_profile.coming_soon,
-                          style: TextStyle(
-                              color: context.colors.textMuted))),
+                  profile.recentComments.isEmpty
+                      ? Center(
+                          child: Text(t.user_profile.no_replies,
+                              style: TextStyle(
+                                  color: context.colors.textMuted)))
+                      : ListView.builder(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          itemCount: profile.recentComments.length,
+                          itemBuilder: (context, index) {
+                            final comment = profile.recentComments[index];
+                            final isAr = Localizations.localeOf(context).languageCode == 'ar';
+                            final repliedToText = comment.post != null
+                                ? (isAr ? 'رد على: ${comment.post!.title}' : 'Replied to: ${comment.post!.title}')
+                                : (isAr ? 'رد على منشور' : 'Replied to a post');
+                            
+                            return Card(
+                              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                side: BorderSide(color: context.colors.border),
+                              ),
+                              color: context.colors.surface,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(12),
+                                onTap: () {
+                                  if (comment.postId.isNotEmpty) {
+                                    context.pushRoute(PostDetailRoute(
+                                      community: (comment.post?.communitySlug.isNotEmpty ?? false)
+                                          ? comment.post!.communitySlug
+                                          : 'all',
+                                      postId: comment.postId,
+                                    ));
+                                  }
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(Icons.reply, size: 14, color: context.colors.textMuted),
+                                          const SizedBox(width: 6),
+                                          Expanded(
+                                            child: Text(
+                                              repliedToText,
+                                              style: TextStyle(
+                                                color: context.colors.textMuted,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Row(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(10),
+                                            child: Container(
+                                              width: 20,
+                                              height: 20,
+                                              color: context.colors.surfaceVariant,
+                                              child: CachedNetworkImage(
+                                                imageUrl: _resolveAvatar(
+                                                  comment.author?.avatarUrl ?? profile.avatarUrl,
+                                                  comment.author?.avatarStyle ?? profile.avatarStyle,
+                                                  comment.author?.avatarSeed ?? profile.avatarSeed,
+                                                  comment.author?.customerId ?? profile.customerId,
+                                                ),
+                                                fit: BoxFit.cover,
+                                                errorWidget: (_, __, ___) => const Icon(Icons.person, size: 12),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            comment.author?.displayName ?? profile.displayName,
+                                            style: TextStyle(
+                                              color: context.colors.textPrimary,
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            _getTimeAgo(comment.createdAt),
+                                            style: TextStyle(color: context.colors.textMuted, fontSize: 12),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        comment.content,
+                                        style: TextStyle(
+                                          color: context.colors.textSecondary,
+                                          fontSize: 13,
+                                          height: 1.3,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                   // Media
-                  Center(
-                      child: Text(t.user_profile.coming_soon,
-                          style: TextStyle(
-                              color: context.colors.textMuted))),
+                  profile.mediaPosts.isEmpty
+                      ? Center(
+                          child: Text(
+                            Localizations.localeOf(context).languageCode == 'ar'
+                                ? 'لا توجد وسائط بعد'
+                                : 'No media yet',
+                            style: TextStyle(color: context.colors.textMuted),
+                          ),
+                        )
+                      : GridView.builder(
+                          padding: const EdgeInsets.all(8),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 8,
+                          ),
+                          itemCount: profile.mediaPosts.length,
+                          itemBuilder: (context, index) {
+                            final post = profile.mediaPosts[index];
+                            final imageUrl = post.mediaUrls.isNotEmpty ? post.mediaUrls.first : '';
+                            return GestureDetector(
+                              onTap: () {
+                                context.pushRoute(PostDetailRoute(
+                                  community: post.communitySlug.isNotEmpty ? post.communitySlug : 'all',
+                                  postId: post.id,
+                                ));
+                              },
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Stack(
+                                  fit: StackFit.expand,
+                                  children: [
+                                    if (imageUrl.isNotEmpty)
+                                      CachedNetworkImage(
+                                        imageUrl: imageUrl,
+                                        fit: BoxFit.cover,
+                                        placeholder: (_, __) => Container(color: context.colors.surfaceVariant),
+                                        errorWidget: (_, __, ___) => Container(
+                                          color: context.colors.surfaceVariant,
+                                          child: const Icon(Icons.broken_image, size: 24),
+                                        ),
+                                      )
+                                    else
+                                      Container(
+                                        color: context.colors.surfaceVariant,
+                                        child: Icon(
+                                          post.contentType == 'VIDEO' ? Icons.play_circle_outline : Icons.image,
+                                          color: context.colors.textMuted,
+                                          size: 32,
+                                        ),
+                                      ),
+                                    if (post.mediaUrls.length > 1)
+                                      Positioned(
+                                        top: 4,
+                                        right: 4,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: Colors.black.withValues(alpha: 0.6),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Text(
+                                            '+${post.mediaUrls.length - 1}',
+                                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                      ),
+                                    if (post.contentType == 'VIDEO')
+                                      Positioned(
+                                        bottom: 4,
+                                        left: 4,
+                                        child: Icon(Icons.play_arrow, color: Colors.white.withValues(alpha: 0.8), size: 20),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                 ],
               ),
             ),

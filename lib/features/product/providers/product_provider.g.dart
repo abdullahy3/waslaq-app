@@ -187,6 +187,201 @@ final allCategoriesProvider =
 );
 
 typedef AllCategoriesRef = AutoDisposeFutureProviderRef<List<CategoryModel>>;
+String _$paginatedProductsHash() => r'88ad9680279ad36b113980caefac667aa4c941c0';
+
+/// See also [paginatedProducts].
+@ProviderFor(paginatedProducts)
+const paginatedProductsProvider = PaginatedProductsFamily();
+
+/// See also [paginatedProducts].
+class PaginatedProductsFamily extends Family<AsyncValue<ProductsResponse>> {
+  /// See also [paginatedProducts].
+  const PaginatedProductsFamily();
+
+  /// See also [paginatedProducts].
+  PaginatedProductsProvider call({
+    int page = 1,
+    int limit = 20,
+    String? categoryId,
+    String? query,
+    String? order,
+  }) {
+    return PaginatedProductsProvider(
+      page: page,
+      limit: limit,
+      categoryId: categoryId,
+      query: query,
+      order: order,
+    );
+  }
+
+  @override
+  PaginatedProductsProvider getProviderOverride(
+    covariant PaginatedProductsProvider provider,
+  ) {
+    return call(
+      page: provider.page,
+      limit: provider.limit,
+      categoryId: provider.categoryId,
+      query: provider.query,
+      order: provider.order,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'paginatedProductsProvider';
+}
+
+/// See also [paginatedProducts].
+class PaginatedProductsProvider
+    extends AutoDisposeFutureProvider<ProductsResponse> {
+  /// See also [paginatedProducts].
+  PaginatedProductsProvider({
+    int page = 1,
+    int limit = 20,
+    String? categoryId,
+    String? query,
+    String? order,
+  }) : this._internal(
+          (ref) => paginatedProducts(
+            ref as PaginatedProductsRef,
+            page: page,
+            limit: limit,
+            categoryId: categoryId,
+            query: query,
+            order: order,
+          ),
+          from: paginatedProductsProvider,
+          name: r'paginatedProductsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$paginatedProductsHash,
+          dependencies: PaginatedProductsFamily._dependencies,
+          allTransitiveDependencies:
+              PaginatedProductsFamily._allTransitiveDependencies,
+          page: page,
+          limit: limit,
+          categoryId: categoryId,
+          query: query,
+          order: order,
+        );
+
+  PaginatedProductsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.page,
+    required this.limit,
+    required this.categoryId,
+    required this.query,
+    required this.order,
+  }) : super.internal();
+
+  final int page;
+  final int limit;
+  final String? categoryId;
+  final String? query;
+  final String? order;
+
+  @override
+  Override overrideWith(
+    FutureOr<ProductsResponse> Function(PaginatedProductsRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: PaginatedProductsProvider._internal(
+        (ref) => create(ref as PaginatedProductsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        page: page,
+        limit: limit,
+        categoryId: categoryId,
+        query: query,
+        order: order,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<ProductsResponse> createElement() {
+    return _PaginatedProductsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is PaginatedProductsProvider &&
+        other.page == page &&
+        other.limit == limit &&
+        other.categoryId == categoryId &&
+        other.query == query &&
+        other.order == order;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, page.hashCode);
+    hash = _SystemHash.combine(hash, limit.hashCode);
+    hash = _SystemHash.combine(hash, categoryId.hashCode);
+    hash = _SystemHash.combine(hash, query.hashCode);
+    hash = _SystemHash.combine(hash, order.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin PaginatedProductsRef on AutoDisposeFutureProviderRef<ProductsResponse> {
+  /// The parameter `page` of this provider.
+  int get page;
+
+  /// The parameter `limit` of this provider.
+  int get limit;
+
+  /// The parameter `categoryId` of this provider.
+  String? get categoryId;
+
+  /// The parameter `query` of this provider.
+  String? get query;
+
+  /// The parameter `order` of this provider.
+  String? get order;
+}
+
+class _PaginatedProductsProviderElement
+    extends AutoDisposeFutureProviderElement<ProductsResponse>
+    with PaginatedProductsRef {
+  _PaginatedProductsProviderElement(super.provider);
+
+  @override
+  int get page => (origin as PaginatedProductsProvider).page;
+  @override
+  int get limit => (origin as PaginatedProductsProvider).limit;
+  @override
+  String? get categoryId => (origin as PaginatedProductsProvider).categoryId;
+  @override
+  String? get query => (origin as PaginatedProductsProvider).query;
+  @override
+  String? get order => (origin as PaginatedProductsProvider).order;
+}
+
 String _$productListHash() => r'b3e057db8074046eaa5885824839707661f2de9b';
 
 abstract class _$ProductList

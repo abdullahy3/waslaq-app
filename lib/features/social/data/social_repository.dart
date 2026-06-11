@@ -18,6 +18,25 @@ class SocialRepository {
     }
   }
 
+  Future<CommunityModel> createCommunity({
+    required String name,
+    required String title,
+    String? description,
+    bool isPrivate = false,
+  }) async {
+    try {
+      final response = await _socialClient.post('/store/social/communities', data: {
+        'name': name,
+        'title': title,
+        if (description != null) 'description': description,
+        'isPrivate': isPrivate,
+      });
+      return CommunityModel.fromJson(response.data['community'] as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
   Future<CommunityModel> getCommunity(String slug) async {
     try {
       final response = await _socialClient.get('/store/social/communities/$slug');
@@ -33,6 +52,39 @@ class SocialRepository {
   Future<void> joinCommunity(String slug) async {
     try {
       await _socialClient.post('/store/social/communities/$slug/join');
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  Future<void> leaveCommunity(String slug) async {
+    try {
+      // The backend uses /join as a toggle for both join and leave actions
+      await _socialClient.post('/store/social/communities/$slug/join');
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  Future<CommunityModel> updateCommunity(
+    String slug, {
+    String? name,
+    String? title,
+    String? description,
+    String? iconUrl,
+    String? bannerUrl,
+    bool? isPrivate,
+  }) async {
+    try {
+      final response = await _socialClient.patch('/store/social/communities/$slug', data: {
+        if (name != null) 'name': name,
+        if (title != null) 'title': title,
+        if (description != null) 'description': description,
+        if (iconUrl != null) 'iconUrl': iconUrl,
+        if (bannerUrl != null) 'bannerUrl': bannerUrl,
+        if (isPrivate != null) 'isPrivate': isPrivate,
+      });
+      return CommunityModel.fromJson(response.data['community'] as Map<String, dynamic>);
     } on DioException catch (e) {
       throw _handleDioError(e);
     }
@@ -74,6 +126,7 @@ class SocialRepository {
     required String content,
     required String contentType,
     required String communityId,
+    String? productId,
   }) async {
     try {
       final response = await _socialClient.post('/store/social/posts', data: {
@@ -81,6 +134,7 @@ class SocialRepository {
         'content': content,
         'contentType': contentType,
         'communityId': communityId,
+        'productId': productId,
       });
       return PostModel.fromJson(response.data['post'] as Map<String, dynamic>);
     } on DioException catch (e) {
@@ -139,6 +193,8 @@ class SocialRepository {
       final map = {
         ...response.data['profile'] as Map<String, dynamic>,
         'posts': response.data['posts'],
+        'comments': response.data['comments'],
+        'mediaPosts': response.data['mediaPosts'],
         'isFollowing': response.data['isFollowing'] ?? false,
       };
       return UserProfileModel.fromJson(map);
@@ -207,6 +263,22 @@ class SocialRepository {
       throw _handleDioError(e);
     }
   }
+
+  Future<String> queryAssistant({
+    required String message,
+    List<Map<String, dynamic>> history = const [],
+  }) async {
+    try {
+      final response = await _socialClient.post('/store/social/assistant', data: {
+        'message': message,
+        'history': history,
+      });
+      return response.data['reply'] as String? ?? '';
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
 
   Exception _handleDioError(DioException e) {
     if (e.error is AppException) {

@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:waslaq_app/i18n/strings.g.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -106,7 +107,7 @@ class _StorageSettingsScreenState extends ConsumerState<StorageSettingsScreen> {
     return Scaffold(
       backgroundColor: context.colors.background,
       appBar: AppBar(
-        title: const Text('Storage & Performance', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(t.settings.storageScreenTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: context.colors.background,
         iconTheme: IconThemeData(color: context.colors.textPrimary),
         elevation: 0,
@@ -115,7 +116,7 @@ class _StorageSettingsScreenState extends ConsumerState<StorageSettingsScreen> {
         padding: const EdgeInsets.all(16),
         children: [
           // ─── IMAGE CACHE SECTION ───
-          _buildSectionHeader('Image Cache'),
+          _buildSectionHeader(t.settings.storageImageSection),
           Card(
             color: context.colors.surface,
             shape: RoundedRectangleBorder(
@@ -155,7 +156,7 @@ class _StorageSettingsScreenState extends ConsumerState<StorageSettingsScreen> {
           const SizedBox(height: 20),
 
           // ─── RECENTLY VIEWED SECTION ───
-          _buildSectionHeader('Recently Viewed'),
+          _buildSectionHeader(t.settings.storageRecentSection),
           Card(
             color: context.colors.surface,
             shape: RoundedRectangleBorder(
@@ -185,7 +186,7 @@ class _StorageSettingsScreenState extends ConsumerState<StorageSettingsScreen> {
 
           // ─── DEVELOPER SECTION (Debug Only) ───
           if (kDebugMode) ...[
-            _buildSectionHeader('Developer Settings (Debug Mode)'),
+            _buildSectionHeader(t.settings.storageDevSection),
             Card(
               color: context.colors.surface,
               shape: RoundedRectangleBorder(

@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:waslaq_app/i18n/strings.g.dart';
 import 'package:waslaq_app/shared/theme/app_colors.dart';
 import 'package:waslaq_app/core/providers/theme_provider.dart';
 import 'package:waslaq_app/core/providers/locale_provider.dart';
@@ -20,7 +21,7 @@ class AppearanceSettingsScreen extends ConsumerWidget {
       case 'Almarai':
         return GoogleFonts.almarai();
       default:
-        return const TextStyle(); // System font
+        return const TextStyle();
     }
   }
 
@@ -28,14 +29,14 @@ class AppearanceSettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final prefs = ref.watch(preferencesProvider);
     final prefsNotifier = ref.read(preferencesProvider.notifier);
-    
     final currentTheme = ref.watch(themeProvider);
     final currentLocale = ref.watch(localeProvider);
+    final s = t.settings;
 
     return Scaffold(
       backgroundColor: context.colors.background,
       appBar: AppBar(
-        title: const Text('Appearance & Language', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(s.appearanceTitle, style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: context.colors.background,
         iconTheme: IconThemeData(color: context.colors.textPrimary),
         elevation: 0,
@@ -44,7 +45,7 @@ class AppearanceSettingsScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(16),
         children: [
           // ─── LANGUAGE SECTION ───
-          _buildSectionHeader(context, 'Language'),
+          _buildSectionHeader(context, s.langSection),
           Card(
             color: context.colors.surface,
             shape: RoundedRectangleBorder(
@@ -56,7 +57,7 @@ class AppearanceSettingsScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('App Language', style: TextStyle(color: context.colors.textPrimary, fontWeight: FontWeight.bold, fontSize: 14)),
+                  Text(s.langAppLabel, style: TextStyle(color: context.colors.textPrimary, fontWeight: FontWeight.bold, fontSize: 14)),
                   const SizedBox(height: 12),
                   Row(
                     children: [
@@ -84,7 +85,7 @@ class AppearanceSettingsScreen extends ConsumerWidget {
           const SizedBox(height: 20),
 
           // ─── THEME SECTION ───
-          _buildSectionHeader(context, 'Theme'),
+          _buildSectionHeader(context, s.themeSection),
           Card(
             color: context.colors.surface,
             shape: RoundedRectangleBorder(
@@ -93,18 +94,18 @@ class AppearanceSettingsScreen extends ConsumerWidget {
             ),
             child: Column(
               children: [
-                _buildThemeTile(context, ref, AppThemeMode.light, Icons.light_mode_outlined, 'Light Theme', currentTheme),
+                _buildThemeTile(context, ref, AppThemeMode.light, Icons.light_mode_outlined, s.themeLight, currentTheme),
                 Divider(height: 1, color: context.colors.border),
-                _buildThemeTile(context, ref, AppThemeMode.dark, Icons.dark_mode_outlined, 'Dark Theme', currentTheme),
+                _buildThemeTile(context, ref, AppThemeMode.dark, Icons.dark_mode_outlined, s.themeDark, currentTheme),
                 Divider(height: 1, color: context.colors.border),
-                _buildThemeTile(context, ref, AppThemeMode.system, Icons.brightness_auto_outlined, 'Follow System', currentTheme),
+                _buildThemeTile(context, ref, AppThemeMode.system, Icons.brightness_auto_outlined, s.themeSystem, currentTheme),
               ],
             ),
           ),
           const SizedBox(height: 20),
 
           // ─── TEXT SIZE SECTION ───
-          _buildSectionHeader(context, 'Text Size'),
+          _buildSectionHeader(context, s.textSizeSection),
           Card(
             color: context.colors.surface,
             shape: RoundedRectangleBorder(
@@ -116,15 +117,15 @@ class AppearanceSettingsScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Adjust Font Scale', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  Text(s.textAdjustLabel, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                   const SizedBox(height: 12),
                   Wrap(
                     spacing: 8,
                     children: [
-                      _buildSizeChip(context, prefs, prefsNotifier, 'Small', 0.85),
-                      _buildSizeChip(context, prefs, prefsNotifier, 'Normal', 1.0),
-                      _buildSizeChip(context, prefs, prefsNotifier, 'Large', 1.15),
-                      _buildSizeChip(context, prefs, prefsNotifier, 'Extra Large', 1.30),
+                      _buildSizeChip(context, prefs, prefsNotifier, s.textSmall, 0.85),
+                      _buildSizeChip(context, prefs, prefsNotifier, s.textNormal, 1.0),
+                      _buildSizeChip(context, prefs, prefsNotifier, s.textLarge, 1.15),
+                      _buildSizeChip(context, prefs, prefsNotifier, s.textXlarge, 1.30),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -139,7 +140,7 @@ class AppearanceSettingsScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Live Preview:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
+                        Text(s.textPreviewLabel, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
                         const SizedBox(height: 6),
                         Text(
                           'The quick brown fox — WaslaQ',
@@ -159,7 +160,7 @@ class AppearanceSettingsScreen extends ConsumerWidget {
           const SizedBox(height: 20),
 
           // ─── ARABIC FONT SECTION ───
-          _buildSectionHeader(context, 'Arabic Font (خط عربي)'),
+          _buildSectionHeader(context, s.arabicFontSection),
           Card(
             color: context.colors.surface,
             shape: RoundedRectangleBorder(
@@ -168,20 +169,20 @@ class AppearanceSettingsScreen extends ConsumerWidget {
             ),
             child: Column(
               children: [
-                _buildFontTile(context, prefs, prefsNotifier, 'default', 'System Default (الافتراضي)', 'أهلاً بك في واصلك - سوقك الاجتماعي الفلسطيني'),
+                _buildFontTile(context, prefs, prefsNotifier, 'default', '${s.fontDefault} (الافتراضي)', 'أهلاً بك في واصلك - سوقك الاجتماعي الفلسطيني'),
                 Divider(height: 1, color: context.colors.border),
-                _buildFontTile(context, prefs, prefsNotifier, 'Cairo', 'Cairo (خط كيرو)', 'أهلاً بك في واصلك - سوقك الاجتماعي الفلسطيني'),
+                _buildFontTile(context, prefs, prefsNotifier, 'Cairo', '${s.fontCairo} (خط كيرو)', 'أهلاً بك في واصلك - سوقك الاجتماعي الفلسطيني'),
                 Divider(height: 1, color: context.colors.border),
-                _buildFontTile(context, prefs, prefsNotifier, 'Tajawal', 'Tajawal (خط تجول)', 'أهلاً بك في واصلك - سوقك الاجتماعي الفلسطيني'),
+                _buildFontTile(context, prefs, prefsNotifier, 'Tajawal', '${s.fontTajawal} (خط تجول)', 'أهلاً بك في واصلك - سوقك الاجتماعي الفلسطيني'),
                 Divider(height: 1, color: context.colors.border),
-                _buildFontTile(context, prefs, prefsNotifier, 'Almarai', 'Almarai (خط المراعي)', 'أهلاً بك في واصلك - سوقك الاجتماعي الفلسطيني'),
+                _buildFontTile(context, prefs, prefsNotifier, 'Almarai', '${s.fontAlmarai} (خط المراعي)', 'أهلاً بك في واصلك - سوقك الاجتماعي الفلسطيني'),
               ],
             ),
           ),
           const SizedBox(height: 20),
 
           // ─── ACCESSIBILITY SECTION ───
-          _buildSectionHeader(context, 'Accessibility'),
+          _buildSectionHeader(context, s.accessibilitySection),
           Card(
             color: context.colors.surface,
             shape: RoundedRectangleBorder(
@@ -192,7 +193,7 @@ class AppearanceSettingsScreen extends ConsumerWidget {
               children: [
                 SwitchListTile(
                   activeColor: context.colors.primary,
-                  title: const Text('Bold Text', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  title: Text(s.boldText, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                   value: prefs.boldText,
                   onChanged: (val) {
                     prefsNotifier.update(prefs.copyWith(boldText: val));
@@ -201,8 +202,8 @@ class AppearanceSettingsScreen extends ConsumerWidget {
                 Divider(height: 1, color: context.colors.border),
                 SwitchListTile(
                   activeColor: context.colors.primary,
-                  title: const Text('Reduce Animations', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                  subtitle: const Text('Recommended for older devices or motion sensitivity', style: TextStyle(fontSize: 11)),
+                  title: Text(s.reduceAnim, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  subtitle: Text(s.reduceAnimSub, style: TextStyle(fontSize: 11)),
                   value: prefs.reduceAnimations,
                   onChanged: (val) {
                     prefsNotifier.update(prefs.copyWith(reduceAnimations: val));
@@ -255,7 +256,7 @@ class AppearanceSettingsScreen extends ConsumerWidget {
   Widget _buildFontTile(BuildContext context, AppPreferences prefs, PreferencesNotifier notifier, String fontName, String label, String sampleText) {
     final isSelected = prefs.arabicFont == fontName;
     return RadioListTile<String>(
-      title: Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+      title: Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
       subtitle: Padding(
         padding: const EdgeInsets.only(top: 4),
         child: Text(

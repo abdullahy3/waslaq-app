@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:waslaq_app/i18n/strings.g.dart';
 import 'package:waslaq_app/shared/theme/app_colors.dart';
 import 'package:waslaq_app/core/api/medusa_client.dart';
 import 'package:waslaq_app/features/account/data/models/social_settings_model.dart';
@@ -152,7 +153,7 @@ class _VendorSettingsScreenState extends ConsumerState<VendorSettingsScreen> {
     return Scaffold(
       backgroundColor: context.colors.background,
       appBar: AppBar(
-        title: const Text('Vendor Settings', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(t.settings.vendorScreenTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: context.colors.background,
         iconTheme: IconThemeData(color: context.colors.textPrimary),
         elevation: 0,
@@ -163,7 +164,7 @@ class _VendorSettingsScreenState extends ConsumerState<VendorSettingsScreen> {
               padding: const EdgeInsets.all(16),
               children: [
                 // ─── STORE STATUS (VACATION MODE) ───
-                _buildSectionHeader('Store Status'),
+                _buildSectionHeader(t.settings.vendorStoreStatusSection),
                 Card(
                   color: context.colors.surface,
                   shape: RoundedRectangleBorder(
@@ -202,7 +203,7 @@ class _VendorSettingsScreenState extends ConsumerState<VendorSettingsScreen> {
                 const SizedBox(height: 20),
 
                 // ─── DELIVERY ZONES ───
-                _buildSectionHeader('Delivery Zones'),
+                _buildSectionHeader(t.settings.vendorDeliverySection),
                 Card(
                   color: context.colors.surface,
                   shape: RoundedRectangleBorder(
@@ -257,7 +258,7 @@ class _VendorSettingsScreenState extends ConsumerState<VendorSettingsScreen> {
 
                 // ─── NOTIFICATIONS (VENDOR) ───
                 if (_socialSettings != null) ...[
-                  _buildSectionHeader('Notifications'),
+                  _buildSectionHeader(t.settings.vendorNotifSection),
                   Card(
                     color: context.colors.surface,
                     shape: RoundedRectangleBorder(

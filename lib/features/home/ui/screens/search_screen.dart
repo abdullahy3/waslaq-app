@@ -21,9 +21,9 @@ class _VendorHit {
 }
 
 class _CommunityHit {
-  final String id, name;
+  final String id, name, slug;
   final String? description;
-  const _CommunityHit({required this.id, required this.name, this.description});
+  const _CommunityHit({required this.id, required this.name, required this.slug, this.description});
 }
 
 class _UserHit {
@@ -84,7 +84,7 @@ class _SearchScreenState extends State<SearchScreen> {
           slug: e['slug'] ?? '', description: e['description'], logoUrl: e['logo_url'],
         )).toList();
         _communities = ((d['communities'] as List?) ?? []).map((e) => _CommunityHit(
-          id: e['id'] ?? '', name: e['name'] ?? e['slug'] ?? '', description: e['description'],
+          id: e['id'] ?? '', name: e['name'] ?? '', slug: e['slug'] ?? '', description: e['description'],
         )).toList();
         _users = ((d['users'] as List?) ?? []).map((e) => _UserHit(
           id: e['customerId'] ?? '', displayName: e['displayName'] ?? e['username'] ?? '',
@@ -175,7 +175,7 @@ class _SearchScreenState extends State<SearchScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.search_rounded, size: 64, color: context.colors.border),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Text(t.search.initial_title, style: TextStyle(color: context.colors.textSecondary, fontSize: 16)),
           Text(t.search.initial_subtitle, style: TextStyle(color: context.colors.textSecondary, fontSize: 16)),
         ],
@@ -196,10 +196,10 @@ class _SearchScreenState extends State<SearchScreen> {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('🔍', style: TextStyle(fontSize: 48)),
-          SizedBox(height: 16),
+          const Text('🔍', style: TextStyle(fontSize: 48)),
+          const SizedBox(height: 16),
           Text(t.search.no_results_query(query: _query), style: TextStyle(color: context.colors.textPrimary, fontSize: 16, fontWeight: FontWeight.bold)),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(t.search.try_different, style: TextStyle(color: context.colors.textSecondary, fontSize: 14)),
         ],
       );
@@ -246,10 +246,10 @@ class _SectionHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(0, 16, 0, 8),
       child: Row(
         children: [
-          Text(emoji, style: TextStyle(fontSize: 16)),
-          SizedBox(width: 8),
+          Text(emoji, style: const TextStyle(fontSize: 16)),
+          const SizedBox(width: 8),
           Text(title, style: TextStyle(color: context.colors.textPrimary, fontSize: 15, fontWeight: FontWeight.bold)),
-          SizedBox(width: 6),
+          const SizedBox(width: 6),
           Text('($count)', style: TextStyle(color: context.colors.textMuted, fontSize: 13)),
         ],
       ),
@@ -278,7 +278,7 @@ class _ProductCard extends StatelessWidget {
             Container(
               width: 72,
               height: 72,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 borderRadius: BorderRadius.horizontal(left: Radius.circular(11)),
               ),
               clipBehavior: Clip.hardEdge,
@@ -291,17 +291,17 @@ class _ProductCard extends StatelessWidget {
                     )
                   : Container(color: context.colors.surfaceVariant),
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(hit.title, style: TextStyle(color: context.colors.textPrimary, fontSize: 14, fontWeight: FontWeight.bold), maxLines: 2, overflow: TextOverflow.ellipsis),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   if (hit.description != null)
                     Text(hit.description!, style: TextStyle(color: context.colors.textMuted, fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
@@ -313,7 +313,7 @@ class _ProductCard extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
           ],
         ),
       ),
@@ -339,7 +339,7 @@ class _VendorCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            SizedBox(width: 4),
+            const SizedBox(width: 4),
             Container(
               width: 72,
               height: 72,
@@ -357,14 +357,14 @@ class _VendorCard extends StatelessWidget {
                     )
                   : _buildPlaceholder(context),
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(vendor.storeName, style: TextStyle(color: context.colors.textPrimary, fontSize: 14, fontWeight: FontWeight.bold), maxLines: 2, overflow: TextOverflow.ellipsis),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   if (vendor.description != null)
                     Text(vendor.description!, style: TextStyle(color: context.colors.textMuted, fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 4),
@@ -374,12 +374,12 @@ class _VendorCard extends StatelessWidget {
                       color: Colors.blue.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Text(t.search.type_store, style: TextStyle(color: Colors.blue, fontSize: 10)),
+                    child: Text(t.search.type_store, style: const TextStyle(color: Colors.blue, fontSize: 10)),
                   ),
                 ],
               ),
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
           ],
         ),
       ),
@@ -403,7 +403,7 @@ class _CommunityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.router.push(CommunityRoute(communitySlug: community.name)),
+      onTap: () => context.router.push(CommunityRoute(communitySlug: community.slug)),
       child: Container(
         height: 80,
         margin: const EdgeInsets.only(bottom: 8),
@@ -414,7 +414,7 @@ class _CommunityCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            SizedBox(width: 4),
+            const SizedBox(width: 4),
             Container(
               width: 72,
               height: 72,
@@ -422,21 +422,21 @@ class _CommunityCard extends StatelessWidget {
                 shape: BoxShape.circle,
                 color: context.colors.surfaceVariant,
               ),
-              child: Center(
+              child: const Center(
                 child: Text(
                   'r/',
                   style: TextStyle(color: Colors.orange, fontSize: 24, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('r/${community.name}', style: TextStyle(color: context.colors.textPrimary, fontSize: 14, fontWeight: FontWeight.bold), maxLines: 2, overflow: TextOverflow.ellipsis),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   if (community.description != null)
                     Text(community.description!, style: TextStyle(color: context.colors.textMuted, fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 4),
@@ -451,7 +451,7 @@ class _CommunityCard extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
           ],
         ),
       ),
@@ -477,7 +477,7 @@ class _UserCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            SizedBox(width: 4),
+            const SizedBox(width: 4),
             Container(
               width: 72,
               height: 72,
@@ -492,14 +492,14 @@ class _UserCard extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('u/${user.displayName}', style: TextStyle(color: context.colors.textPrimary, fontSize: 14, fontWeight: FontWeight.bold), maxLines: 2, overflow: TextOverflow.ellipsis),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
@@ -511,7 +511,7 @@ class _UserCard extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
           ],
         ),
       ),
@@ -539,7 +539,7 @@ class _PostCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(post.title, style: TextStyle(color: context.colors.textPrimary, fontSize: 14, fontWeight: FontWeight.bold)),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(t.search.post_author_votes(author: post.authorDisplayName, score: post.score.toString()), style: TextStyle(color: context.colors.textMuted, fontSize: 12)),
             const SizedBox(height: 8),
             Container(

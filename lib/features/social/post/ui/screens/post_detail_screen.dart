@@ -32,6 +32,7 @@ class PostDetailScreen extends ConsumerStatefulWidget {
 
 class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
   final _commentController = TextEditingController();
+  CommentModel? _replyToComment;
 
   String _getTimeAgo(DateTime date) {
     final diff = DateTime.now().difference(date);
@@ -52,8 +53,15 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     final content = _commentController.text.trim();
     if (content.isEmpty) return;
     try {
-      await ref.read(socialRepositoryProvider).createComment(postId: widget.postId, content: content);
+      await ref.read(socialRepositoryProvider).createComment(
+        postId: widget.postId,
+        content: content,
+        parentId: _replyToComment?.id,
+      );
       _commentController.clear();
+      setState(() {
+        _replyToComment = null;
+      });
       if (mounted) {
         FocusScope.of(context).unfocus();
       }
@@ -375,60 +383,122 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                                       ..sort((a, b) => b.score.compareTo(a.score));
                                       
                                     return Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        CommentTile(
-                                          comment: root,
-                                          onReply: (username) {
-                                            _commentController.text = '@$username ';
-                                            FocusScope.of(context).requestFocus();
-                                          },
-                                        ),
-                                        for (final child1 in children1) ...[
-                                          Padding(
-                                            padding: const EdgeInsets.only(left: 16.0),
-                                            child: CommentTile(
-                                              comment: child1,
-                                              onReply: (username) {
-                                                _commentController.text = '@$username ';
-                                                FocusScope.of(context).requestFocus();
-                                              },
-                                            ),
-                                          ),
-                                          Builder(
-                                            builder: (context) {
-                                              final children2 = comments.where((c) => c.parentId == child1.id).toList()
-                                                ..sort((a, b) => b.score.compareTo(a.score));
-                                              if (children2.isEmpty) return SizedBox();
-                                              return Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  for (final child2 in children2)
-                                                    Padding(
-                                                      padding: const EdgeInsets.only(left: 32.0),
-                                                      child: CommentTile(
-                                                        comment: child2,
-                                                        onReply: (username) {
-                                                          _commentController.text = '@$username ';
-                                                          FocusScope.of(context).requestFocus();
-                                                        },
-                                                      ),
-                                                    ),
-                                                  if (comments.any((c) => children2.map((e)=>e.id).contains(c.parentId)))
-                                                    Padding(
-                                                      padding: const EdgeInsets.only(left: 48.0, bottom: 8.0, top: 4.0),
-                                                      child: Text(
-                                                        t.community.view_more_replies,
-                                                        style: TextStyle(color: context.colors.primary, fontSize: 13, fontWeight: FontWeight.bold),
-                                                      ),
-                                                    ),
-                                                ],
-                                              );
-                                            },
-                                          ),
-                                        ],
-                                      ],
-                                    );
+                                       crossAxisAlignment: CrossAxisAlignment.start,
+                                       children: [
+                                         CommentTile(
+                                           comment: root,
+                                           leftPadding: 16.0,
+                                           onReply: (replyTo) {
+                                             setState(() {
+                                               _replyToComment = replyTo;
+                                             });
+                                             final username = replyTo.author?.username ?? "user";
+                                             _commentController.text = '@$username ';
+                                             FocusScope.of(context).requestFocus();
+                                           },
+                                         ),
+                                         for (final child1 in children1) ...[
+                                           IntrinsicHeight(
+                                             child: Row(
+                                               crossAxisAlignment: CrossAxisAlignment.stretch,
+                                               children: [
+                                                 Container(
+                                                   width: 2,
+                                                   margin: const EdgeInsets.only(left: 27, right: 0),
+                                                   color: context.colors.border.withValues(alpha: 0.5),
+                                                 ),
+                                                 Expanded(
+                                                   child: CommentTile(
+                                                     comment: child1,
+                                                     leftPadding: 8.0,
+                                                     onReply: (replyTo) {
+                                                       setState(() {
+                                                         _replyToComment = replyTo;
+                                                       });
+                                                       final username = replyTo.author?.username ?? "user";
+                                                       _commentController.text = '@$username ';
+                                                       FocusScope.of(context).requestFocus();
+                                                     },
+                                                   ),
+                                                 ),
+                                               ],
+                                             ),
+                                           ),
+                                           Builder(
+                                             builder: (context) {
+                                               final children2 = comments.where((c) => c.parentId == child1.id).toList()
+                                                 ..sort((a, b) => b.score.compareTo(a.score));
+                                               if (children2.isEmpty) return const SizedBox();
+                                               return Column(
+                                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                                 children: [
+                                                   for (final child2 in children2)
+                                                     IntrinsicHeight(
+                                                       child: Row(
+                                                         crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                         children: [
+                                                           Container(
+                                                             width: 2,
+                                                             margin: const EdgeInsets.only(left: 27, right: 0),
+                                                             color: context.colors.border.withValues(alpha: 0.5),
+                                                           ),
+                                                           Container(
+                                                             width: 2,
+                                                             margin: const EdgeInsets.only(left: 19, right: 0),
+                                                             color: context.colors.border.withValues(alpha: 0.5),
+                                                           ),
+                                                           Expanded(
+                                                             child: CommentTile(
+                                                               comment: child2,
+                                                               leftPadding: 8.0,
+                                                               onReply: (replyTo) {
+                                                                 setState(() {
+                                                                   _replyToComment = replyTo;
+                                                                 });
+                                                                 final username = replyTo.author?.username ?? "user";
+                                                                 _commentController.text = '@$username ';
+                                                                 FocusScope.of(context).requestFocus();
+                                                               },
+                                                             ),
+                                                           ),
+                                                         ],
+                                                       ),
+                                                     ),
+                                                   if (comments.any((c) => children2.map((e)=>e.id).contains(c.parentId)))
+                                                     IntrinsicHeight(
+                                                       child: Row(
+                                                         crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                         children: [
+                                                           Container(
+                                                             width: 2,
+                                                             margin: const EdgeInsets.only(left: 27, right: 0),
+                                                             color: context.colors.border.withValues(alpha: 0.5),
+                                                           ),
+                                                           Container(
+                                                             width: 2,
+                                                             margin: const EdgeInsets.only(left: 19, right: 0),
+                                                             color: context.colors.border.withValues(alpha: 0.5),
+                                                           ),
+                                                           const SizedBox(width: 8),
+                                                           Expanded(
+                                                             child: Padding(
+                                                               padding: const EdgeInsets.only(left: 8.0, bottom: 8.0, top: 4.0),
+                                                               child: Text(
+                                                                 t.community.view_more_replies,
+                                                                 style: TextStyle(color: context.colors.primary, fontSize: 13, fontWeight: FontWeight.bold),
+                                                               ),
+                                                             ),
+                                                           ),
+                                                         ],
+                                                       ),
+                                                     ),
+                                                 ],
+                                               );
+                                             },
+                                           ),
+                                         ],
+                                       ],
+                                     );
                                   },
                                 );
                               },
@@ -456,45 +526,84 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
               border: Border(top: BorderSide(color: context.colors.border)),
             ),
             child: isAuthenticated
-                ? Row(
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Container(
-                          width: 24,
-                          height: 24,
-                          color: context.colors.surfaceVariant,
-                          child: SvgPicture.network(
-                            'https://api.dicebear.com/7.x/bottts/svg?seed=$currentUserSeed',
-                            width: 24,
-                            height: 24,
-                            placeholderBuilder: (_) => SizedBox(),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: TextField(
-                          controller: _commentController,
-                          style: TextStyle(color: context.colors.textPrimary, fontSize: 14),
-                          decoration: InputDecoration(
-                            hintText: t.community.add_comment,
-                            hintStyle: TextStyle(color: context.colors.textMuted),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide.none,
+                      if (_replyToComment != null) ...[
+                        Row(
+                          children: [
+                            Icon(Icons.reply, size: 14, color: context.colors.textMuted),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                Localizations.localeOf(context).languageCode == 'ar'
+                                    ? 'الرد على @${_replyToComment!.author?.username ?? "user"}'
+                                    : 'Replying to @${_replyToComment!.author?.username ?? "user"}',
+                                style: TextStyle(
+                                  color: context.colors.textMuted,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                             ),
-                            filled: true,
-                            fillColor: context.colors.surfaceVariant,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            isDense: true,
-                          ),
+                            GestureDetector(
+                              onTap: () {
+                                final username = _replyToComment?.author?.username ?? "user";
+                                setState(() {
+                                  _replyToComment = null;
+                                });
+                                final prefix = '@$username ';
+                                if (_commentController.text.startsWith(prefix)) {
+                                  _commentController.text = _commentController.text.substring(prefix.length);
+                                }
+                              },
+                              child: Icon(Icons.close, size: 16, color: context.colors.textMuted),
+                            ),
+                          ],
                         ),
-                      ),
-                      SizedBox(width: 8),
-                      IconButton(
-                        onPressed: _submitComment,
-                        icon: Icon(Icons.send, color: context.colors.primary),
+                        const SizedBox(height: 8),
+                      ],
+                      Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Container(
+                              width: 24,
+                              height: 24,
+                              color: context.colors.surfaceVariant,
+                              child: SvgPicture.network(
+                                'https://api.dicebear.com/7.x/bottts/svg?seed=$currentUserSeed',
+                                width: 24,
+                                height: 24,
+                                placeholderBuilder: (_) => SizedBox(),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: TextField(
+                              controller: _commentController,
+                              style: TextStyle(color: context.colors.textPrimary, fontSize: 14),
+                              decoration: InputDecoration(
+                                hintText: t.community.add_comment,
+                                hintStyle: TextStyle(color: context.colors.textMuted),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                  borderSide: BorderSide.none,
+                                ),
+                                filled: true,
+                                fillColor: context.colors.surfaceVariant,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                isDense: true,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          IconButton(
+                            onPressed: _submitComment,
+                            icon: Icon(Icons.send, color: context.colors.primary),
+                          ),
+                        ],
                       ),
                     ],
                   )
@@ -513,12 +622,14 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
 
 class CommentTile extends ConsumerWidget {
   final CommentModel comment;
-  final Function(String) onReply;
+  final Function(CommentModel) onReply;
+  final double leftPadding;
 
   const CommentTile({
     super.key,
     required this.comment,
     required this.onReply,
+    this.leftPadding = 16.0,
   });
 
   String _getTimeAgo(DateTime date) {
@@ -539,7 +650,7 @@ class CommentTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      padding: EdgeInsets.only(left: leftPadding, right: 16.0, top: 8.0, bottom: 8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -620,7 +731,7 @@ class CommentTile extends ConsumerWidget {
               ),
               SizedBox(width: 16),
               GestureDetector(
-                onTap: () => onReply(comment.author?.username ?? 'user'),
+                onTap: () => onReply(comment),
                 child: Text(
                   t.community.reply,
                   style: TextStyle(color: context.colors.textMuted, fontSize: 12, fontWeight: FontWeight.bold),

@@ -5,11 +5,16 @@ import '../../core/auth/auth_notifier.dart';
 import '../../router/app_router.dart';
 import '../theme/app_colors.dart';
 import '../../features/social/post/providers/fab_context_provider.dart';
+import '../../features/social/post/ui/screens/create_post_screen.dart';
+import '../../features/social/post/ui/screens/product_picker_sheet.dart';
+import '../../features/social/data/models/social_models.dart';
+import '../../features/product/data/models/product_model.dart';
 import '../../i18n/strings.g.dart';
+import '../../features/social/community/ui/screens/create_community_screen.dart';
+import '../../features/social/assistant/ui/screens/ai_assistant_screen.dart';
 
 // ─── ContextAwareScaffold ────────────────────────────────────────────────────
 // Wrap any screen's Scaffold with this to set/clear FAB context automatically.
-// The child must be the screen's own Scaffold widget.
 
 class ContextAwareScaffold extends ConsumerStatefulWidget {
   final Widget child;
@@ -50,7 +55,6 @@ class _ContextAwareScaffoldState extends ConsumerState<ContextAwareScaffold> {
 }
 
 // ─── WaslaqFAB ───────────────────────────────────────────────────────────────
-// Drop this into any Scaffold.floatingActionButton that needs it.
 
 class WaslaqFAB extends ConsumerWidget {
   const WaslaqFAB({super.key});
@@ -127,8 +131,7 @@ class _CreatePostSheet extends StatelessWidget {
           // Drag handle
           Center(
             child: Container(
-              width: 40,
-              height: 4,
+              width: 40, height: 4,
               decoration: BoxDecoration(
                 color: context.colors.border,
                 borderRadius: BorderRadius.circular(2),
@@ -145,46 +148,115 @@ class _CreatePostSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
+
+          // ── منشور عام ─────────────────────────────────────────────
           _SheetOption(
             icon: Icons.public_outlined,
             label: t.create_post.general_post,
             onTap: () {
-              Navigator.pop(context);
-              context.router.push(CreatePostRoute());
+              final navigator = Navigator.of(context);
+              navigator.pop();
+              navigator.push(MaterialPageRoute(builder: (_) =>
+                const CreatePostScreen(type: PostCreationType.general),
+              ));
             },
           ),
+
+          // ── نشر داخل مجتمع ────────────────────────────────────────
           _SheetOption(
             icon: Icons.group_outlined,
             label: fabContext?.communitySlug != null
-                ? t.create_post.community_post_in(
-                    slug: fabContext!.communitySlug!)
+                ? t.create_post.community_post_in(slug: fabContext!.communitySlug!)
                 : t.create_post.community_post,
             onTap: () {
-              Navigator.pop(context);
-              context.router.push(CreatePostRoute(
-                communitySlug: fabContext?.communitySlug,
+              final navigator = Navigator.of(context);
+              navigator.pop();
+              navigator.push(MaterialPageRoute(builder: (_) =>
+                CreatePostScreen(
+                  type: PostCreationType.community,
+                  communitySlug: fabContext?.communitySlug,
+                ),
               ));
             },
           ),
+
+          // ── مشاركة منتج ───────────────────────────────────────────
           _SheetOption(
             icon: Icons.shopping_bag_outlined,
             label: fabContext?.productTitle != null
-                ? t.create_post.share_product_named(
-                    title: fabContext!.productTitle!)
+                ? t.create_post.share_product_named(title: fabContext!.productTitle!)
                 : t.create_post.share_product,
-            onTap: () {
-              Navigator.pop(context);
-              context.router.push(CreatePostRoute(
-                prefilledProductId: fabContext?.productId,
-              ));
+            onTap: () async {
+              final navigator = Navigator.of(context);
+              navigator.pop();
+              
+              final product = await showModalBottomSheet<ProductModel>(
+                context: navigator.context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (_) => const ProductPickerSheet(),
+              );
+              
+              if (product != null) {
+                navigator.push(MaterialPageRoute(builder: (_) =>
+                  CreatePostScreen(
+                    type: PostCreationType.productShare,
+                    preselectedProduct: product,
+                  ),
+                ));
+              }
             },
           ),
+
+          // ── سؤال عن منتج ─────────────────────────────────────────
           _SheetOption(
             icon: Icons.help_outline,
             label: t.create_post.ask_product,
+            onTap: () async {
+              final navigator = Navigator.of(context);
+              navigator.pop();
+              
+              final product = await showModalBottomSheet<ProductModel>(
+                context: navigator.context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (_) => const ProductPickerSheet(),
+              );
+              
+              if (product != null) {
+                navigator.push(MaterialPageRoute(builder: (_) =>
+                  CreatePostScreen(
+                    type: PostCreationType.productQuestion,
+                    preselectedProduct: product,
+                  ),
+                ));
+              }
+            },
+          ),
+
+          // ── إنشاء مجتمع ───────────────────────────────────────────
+          _SheetOption(
+            icon: Icons.group_add_outlined,
+            label: t.create_post.create_community,
             onTap: () {
-              Navigator.pop(context);
-              context.router.push(CreatePostRoute());
+              final navigator = Navigator.of(context);
+              navigator.pop();
+              navigator.push(MaterialPageRoute(builder: (_) =>
+                const CreateCommunityScreen(),
+              ));
+            },
+          ),
+
+          // ── المساعد الذكي ──────────────────────────────────────────
+          _SheetOption(
+            icon: Icons.smart_toy_outlined,
+            label: t.create_post.ai_assistant,
+            onTap: () {
+              final navigator = Navigator.of(context);
+              navigator.pop();
+              navigator.push(MaterialPageRoute(builder: (_) =>
+                const AiAssistantScreen(),
+              ));
             },
           ),
         ],
@@ -226,8 +298,7 @@ class _SheetOption extends StatelessWidget {
                 ),
               ),
             ),
-            Icon(Icons.chevron_right,
-                color: context.colors.textMuted, size: 18),
+            Icon(Icons.chevron_right, color: context.colors.textMuted, size: 18),
           ],
         ),
       ),

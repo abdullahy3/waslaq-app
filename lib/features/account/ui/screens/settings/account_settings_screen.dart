@@ -5,6 +5,7 @@ import 'package:local_auth/local_auth.dart';
 import 'package:waslaq_app/core/api/medusa_client.dart';
 import 'package:waslaq_app/core/auth/auth_notifier.dart';
 import 'package:waslaq_app/core/auth/firebase_service.dart';
+import 'package:waslaq_app/i18n/strings.g.dart';
 import 'package:waslaq_app/shared/theme/app_colors.dart';
 import 'package:waslaq_app/shared/widgets/biometric_guard.dart';
 import 'package:waslaq_app/core/providers/preferences_provider.dart';
@@ -125,8 +126,6 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
   Future<void> _toggleBiometricLock(bool enabled) async {
     final prefs = ref.read(preferencesProvider);
     if (enabled) {
-      // Tell BiometricGuard we're about to show a biometric dialog so it
-      // doesn't misinterpret the resulting Android lifecycle pause.
       BiometricGuard.externalAuthInProgress = true;
       try {
         final didAuth = await _auth.authenticate(
@@ -152,7 +151,6 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
   Future<void> _togglePurchaseConfirmation(bool enabled) async {
     final prefs = ref.read(preferencesProvider);
     if (enabled) {
-      // Tell BiometricGuard we're about to show a biometric dialog.
       BiometricGuard.externalAuthInProgress = true;
       try {
         final didAuth = await _auth.authenticate(
@@ -218,14 +216,15 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
   }
 
   void _showDeleteConfirmation() {
+    final s = t.settings;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: context.colors.surface,
-        title: const Text('Delete Account', style: TextStyle(color: Colors.red)),
+        title: Text(s.deleteAccount, style: TextStyle(color: Colors.red)),
         content: const Text('Are you absolutely sure you want to request account deletion? Your data will be hidden and permanently deleted after 30 days.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(s.cancel)),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
@@ -240,11 +239,12 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
   }
 
   void _showSecondDeleteConfirmation() {
+    final s = t.settings;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: context.colors.surface,
-        title: const Text('Final Confirmation', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+        title: Text(s.permanentAction, style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
         content: const Text('This is your last warning. Once submitted, your profile will be scheduled for deletion. You will have 30 days to cancel this request.'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Keep Account')),
@@ -254,7 +254,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
               Navigator.pop(ctx);
               _deleteAccount();
             },
-            child: const Text('Delete Permanently'),
+            child: Text(s.deleteAccount),
           ),
         ],
       ),
@@ -263,6 +263,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final s = t.settings;
     final authState = ref.watch(authNotifierProvider);
     final email = authState.maybeWhen(
       authenticated: (_, mail, __, ___, ____) => mail ?? '',
@@ -273,7 +274,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
     return Scaffold(
       backgroundColor: context.colors.background,
       appBar: AppBar(
-        title: const Text('Account & Security', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(s.accountScreenTitle, style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: context.colors.background,
         iconTheme: IconThemeData(color: context.colors.textPrimary),
         elevation: 0,
@@ -293,9 +294,9 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Email Address', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  Text(s.accountEmailLabel, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                   const SizedBox(height: 4),
-                  Text(email.isNotEmpty ? email : 'Not set', style: TextStyle(color: context.colors.textSecondary)),
+                  Text(email.isNotEmpty ? email : s.notSet, style: TextStyle(color: context.colors.textSecondary)),
                   const SizedBox(height: 12),
                   if (!_showEmailForm)
                     OutlinedButton(
@@ -326,7 +327,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                         const SizedBox(width: 8),
                         TextButton(
                           onPressed: () => setState(() => _showEmailForm = false),
-                          child: const Text('Cancel'),
+                          child: Text(s.cancel),
                         ),
                       ],
                     ),
@@ -349,13 +350,13 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Password', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  Text(s.accountPasswordLabel, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                   const SizedBox(height: 4),
-                  Text('Send a reset link to your email', style: TextStyle(color: context.colors.textMuted, fontSize: 13)),
+                  Text(s.accountPasswordSub, style: TextStyle(color: context.colors.textMuted, fontSize: 13)),
                   const SizedBox(height: 12),
                   OutlinedButton(
                     onPressed: email.isEmpty ? null : () => _sendPasswordReset(email),
-                    child: const Text('Send Reset Link'),
+                    child: Text(s.resetLinkButton),
                   ),
                 ],
               ),
@@ -375,7 +376,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Connected Accounts', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  Text(s.accountConnectedLabel, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                   const SizedBox(height: 12),
                   Row(
                     children: [
@@ -384,7 +385,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                       const Text('Google', style: TextStyle(fontWeight: FontWeight.w500)),
                       const Spacer(),
                       Chip(
-                        label: const Text('Connected', style: TextStyle(color: Colors.white, fontSize: 11)),
+                        label: Text(s.connected, style: TextStyle(color: Colors.white, fontSize: 11)),
                         backgroundColor: Colors.green,
                         padding: EdgeInsets.zero,
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -397,7 +398,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
           ),
           const SizedBox(height: 16),
 
-          // ─── BIOMETRIC LOCK CARD (Mobile Only) ───
+          // ─── BIOMETRIC LOCK CARD ───
           if (_isBiometricSupported) ...[
             Card(
               color: context.colors.surface,
@@ -407,8 +408,8 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
               ),
               child: SwitchListTile(
                 activeColor: context.colors.primary,
-                title: const Text('Biometric Lock', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                subtitle: const Text('Require fingerprint or Face ID to open WaslaQ', style: TextStyle(fontSize: 12)),
+                title: Text(s.accountBiometric, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                subtitle: Text(s.accountBiometricSub, style: TextStyle(fontSize: 12)),
                 value: prefs.biometricLock,
                 onChanged: _toggleBiometricLock,
               ),
@@ -424,8 +425,8 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
               ),
               child: SwitchListTile(
                 activeColor: context.colors.primary,
-                title: const Text('Purchase Confirmation', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                subtitle: const Text('Require biometric before completing any purchase', style: TextStyle(fontSize: 12)),
+                title: Text(s.accountPurchaseConfirm, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                subtitle: Text(s.accountPurchaseConfirmSub, style: TextStyle(fontSize: 12)),
                 value: prefs.purchaseConfirmation,
                 onChanged: _togglePurchaseConfirmation,
               ),
@@ -469,8 +470,8 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
               ),
               child: SwitchListTile(
                 activeColor: context.colors.primary,
-                title: const Text('Login Notifications', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                subtitle: const Text('Get notified when your account signs in from a new device', style: TextStyle(fontSize: 12)),
+                title: Text(s.accountLoginNotif, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                subtitle: Text(s.accountLoginNotifSub, style: TextStyle(fontSize: 12)),
                 value: _socialSettings!.loginNotifications,
                 onChanged: (val) {
                   _updateSocialSettings(_socialSettings!.copyWith(loginNotifications: val));
@@ -492,9 +493,9 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Delete Account', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.red)),
+                  Text(s.deleteAccount, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.red)),
                   const SizedBox(height: 6),
-                  const Text('This action is permanent. Your account will be deleted after 30 days.', style: TextStyle(color: Colors.red, fontSize: 12)),
+                  Text(s.permanentAction, style: TextStyle(color: Colors.red, fontSize: 12)),
                   const SizedBox(height: 12),
                   if (_deletionDate == null)
                     OutlinedButton(
@@ -503,7 +504,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                         side: const BorderSide(color: Colors.red),
                       ),
                       onPressed: _isDeleting ? null : _showDeleteConfirmation,
-                      child: const Text('Delete My Account'),
+                      child: Text(s.deleteAccount),
                     )
                   else ...[
                     Text('Deletion scheduled for: ${_deletionDate!.toLocal().toString().split(' ')[0]}', style: const TextStyle(fontWeight: FontWeight.bold)),

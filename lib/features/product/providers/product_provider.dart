@@ -64,3 +64,40 @@ Future<List<CategoryModel>> categories(CategoriesRef ref) async {
 Future<List<CategoryModel>> allCategories(AllCategoriesRef ref) {
   return ProductRepository.getCategories();
 }
+
+// ---------------------------------------------------------------------------
+// Paginated products list with total count for store tab
+// ---------------------------------------------------------------------------
+
+@riverpod
+Future<ProductsResponse> paginatedProducts(
+  PaginatedProductsRef ref, {
+  int page = 1,
+  int limit = 20,
+  String? categoryId,
+  String? query,
+  String? order,
+}) async {
+  final offset = (page - 1) * limit;
+  final isPriceSort = order == 'price_asc' || order == 'price_desc';
+
+  final res = await ProductRepository.getProductsPaginated(
+    limit: limit,
+    offset: offset,
+    categoryId: categoryId,
+    query: query,
+    order: isPriceSort ? null : order,
+  );
+
+  if (isPriceSort) {
+    final sortedProducts = List<ProductModel>.from(res.products);
+    sortedProducts.sort((a, b) {
+      final priceA = a.lowestPrice ?? 0.0;
+      final priceB = b.lowestPrice ?? 0.0;
+      return order == 'price_asc' ? priceA.compareTo(priceB) : priceB.compareTo(priceA);
+    });
+    return ProductsResponse(products: sortedProducts, count: res.count);
+  }
+
+  return res;
+}

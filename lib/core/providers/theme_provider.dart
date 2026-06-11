@@ -10,7 +10,7 @@ class ThemeNotifier extends StateNotifier<AppThemeMode> {
   static const _storage = FlutterSecureStorage();
   static const _key = 'waslaq_theme';
 
-  ThemeNotifier() : super(AppThemeMode.dark) {
+  ThemeNotifier() : super(AppThemeMode.system) {
     _loadSaved();
   }
 
@@ -20,7 +20,7 @@ class ThemeNotifier extends StateNotifier<AppThemeMode> {
       state = switch (saved) {
         'light'  => AppThemeMode.light,
         'system' => AppThemeMode.system,
-        _        => AppThemeMode.dark,
+        _        => AppThemeMode.system,
       };
     } catch (_) {}
   }
