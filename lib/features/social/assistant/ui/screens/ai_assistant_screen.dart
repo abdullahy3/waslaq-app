@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:auto_route/auto_route.dart';
 import '../../../../../router/app_router.dart';
 import '../../../../../shared/theme/app_colors.dart';
-import '../../../data/social_repository.dart';
 import '../../../providers/social_providers.dart';
 
 class AiMessage {
@@ -147,7 +146,7 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: colors.primary.withOpacity(0.1),
+                color: colors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(Icons.smart_toy_outlined, color: colors.primary, size: 22),
@@ -166,13 +165,15 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
             Expanded(
               child: _messages.isEmpty
                   ? Center(child: CircularProgressIndicator(color: colors.primary))
-                  : ListView.builder(
-                      controller: _scrollController,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      itemCount: _messages.length,
-                      itemBuilder: (context, index) {
-                        return _buildMessageBubble(_messages[index], colors);
-                      },
+                  : SelectionArea(
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        itemCount: _messages.length,
+                        itemBuilder: (context, index) {
+                          return _buildMessageBubble(_messages[index], colors);
+                        },
+                      ),
                     ),
             ),
             if (_isTyping) _buildTypingIndicator(colors, isAr),
@@ -214,8 +215,8 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
                 suggestions[index],
                 style: TextStyle(color: colors.primary, fontSize: 12),
               ),
-              backgroundColor: colors.primary.withOpacity(0.05),
-              side: BorderSide(color: colors.primary.withOpacity(0.2)),
+              backgroundColor: colors.primary.withValues(alpha: 0.05),
+              side: BorderSide(color: colors.primary.withValues(alpha: 0.2)),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               onPressed: () => _sendMessage(suggestions[index]),
             ),
@@ -372,7 +373,7 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: colors.surfaceVariant.withOpacity(0.5),
+                color: colors.surfaceVariant.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(24),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 16),
