@@ -158,6 +158,36 @@ class VendorRepository {
     }
   }
 
+  Future<Map<String, dynamic>> importProducts(File file) async {
+    try {
+      final formData = FormData();
+      formData.files.add(MapEntry(
+        'file',
+        await MultipartFile.fromFile(file.path, filename: file.path.split('/').last),
+      ));
+      final res = await _client.post(
+        '/store/custom/vendor/products/import',
+        data: formData,
+        options: Options(contentType: 'multipart/form-data'),
+      );
+      return res.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw _wrap(e);
+    }
+  }
+
+  Future<List<int>> exportProducts() async {
+    try {
+      final res = await _client.get(
+        '/store/custom/vendor/products/export',
+        options: Options(responseType: ResponseType.bytes),
+      );
+      return res.data as List<int>;
+    } on DioException catch (e) {
+      throw _wrap(e);
+    }
+  }
+
   // ─── Finances ───────────────────────────────────────────────────────────────
 
   Future<VendorBalance> getBalance() async {

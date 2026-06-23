@@ -331,7 +331,16 @@
     "continue_shipping": "متابعة الشحن",
     "cart_empty": "عربة التسوق فارغة",
     "qty": "الكمية: ${count}",
-    "continue_shopping": "متابعة التسوق"
+    "continue_shopping": "متابعة التسوق",
+    "customer_info_step": "المعلومات",
+    "delivery_step": "التوصيل",
+    "payment_step": "الدفع",
+    "customer_info_title": "معلومات العميل",
+    "no_shipping_options": "لا توجد خيارات شحن متاحة",
+    "agree_prefix": "أوافق على ",
+    "terms_link": "شروط الاستخدام",
+    "and_text": " و",
+    "privacy_link": "سياسة الخصوصية"
   },
   "category": {
     "browse_categories": "تصفح الفئات",
@@ -1156,7 +1165,13 @@
     "supportHelpSection": "المساعدة",
     "supportEscrowSection": "الضمان والمدفوعات",
     "supportLegalSection": "قانوني",
-    "notifCommunityLabel": "إشعارات المجتمع"
+    "notifCommunityLabel": "إشعارات المجتمع",
+    "currencySection": "العملة",
+    "currencyLabel": "عملة العرض",
+    "currencyIls": "شيكل (₪)",
+    "currencyIlsSub": "عرض الأسعار بالشيكل الإسرائيلي الجديد",
+    "currencyUsd": "دولار (USD)",
+    "currencyUsdSub": "عرض الأسعار محوّلة إلى الدولار الأمريكي"
   },
   "become_vendor": {
     "title": "انضم إلى قائمة الموردين",
@@ -2023,5 +2038,53 @@
     "private_community_locked": "خاص - انضم للاختيار",
     "create_community": "إنشاء مجتمع",
     "ai_assistant": "المساعد الذكي (AI)"
+  },
+  "errors": {
+    "network": "لا يوجد اتصال بالإنترنت — تحقق من الشبكة وحاول مجدداً",
+    "timeout": "الاتصال يستغرق وقتاً طويلاً — حاول مرة أخرى",
+    "server": "حدث خطأ من طرفنا — حاول مجدداً بعد قليل",
+    "unauthorized": "انتهت صلاحية الجلسة — سجّل الدخول من جديد",
+    "not_found": "لم نعثر على ما تبحث عنه",
+    "rate_limited": "محاولات كثيرة — انتظر لحظة وحاول مجدداً",
+    "validation": "بعض المعلومات غير صحيحة — راجعها وحاول مجدداً",
+    "unknown": "حدث خطأ ما — حاول مرة أخرى",
+    "offline_banner": "لا يوجد اتصال بالإنترنت",
+    "back_online": "عاد الاتصال",
+    "crash_title": "عذراً، حدث خلل",
+    "crash_message": "حدث خطأ غير متوقع. ارجع للخلف وحاول مجدداً."
+  },
+  "connections": {
+    "title": "التواصل",
+    "followers": "المتابِعون",
+    "following": "يتابِع",
+    "no_followers": "لا يوجد متابِعون بعد",
+    "no_following": "لا يتابع أحداً بعد",
+    "remove_follower": "إزالة المتابِع",
+    "remove": "إزالة",
+    "remove_follower_confirm": "إزالة ${name} من متابِعيك؟ لن يتم إخباره بذلك.",
+    "removed": "تمت إزالة المتابِع",
+    "block": "حظر",
+    "block_confirm": "حظر ${name}؟ لن يتمكن من متابعتك أو مراسلتك.",
+    "blocked": "تم حظر المستخدم"
+  },
+  "vendor_import": {
+    "title": "استيراد / تصدير",
+    "step1_title": "تصدير منتجاتك",
+    "step1_desc": "نزّل منتجاتك الحالية كملف Excel، عدّل أو أضف صفوفاً جديدة، ثم أعد رفعه. البائعون الجدد يحصلون على صف نموذجي.",
+    "step1_btn": "تصدير المنتجات (.xlsx)",
+    "step2_title": "استيراد المنتجات",
+    "step2_desc": "ارفع ملف .xlsx أو .csv المعبّأ. الحد الأقصى 100 منتج لكل عملية.",
+    "tap_to_select": "اضغط لاختيار ملف",
+    "file_too_large": "الملف يتجاوز حد 5 ميغابايت.",
+    "import_completed": "اكتمل الاستيراد!",
+    "import_failed": "فشل الاستيراد: ${error}",
+    "export_failed": "فشل التصدير: ${error}",
+    "export_share_text": "تصدير منتجات واصلك",
+    "start_import": "بدء الاستيراد",
+    "results_title": "نتائج الاستيراد",
+    "products_created": "تم إنشاء ${count} منتجات",
+    "rows_failed": "فشل ${count} صفوف",
+    "import_another": "استيراد آخر",
+    "done": "تم"
   }
 }

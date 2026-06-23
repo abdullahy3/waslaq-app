@@ -11,10 +11,12 @@ import 'package:file_picker/file_picker.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../../shared/theme/app_colors.dart';
 import '../../../../core/api/medusa_client.dart';
+import '../../../../router/app_router.dart';
 import '../../data/models/vendor_dashboard_model.dart';
 import '../../data/repositories/vendor_repository.dart';
 import '../../providers/vendor_providers.dart';
 import '../../../../../i18n/strings.g.dart';
+import 'package:waslaq_app/core/error/error_localizer.dart';
 
 @RoutePage()
 class VendorDashboardScreen extends ConsumerStatefulWidget {
@@ -146,7 +148,7 @@ class _OverviewTab extends ConsumerWidget {
       onRefresh: () async => ref.invalidate(vendorDashboardProvider),
       child: dashAsync.when(
         loading: () => _shimmerList(context),
-        error: (e, _) => _errorWidget(context, e.toString(), () => ref.invalidate(vendorDashboardProvider)),
+        error: (e, _) => _errorWidget(context, localizeError(e), () => ref.invalidate(vendorDashboardProvider)),
         data: (dash) => _OverviewBody(dash: dash),
       ),
     );
@@ -227,7 +229,7 @@ class _OrdersTab extends ConsumerWidget {
       onRefresh: () async => ref.invalidate(vendorOrdersProvider),
       child: ordersAsync.when(
         loading: () => _shimmerList(context),
-        error: (e, _) => _errorWidget(context, e.toString(), () => ref.invalidate(vendorOrdersProvider)),
+        error: (e, _) => _errorWidget(context, localizeError(e), () => ref.invalidate(vendorOrdersProvider)),
         data: (orders) {
           if (orders.isEmpty) {
             return Center(child: _emptyBox(context, Icons.receipt_long_outlined, t.account.no_orders));
@@ -278,7 +280,7 @@ class _FullOrderTileState extends State<_FullOrderTile> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: context.colors.error));
+          SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error));
       }
     } finally {
       if (mounted) setState(() => _shipping = false);
@@ -424,7 +426,7 @@ class _ProductsTabState extends ConsumerState<_ProductsTab> {
     final productsAsync = ref.watch(vendorProductsProvider);
     return productsAsync.when(
       loading: () => _shimmerList(context),
-      error: (e, _) => _errorWidget(context, e.toString(), () => ref.invalidate(vendorProductsProvider)),
+      error: (e, _) => _errorWidget(context, localizeError(e), () => ref.invalidate(vendorProductsProvider)),
       data: (products) => Stack(children: [
         RefreshIndicator(
           onRefresh: () async => ref.invalidate(vendorProductsProvider),
@@ -451,14 +453,31 @@ class _ProductsTabState extends ConsumerState<_ProductsTab> {
         if (!_showForm)
           Positioned(
             bottom: 20, right: 20,
-            child: FloatingActionButton.small(
-              onPressed: () => setState(() => _showForm = true),
-              backgroundColor: context.colors.primary,
-              foregroundColor: Colors.white,
-              elevation: 1.0,
-              highlightElevation: 1.5,
-              shape: const CircleBorder(),
-              child: const Icon(Icons.add, color: Colors.white, size: 18),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FloatingActionButton.small(
+                  heroTag: 'fab_import_export',
+                  onPressed: () => context.router.push(const VendorImportRoute()),
+                  backgroundColor: context.colors.surface,
+                  foregroundColor: context.colors.primary,
+                  elevation: 1.0,
+                  highlightElevation: 1.5,
+                  shape: CircleBorder(side: BorderSide(color: context.colors.primary.withValues(alpha: 0.3))),
+                  child: const Icon(Icons.upload_file_outlined, size: 16),
+                ),
+                const SizedBox(height: 8),
+                FloatingActionButton.small(
+                  heroTag: 'fab_add_product',
+                  onPressed: () => setState(() => _showForm = true),
+                  backgroundColor: context.colors.primary,
+                  foregroundColor: Colors.white,
+                  elevation: 1.0,
+                  highlightElevation: 1.5,
+                  shape: const CircleBorder(),
+                  child: const Icon(Icons.add, color: Colors.white, size: 18),
+                ),
+              ],
             ),
           ),
       ]),
@@ -489,7 +508,6 @@ class _ProductTileState extends State<_ProductTile> {
     bool manageInventory = widget.product.manageInventory;
     
     final digitalUrlCtrl = TextEditingController();
-    File? digitalFile;
 
     // Existing image URLs from product
     final existingUrls = List<String>.from(widget.product.images);
@@ -628,7 +646,7 @@ class _ProductTileState extends State<_ProductTile> {
                   const Spacer(),
                   Switch(
                     value: manageInventory,
-                    activeColor: context.colors.primary,
+                    activeThumbColor: context.colors.primary,
                     onChanged: (val) => setModalState(() => manageInventory = val),
                   ),
                 ],
@@ -658,14 +676,9 @@ class _ProductTileState extends State<_ProductTile> {
                       
                       String? finalDigitalUrl;
                       if (widget.product.productType == 'virtual') {
-                        if (digitalFile != null) {
-                          final uploaded = await repo.uploadImages([digitalFile!]);
-                          if (uploaded.isNotEmpty) {
-                            finalDigitalUrl = uploaded.first;
-                          }
-                        } else if (digitalUrlCtrl.text.trim().isNotEmpty) {
-                          finalDigitalUrl = digitalUrlCtrl.text.trim();
-                        }
+                        if (digitalUrlCtrl.text.trim().isNotEmpty) {
+                        finalDigitalUrl = digitalUrlCtrl.text.trim();
+                      }
                       }
                       
                       final variantId = widget.product.variantId;
@@ -752,7 +765,7 @@ class _ProductTileState extends State<_ProductTile> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: context.colors.error));
+          SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error));
       }
       setState(() => _deleting = false);
     }
@@ -870,10 +883,6 @@ class _AddProductFormState extends ConsumerState<_AddProductForm> with Automatic
   @override
   bool get wantKeepAlive => true;
 
-  @override
-  void initState() {
-    super.initState();
-  }
 
 
   @override
@@ -1067,7 +1076,7 @@ class _AddProductFormState extends ConsumerState<_AddProductForm> with Automatic
         // Category
         if (rootCats.isNotEmpty) ...[
           DropdownButtonFormField<String>(
-            value: _selectedCategoryId,
+            initialValue: _selectedCategoryId,
             hint: Text(t.vendor_dashboard.select_category, style: TextStyle(color: context.colors.textMuted)),
             style: TextStyle(color: context.colors.textPrimary, fontSize: 14),
             dropdownColor: context.colors.surface,
@@ -1099,7 +1108,7 @@ class _AddProductFormState extends ConsumerState<_AddProductForm> with Automatic
             const Spacer(),
             Switch(
               value: _manageInventory,
-              activeColor: context.colors.primary,
+              activeThumbColor: context.colors.primary,
               onChanged: (val) => setState(() => _manageInventory = val),
             ),
           ],
@@ -1228,7 +1237,7 @@ class _FinancesTab extends ConsumerWidget {
         onRefresh: () async => ref.invalidate(vendorBalanceProvider),
         child: balanceAsync.when(
           loading: () => _shimmerList(context),
-          error: (e, st) => _errorWidget(context, '$e', () => ref.invalidate(vendorBalanceProvider)),
+          error: (e, st) => _errorWidget(context, localizeError(e), () => ref.invalidate(vendorBalanceProvider)),
           data: (balance) {
             try {
               return _FinancesContent(balance: balance, onReload: () async => ref.invalidate(vendorBalanceProvider));
@@ -1731,7 +1740,7 @@ class _QATabState extends ConsumerState<_QATab> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: context.colors.error));
+          SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error));
       }
     } finally {
       if (mounted) setState(() => _submitting = false);
@@ -1746,7 +1755,7 @@ class _QATabState extends ConsumerState<_QATab> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: context.colors.error));
+          SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error));
       }
     }
   }
@@ -1758,7 +1767,7 @@ class _QATabState extends ConsumerState<_QATab> {
       onRefresh: () async => ref.invalidate(vendorQuestionsProvider),
       child: questionsAsync.when(
         loading: () => _shimmerList(context),
-        error: (e, _) => _errorWidget(context, e.toString(), () => ref.invalidate(vendorQuestionsProvider)),
+        error: (e, _) => _errorWidget(context, localizeError(e), () => ref.invalidate(vendorQuestionsProvider)),
         data: (questions) {
           if (questions.isEmpty) {
             return Center(child: _emptyBox(context, Icons.question_answer_outlined, t.vendor_dashboard.no_questions));
@@ -2219,7 +2228,7 @@ class _SettingsTabState extends ConsumerState<_SettingsTab> {
           ),
         ),
         const SizedBox(height: 16),
-        _settingField(t.become_vendor.store_name + ' *', _storeNameCtrl),
+        _settingField('${t.become_vendor.store_name} *', _storeNameCtrl),
         SizedBox(height: 10),
         _settingField(t.vendor_dashboard.slug_label, _slugCtrl,
             hint: 'waslaq.com/vendors/your-slug'),

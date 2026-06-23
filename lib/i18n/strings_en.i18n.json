@@ -331,7 +331,16 @@
     "continue_shipping": "Continue to Shipping",
     "cart_empty": "Cart empty",
     "qty": "Qty: ${count}",
-    "continue_shopping": "Continue Shopping"
+    "continue_shopping": "Continue Shopping",
+    "customer_info_step": "Info",
+    "delivery_step": "Delivery",
+    "payment_step": "Payment",
+    "customer_info_title": "Customer Information",
+    "no_shipping_options": "No shipping options available",
+    "agree_prefix": "I agree to the ",
+    "terms_link": "Terms of Use",
+    "and_text": " and ",
+    "privacy_link": "Privacy Policy"
   },
   "category": {
     "browse_categories": "Browse Categories",
@@ -1156,7 +1165,13 @@
     "supportHelpSection": "Help",
     "supportEscrowSection": "Escrow & Payments",
     "supportLegalSection": "Legal",
-    "notifCommunityLabel": "Community Notifications"
+    "notifCommunityLabel": "Community Notifications",
+    "currencySection": "Currency",
+    "currencyLabel": "Display currency",
+    "currencyIls": "Shekel (₪ ILS)",
+    "currencyIlsSub": "Show prices in Israeli new shekel",
+    "currencyUsd": "Dollar (USD)",
+    "currencyUsdSub": "Show converted prices in US dollar"
   },
   "become_vendor": {
     "title": "Become a Vendor",
@@ -2023,5 +2038,53 @@
     "private_community_locked": "Private - Join to select",
     "create_community": "Create a Community",
     "ai_assistant": "AI Assistant"
+  },
+  "errors": {
+    "network": "No internet connection — check your network and try again",
+    "timeout": "The connection is taking too long — please try again",
+    "server": "Something went wrong on our side — please try again shortly",
+    "unauthorized": "Your session has expired — please sign in again",
+    "not_found": "We couldn't find what you're looking for",
+    "rate_limited": "Too many attempts — wait a moment and try again",
+    "validation": "Some information looks incorrect — please review and try again",
+    "unknown": "Something went wrong — please try again",
+    "offline_banner": "No internet connection",
+    "back_online": "Back online",
+    "crash_title": "Oops, something broke",
+    "crash_message": "An unexpected error occurred. Please go back and try again."
+  },
+  "connections": {
+    "title": "Connections",
+    "followers": "Followers",
+    "following": "Following",
+    "no_followers": "No followers yet",
+    "no_following": "Not following anyone yet",
+    "remove_follower": "Remove follower",
+    "remove": "Remove",
+    "remove_follower_confirm": "Remove ${name} from your followers? They won't be told.",
+    "removed": "Follower removed",
+    "block": "Block",
+    "block_confirm": "Block ${name}? They won't be able to follow or message you.",
+    "blocked": "User blocked"
+  },
+  "vendor_import": {
+    "title": "Import / Export",
+    "step1_title": "Export Your Products",
+    "step1_desc": "Download your existing products as an Excel file. Edit it, add new rows, then re-import. New vendors get a sample row.",
+    "step1_btn": "Export Products (.xlsx)",
+    "step2_title": "Import Products",
+    "step2_desc": "Upload your completed .xlsx or .csv file. Maximum 100 products per import.",
+    "tap_to_select": "Tap to select file",
+    "file_too_large": "File exceeds 5MB limit.",
+    "import_completed": "Import completed!",
+    "import_failed": "Import failed: ${error}",
+    "export_failed": "Export failed: ${error}",
+    "export_share_text": "WaslaQ Products Export",
+    "start_import": "Start Import",
+    "results_title": "Import Results",
+    "products_created": "${count} Products Created",
+    "rows_failed": "${count} Rows Failed",
+    "import_another": "Import Another",
+    "done": "Done"
   }
 }

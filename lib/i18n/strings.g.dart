@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 3854 (1927 per locale)
+/// Strings: 3968 (1984 per locale)
 ///
-/// Built on 2026-06-11 at 18:36 UTC
+/// Built on 2026-06-23 at 17:40 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -197,6 +197,9 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final StringsSavedItemsEn saved_items = StringsSavedItemsEn._(_root);
 	late final StringsLegalEn legal = StringsLegalEn._(_root);
 	late final StringsCreatePostEn create_post = StringsCreatePostEn._(_root);
+	late final StringsErrorsEn errors = StringsErrorsEn._(_root);
+	late final StringsConnectionsEn connections = StringsConnectionsEn._(_root);
+	late final StringsVendorImportEn vendor_import = StringsVendorImportEn._(_root);
 }
 
 // Path: nav
@@ -580,6 +583,15 @@ class StringsCheckoutEn {
 	String get cart_empty => 'Cart empty';
 	String qty({required Object count}) => 'Qty: ${count}';
 	String get continue_shopping => 'Continue Shopping';
+	String get customer_info_step => 'Info';
+	String get delivery_step => 'Delivery';
+	String get payment_step => 'Payment';
+	String get customer_info_title => 'Customer Information';
+	String get no_shipping_options => 'No shipping options available';
+	String get agree_prefix => 'I agree to the ';
+	String get terms_link => 'Terms of Use';
+	String get and_text => ' and ';
+	String get privacy_link => 'Privacy Policy';
 }
 
 // Path: category
@@ -1538,6 +1550,12 @@ class StringsSettingsEn {
 	String get supportEscrowSection => 'Escrow & Payments';
 	String get supportLegalSection => 'Legal';
 	String get notifCommunityLabel => 'Community Notifications';
+	String get currencySection => 'Currency';
+	String get currencyLabel => 'Display currency';
+	String get currencyIls => 'Shekel (₪ ILS)';
+	String get currencyIlsSub => 'Show prices in Israeli new shekel';
+	String get currencyUsd => 'Dollar (USD)';
+	String get currencyUsdSub => 'Show converted prices in US dollar';
 }
 
 // Path: become_vendor
@@ -2560,6 +2578,75 @@ class StringsCreatePostEn {
 	String get ai_assistant => 'AI Assistant';
 }
 
+// Path: errors
+class StringsErrorsEn {
+	StringsErrorsEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get network => 'No internet connection — check your network and try again';
+	String get timeout => 'The connection is taking too long — please try again';
+	String get server => 'Something went wrong on our side — please try again shortly';
+	String get unauthorized => 'Your session has expired — please sign in again';
+	String get not_found => 'We couldn\'t find what you\'re looking for';
+	String get rate_limited => 'Too many attempts — wait a moment and try again';
+	String get validation => 'Some information looks incorrect — please review and try again';
+	String get unknown => 'Something went wrong — please try again';
+	String get offline_banner => 'No internet connection';
+	String get back_online => 'Back online';
+	String get crash_title => 'Oops, something broke';
+	String get crash_message => 'An unexpected error occurred. Please go back and try again.';
+}
+
+// Path: connections
+class StringsConnectionsEn {
+	StringsConnectionsEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get title => 'Connections';
+	String get followers => 'Followers';
+	String get following => 'Following';
+	String get no_followers => 'No followers yet';
+	String get no_following => 'Not following anyone yet';
+	String get remove_follower => 'Remove follower';
+	String get remove => 'Remove';
+	String remove_follower_confirm({required Object name}) => 'Remove ${name} from your followers? They won\'t be told.';
+	String get removed => 'Follower removed';
+	String get block => 'Block';
+	String block_confirm({required Object name}) => 'Block ${name}? They won\'t be able to follow or message you.';
+	String get blocked => 'User blocked';
+}
+
+// Path: vendor_import
+class StringsVendorImportEn {
+	StringsVendorImportEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get title => 'Import / Export';
+	String get step1_title => 'Export Your Products';
+	String get step1_desc => 'Download your existing products as an Excel file. Edit it, add new rows, then re-import. New vendors get a sample row.';
+	String get step1_btn => 'Export Products (.xlsx)';
+	String get step2_title => 'Import Products';
+	String get step2_desc => 'Upload your completed .xlsx or .csv file. Maximum 100 products per import.';
+	String get tap_to_select => 'Tap to select file';
+	String get file_too_large => 'File exceeds 5MB limit.';
+	String get import_completed => 'Import completed!';
+	String import_failed({required Object error}) => 'Import failed: ${error}';
+	String export_failed({required Object error}) => 'Export failed: ${error}';
+	String get export_share_text => 'WaslaQ Products Export';
+	String get start_import => 'Start Import';
+	String get results_title => 'Import Results';
+	String products_created({required Object count}) => '${count} Products Created';
+	String rows_failed({required Object count}) => '${count} Rows Failed';
+	String get import_another => 'Import Another';
+	String get done => 'Done';
+}
+
 // Path: <root>
 class StringsAr extends Translations {
 	/// You can call this constructor and build your own translation instance of this locale.
@@ -2634,6 +2721,9 @@ class StringsAr extends Translations {
 	@override late final StringsSavedItemsAr saved_items = StringsSavedItemsAr._(_root);
 	@override late final StringsLegalAr legal = StringsLegalAr._(_root);
 	@override late final StringsCreatePostAr create_post = StringsCreatePostAr._(_root);
+	@override late final StringsErrorsAr errors = StringsErrorsAr._(_root);
+	@override late final StringsConnectionsAr connections = StringsConnectionsAr._(_root);
+	@override late final StringsVendorImportAr vendor_import = StringsVendorImportAr._(_root);
 }
 
 // Path: nav
@@ -3017,6 +3107,15 @@ class StringsCheckoutAr extends StringsCheckoutEn {
 	@override String get cart_empty => 'عربة التسوق فارغة';
 	@override String qty({required Object count}) => 'الكمية: ${count}';
 	@override String get continue_shopping => 'متابعة التسوق';
+	@override String get customer_info_step => 'المعلومات';
+	@override String get delivery_step => 'التوصيل';
+	@override String get payment_step => 'الدفع';
+	@override String get customer_info_title => 'معلومات العميل';
+	@override String get no_shipping_options => 'لا توجد خيارات شحن متاحة';
+	@override String get agree_prefix => 'أوافق على ';
+	@override String get terms_link => 'شروط الاستخدام';
+	@override String get and_text => ' و';
+	@override String get privacy_link => 'سياسة الخصوصية';
 }
 
 // Path: category
@@ -3975,6 +4074,12 @@ class StringsSettingsAr extends StringsSettingsEn {
 	@override String get supportEscrowSection => 'الضمان والمدفوعات';
 	@override String get supportLegalSection => 'قانوني';
 	@override String get notifCommunityLabel => 'إشعارات المجتمع';
+	@override String get currencySection => 'العملة';
+	@override String get currencyLabel => 'عملة العرض';
+	@override String get currencyIls => 'شيكل (₪)';
+	@override String get currencyIlsSub => 'عرض الأسعار بالشيكل الإسرائيلي الجديد';
+	@override String get currencyUsd => 'دولار (USD)';
+	@override String get currencyUsdSub => 'عرض الأسعار محوّلة إلى الدولار الأمريكي';
 }
 
 // Path: become_vendor
@@ -4997,6 +5102,75 @@ class StringsCreatePostAr extends StringsCreatePostEn {
 	@override String get ai_assistant => 'المساعد الذكي (AI)';
 }
 
+// Path: errors
+class StringsErrorsAr extends StringsErrorsEn {
+	StringsErrorsAr._(StringsAr root) : this._root = root, super._(root);
+
+	@override final StringsAr _root; // ignore: unused_field
+
+	// Translations
+	@override String get network => 'لا يوجد اتصال بالإنترنت — تحقق من الشبكة وحاول مجدداً';
+	@override String get timeout => 'الاتصال يستغرق وقتاً طويلاً — حاول مرة أخرى';
+	@override String get server => 'حدث خطأ من طرفنا — حاول مجدداً بعد قليل';
+	@override String get unauthorized => 'انتهت صلاحية الجلسة — سجّل الدخول من جديد';
+	@override String get not_found => 'لم نعثر على ما تبحث عنه';
+	@override String get rate_limited => 'محاولات كثيرة — انتظر لحظة وحاول مجدداً';
+	@override String get validation => 'بعض المعلومات غير صحيحة — راجعها وحاول مجدداً';
+	@override String get unknown => 'حدث خطأ ما — حاول مرة أخرى';
+	@override String get offline_banner => 'لا يوجد اتصال بالإنترنت';
+	@override String get back_online => 'عاد الاتصال';
+	@override String get crash_title => 'عذراً، حدث خلل';
+	@override String get crash_message => 'حدث خطأ غير متوقع. ارجع للخلف وحاول مجدداً.';
+}
+
+// Path: connections
+class StringsConnectionsAr extends StringsConnectionsEn {
+	StringsConnectionsAr._(StringsAr root) : this._root = root, super._(root);
+
+	@override final StringsAr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'التواصل';
+	@override String get followers => 'المتابِعون';
+	@override String get following => 'يتابِع';
+	@override String get no_followers => 'لا يوجد متابِعون بعد';
+	@override String get no_following => 'لا يتابع أحداً بعد';
+	@override String get remove_follower => 'إزالة المتابِع';
+	@override String get remove => 'إزالة';
+	@override String remove_follower_confirm({required Object name}) => 'إزالة ${name} من متابِعيك؟ لن يتم إخباره بذلك.';
+	@override String get removed => 'تمت إزالة المتابِع';
+	@override String get block => 'حظر';
+	@override String block_confirm({required Object name}) => 'حظر ${name}؟ لن يتمكن من متابعتك أو مراسلتك.';
+	@override String get blocked => 'تم حظر المستخدم';
+}
+
+// Path: vendor_import
+class StringsVendorImportAr extends StringsVendorImportEn {
+	StringsVendorImportAr._(StringsAr root) : this._root = root, super._(root);
+
+	@override final StringsAr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'استيراد / تصدير';
+	@override String get step1_title => 'تصدير منتجاتك';
+	@override String get step1_desc => 'نزّل منتجاتك الحالية كملف Excel، عدّل أو أضف صفوفاً جديدة، ثم أعد رفعه. البائعون الجدد يحصلون على صف نموذجي.';
+	@override String get step1_btn => 'تصدير المنتجات (.xlsx)';
+	@override String get step2_title => 'استيراد المنتجات';
+	@override String get step2_desc => 'ارفع ملف .xlsx أو .csv المعبّأ. الحد الأقصى 100 منتج لكل عملية.';
+	@override String get tap_to_select => 'اضغط لاختيار ملف';
+	@override String get file_too_large => 'الملف يتجاوز حد 5 ميغابايت.';
+	@override String get import_completed => 'اكتمل الاستيراد!';
+	@override String import_failed({required Object error}) => 'فشل الاستيراد: ${error}';
+	@override String export_failed({required Object error}) => 'فشل التصدير: ${error}';
+	@override String get export_share_text => 'تصدير منتجات واصلك';
+	@override String get start_import => 'بدء الاستيراد';
+	@override String get results_title => 'نتائج الاستيراد';
+	@override String products_created({required Object count}) => 'تم إنشاء ${count} منتجات';
+	@override String rows_failed({required Object count}) => 'فشل ${count} صفوف';
+	@override String get import_another => 'استيراد آخر';
+	@override String get done => 'تم';
+}
+
 /// Flat map(s) containing all translations.
 /// Only for edge cases! For simple maps, use the map function of this library.
 
@@ -5323,6 +5497,15 @@ extension on Translations {
 			case 'checkout.cart_empty': return 'Cart empty';
 			case 'checkout.qty': return ({required Object count}) => 'Qty: ${count}';
 			case 'checkout.continue_shopping': return 'Continue Shopping';
+			case 'checkout.customer_info_step': return 'Info';
+			case 'checkout.delivery_step': return 'Delivery';
+			case 'checkout.payment_step': return 'Payment';
+			case 'checkout.customer_info_title': return 'Customer Information';
+			case 'checkout.no_shipping_options': return 'No shipping options available';
+			case 'checkout.agree_prefix': return 'I agree to the ';
+			case 'checkout.terms_link': return 'Terms of Use';
+			case 'checkout.and_text': return ' and ';
+			case 'checkout.privacy_link': return 'Privacy Policy';
 			case 'category.browse_categories': return 'Browse Categories';
 			case 'category.subcategories': return 'Subcategories';
 			case 'category.recommended': return 'Recommended';
@@ -6108,6 +6291,12 @@ extension on Translations {
 			case 'settings.supportEscrowSection': return 'Escrow & Payments';
 			case 'settings.supportLegalSection': return 'Legal';
 			case 'settings.notifCommunityLabel': return 'Community Notifications';
+			case 'settings.currencySection': return 'Currency';
+			case 'settings.currencyLabel': return 'Display currency';
+			case 'settings.currencyIls': return 'Shekel (₪ ILS)';
+			case 'settings.currencyIlsSub': return 'Show prices in Israeli new shekel';
+			case 'settings.currencyUsd': return 'Dollar (USD)';
+			case 'settings.currencyUsdSub': return 'Show converted prices in US dollar';
 			case 'become_vendor.title': return 'Become a Vendor';
 			case 'become_vendor.subtitle': return 'Join our platform and start selling your products.';
 			case 'become_vendor.benefit1': return 'Sell physical and digital products';
@@ -6930,6 +7119,48 @@ extension on Translations {
 			case 'create_post.private_community_locked': return 'Private - Join to select';
 			case 'create_post.create_community': return 'Create a Community';
 			case 'create_post.ai_assistant': return 'AI Assistant';
+			case 'errors.network': return 'No internet connection — check your network and try again';
+			case 'errors.timeout': return 'The connection is taking too long — please try again';
+			case 'errors.server': return 'Something went wrong on our side — please try again shortly';
+			case 'errors.unauthorized': return 'Your session has expired — please sign in again';
+			case 'errors.not_found': return 'We couldn\'t find what you\'re looking for';
+			case 'errors.rate_limited': return 'Too many attempts — wait a moment and try again';
+			case 'errors.validation': return 'Some information looks incorrect — please review and try again';
+			case 'errors.unknown': return 'Something went wrong — please try again';
+			case 'errors.offline_banner': return 'No internet connection';
+			case 'errors.back_online': return 'Back online';
+			case 'errors.crash_title': return 'Oops, something broke';
+			case 'errors.crash_message': return 'An unexpected error occurred. Please go back and try again.';
+			case 'connections.title': return 'Connections';
+			case 'connections.followers': return 'Followers';
+			case 'connections.following': return 'Following';
+			case 'connections.no_followers': return 'No followers yet';
+			case 'connections.no_following': return 'Not following anyone yet';
+			case 'connections.remove_follower': return 'Remove follower';
+			case 'connections.remove': return 'Remove';
+			case 'connections.remove_follower_confirm': return ({required Object name}) => 'Remove ${name} from your followers? They won\'t be told.';
+			case 'connections.removed': return 'Follower removed';
+			case 'connections.block': return 'Block';
+			case 'connections.block_confirm': return ({required Object name}) => 'Block ${name}? They won\'t be able to follow or message you.';
+			case 'connections.blocked': return 'User blocked';
+			case 'vendor_import.title': return 'Import / Export';
+			case 'vendor_import.step1_title': return 'Export Your Products';
+			case 'vendor_import.step1_desc': return 'Download your existing products as an Excel file. Edit it, add new rows, then re-import. New vendors get a sample row.';
+			case 'vendor_import.step1_btn': return 'Export Products (.xlsx)';
+			case 'vendor_import.step2_title': return 'Import Products';
+			case 'vendor_import.step2_desc': return 'Upload your completed .xlsx or .csv file. Maximum 100 products per import.';
+			case 'vendor_import.tap_to_select': return 'Tap to select file';
+			case 'vendor_import.file_too_large': return 'File exceeds 5MB limit.';
+			case 'vendor_import.import_completed': return 'Import completed!';
+			case 'vendor_import.import_failed': return ({required Object error}) => 'Import failed: ${error}';
+			case 'vendor_import.export_failed': return ({required Object error}) => 'Export failed: ${error}';
+			case 'vendor_import.export_share_text': return 'WaslaQ Products Export';
+			case 'vendor_import.start_import': return 'Start Import';
+			case 'vendor_import.results_title': return 'Import Results';
+			case 'vendor_import.products_created': return ({required Object count}) => '${count} Products Created';
+			case 'vendor_import.rows_failed': return ({required Object count}) => '${count} Rows Failed';
+			case 'vendor_import.import_another': return 'Import Another';
+			case 'vendor_import.done': return 'Done';
 			default: return null;
 		}
 	}
@@ -7258,6 +7489,15 @@ extension on StringsAr {
 			case 'checkout.cart_empty': return 'عربة التسوق فارغة';
 			case 'checkout.qty': return ({required Object count}) => 'الكمية: ${count}';
 			case 'checkout.continue_shopping': return 'متابعة التسوق';
+			case 'checkout.customer_info_step': return 'المعلومات';
+			case 'checkout.delivery_step': return 'التوصيل';
+			case 'checkout.payment_step': return 'الدفع';
+			case 'checkout.customer_info_title': return 'معلومات العميل';
+			case 'checkout.no_shipping_options': return 'لا توجد خيارات شحن متاحة';
+			case 'checkout.agree_prefix': return 'أوافق على ';
+			case 'checkout.terms_link': return 'شروط الاستخدام';
+			case 'checkout.and_text': return ' و';
+			case 'checkout.privacy_link': return 'سياسة الخصوصية';
 			case 'category.browse_categories': return 'تصفح الفئات';
 			case 'category.subcategories': return 'الفئات الفرعية';
 			case 'category.recommended': return 'موصى به';
@@ -8043,6 +8283,12 @@ extension on StringsAr {
 			case 'settings.supportEscrowSection': return 'الضمان والمدفوعات';
 			case 'settings.supportLegalSection': return 'قانوني';
 			case 'settings.notifCommunityLabel': return 'إشعارات المجتمع';
+			case 'settings.currencySection': return 'العملة';
+			case 'settings.currencyLabel': return 'عملة العرض';
+			case 'settings.currencyIls': return 'شيكل (₪)';
+			case 'settings.currencyIlsSub': return 'عرض الأسعار بالشيكل الإسرائيلي الجديد';
+			case 'settings.currencyUsd': return 'دولار (USD)';
+			case 'settings.currencyUsdSub': return 'عرض الأسعار محوّلة إلى الدولار الأمريكي';
 			case 'become_vendor.title': return 'انضم إلى قائمة الموردين';
 			case 'become_vendor.subtitle': return 'انضم إلى منصتنا وابدأ في بيع منتجاتك.';
 			case 'become_vendor.benefit1': return 'بيع المنتجات المادية والرقمية';
@@ -8865,6 +9111,48 @@ extension on StringsAr {
 			case 'create_post.private_community_locked': return 'خاص - انضم للاختيار';
 			case 'create_post.create_community': return 'إنشاء مجتمع';
 			case 'create_post.ai_assistant': return 'المساعد الذكي (AI)';
+			case 'errors.network': return 'لا يوجد اتصال بالإنترنت — تحقق من الشبكة وحاول مجدداً';
+			case 'errors.timeout': return 'الاتصال يستغرق وقتاً طويلاً — حاول مرة أخرى';
+			case 'errors.server': return 'حدث خطأ من طرفنا — حاول مجدداً بعد قليل';
+			case 'errors.unauthorized': return 'انتهت صلاحية الجلسة — سجّل الدخول من جديد';
+			case 'errors.not_found': return 'لم نعثر على ما تبحث عنه';
+			case 'errors.rate_limited': return 'محاولات كثيرة — انتظر لحظة وحاول مجدداً';
+			case 'errors.validation': return 'بعض المعلومات غير صحيحة — راجعها وحاول مجدداً';
+			case 'errors.unknown': return 'حدث خطأ ما — حاول مرة أخرى';
+			case 'errors.offline_banner': return 'لا يوجد اتصال بالإنترنت';
+			case 'errors.back_online': return 'عاد الاتصال';
+			case 'errors.crash_title': return 'عذراً، حدث خلل';
+			case 'errors.crash_message': return 'حدث خطأ غير متوقع. ارجع للخلف وحاول مجدداً.';
+			case 'connections.title': return 'التواصل';
+			case 'connections.followers': return 'المتابِعون';
+			case 'connections.following': return 'يتابِع';
+			case 'connections.no_followers': return 'لا يوجد متابِعون بعد';
+			case 'connections.no_following': return 'لا يتابع أحداً بعد';
+			case 'connections.remove_follower': return 'إزالة المتابِع';
+			case 'connections.remove': return 'إزالة';
+			case 'connections.remove_follower_confirm': return ({required Object name}) => 'إزالة ${name} من متابِعيك؟ لن يتم إخباره بذلك.';
+			case 'connections.removed': return 'تمت إزالة المتابِع';
+			case 'connections.block': return 'حظر';
+			case 'connections.block_confirm': return ({required Object name}) => 'حظر ${name}؟ لن يتمكن من متابعتك أو مراسلتك.';
+			case 'connections.blocked': return 'تم حظر المستخدم';
+			case 'vendor_import.title': return 'استيراد / تصدير';
+			case 'vendor_import.step1_title': return 'تصدير منتجاتك';
+			case 'vendor_import.step1_desc': return 'نزّل منتجاتك الحالية كملف Excel، عدّل أو أضف صفوفاً جديدة، ثم أعد رفعه. البائعون الجدد يحصلون على صف نموذجي.';
+			case 'vendor_import.step1_btn': return 'تصدير المنتجات (.xlsx)';
+			case 'vendor_import.step2_title': return 'استيراد المنتجات';
+			case 'vendor_import.step2_desc': return 'ارفع ملف .xlsx أو .csv المعبّأ. الحد الأقصى 100 منتج لكل عملية.';
+			case 'vendor_import.tap_to_select': return 'اضغط لاختيار ملف';
+			case 'vendor_import.file_too_large': return 'الملف يتجاوز حد 5 ميغابايت.';
+			case 'vendor_import.import_completed': return 'اكتمل الاستيراد!';
+			case 'vendor_import.import_failed': return ({required Object error}) => 'فشل الاستيراد: ${error}';
+			case 'vendor_import.export_failed': return ({required Object error}) => 'فشل التصدير: ${error}';
+			case 'vendor_import.export_share_text': return 'تصدير منتجات واصلك';
+			case 'vendor_import.start_import': return 'بدء الاستيراد';
+			case 'vendor_import.results_title': return 'نتائج الاستيراد';
+			case 'vendor_import.products_created': return ({required Object count}) => 'تم إنشاء ${count} منتجات';
+			case 'vendor_import.rows_failed': return ({required Object count}) => 'فشل ${count} صفوف';
+			case 'vendor_import.import_another': return 'استيراد آخر';
+			case 'vendor_import.done': return 'تم';
 			default: return null;
 		}
 	}
