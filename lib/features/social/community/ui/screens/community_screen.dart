@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +9,7 @@ import '../../../../../i18n/strings.g.dart';
 import '../../../../../shared/theme/app_colors.dart';
 import '../../../../../shared/widgets/post_card.dart';
 import '../../../../../shared/widgets/post_card_skeleton.dart';
+import '../../../../../shared/widgets/user_avatar.dart';
 import '../../../../../core/api/medusa_client.dart';
 import '../../../../../core/auth/auth_notifier.dart';
 import '../../../providers/social_providers.dart';
@@ -35,13 +35,14 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
   String? _communityId;
   bool _joiningOrLeaving = false;
   bool? _isMemberOverride;
+  bool? _isPendingOverride;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.refresh(communityProvider(widget.communitySlug));
+      ref.invalidate(communityProvider(widget.communitySlug));
     });
   }
 
@@ -111,15 +112,11 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
     return ContextAwareScaffold(
       fabContext: FabContextData(communitySlug: widget.communitySlug),
       child: Scaffold(
-        floatingActionButton: const WaslaqFAB(),
-        floatingActionButtonLocation:
-            Directionality.of(context) == TextDirection.rtl
-                ? FloatingActionButtonLocation.startFloat
-                : FloatingActionButtonLocation.endFloat,
         body: communityState.when(
           data: (community) {
             final isMember = _isMemberOverride ?? community.isMember;
-            // Store community ID for pagination
+            final isPending = _isPendingOverride ?? community.isPending;
+
             if (_communityId != community.id) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 setState(() => _communityId = community.id);
@@ -131,7 +128,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
             return CustomScrollView(
               controller: _scrollController,
               slivers: [
-                // ─── Slivers App Bar (Plain, clear background with Back and Settings buttons) ───
+                // ─── Slivers App Bar ───
                 SliverAppBar(
                   pinned: true,
                   elevation: 0,
@@ -150,18 +147,17 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                   ],
                 ),
 
-                // ─── Header Section (Banner + overlap circle logo) ───
+                // ─── Header Section ───
                 SliverToBoxAdapter(
                   child: Container(
                     color: context.colors.surface,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Stack for banner and logo
                         Stack(
                           clipBehavior: Clip.none,
                           children: [
-                            Container(
+                            SizedBox(
                               height: 120,
                               width: double.infinity,
                               child: community.bannerUrl != null && community.bannerUrl!.isNotEmpty
@@ -173,7 +169,6 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                                     )
                                   : _bannerPlaceholder(context),
                             ),
-                            // Logo overlapping bottom of banner
                             Positioned(
                               bottom: -36,
                               right: Directionality.of(context) == TextDirection.rtl ? 16 : null,
@@ -206,15 +201,13 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 44), // Space for overlapping logo
+                        const SizedBox(height: 44),
 
-                        // Info section
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Member count above community name
                               Text(
                                 t.community.members_count(count: community.memberCount.toString()),
                                 style: TextStyle(
@@ -224,7 +217,6 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                                 ),
                               ),
                               const SizedBox(height: 2),
-                              // Community name
                               Text(
                                 'r/${community.slug}',
                                 style: TextStyle(
@@ -234,7 +226,6 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                                 ),
                               ),
                               const SizedBox(height: 4),
-                              // Title
                               Text(
                                 community.title,
                                 style: TextStyle(
@@ -255,82 +246,138 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                                 ),
                               ],
                               const SizedBox(height: 16),
-                              // Join Button row
+
+                              // ─── Join / Leave / Pending / Founder buttons ───
                               Row(
                                 children: [
                                   Expanded(
-                                    child: isMember
-                                        ? OutlinedButton.icon(
-                                            onPressed: _joiningOrLeaving ? null : () async {
-                                              final confirm = await showDialog<bool>(
-                                                context: context,
-                                                builder: (ctx) => AlertDialog(
-                                                  title: Text(t.community.leave_title),
-                                                  content: Text(t.community.leave_confirm),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () => Navigator.pop(ctx, false),
-                                                      child: Text(t.community.cancel),
-                                                    ),
-                                                    TextButton(
-                                                      onPressed: () => Navigator.pop(ctx, true),
-                                                      child: Text(t.community.leave, style: const TextStyle(color: Colors.red)),
-                                                    ),
-                                                  ],
+                                    child: community.isCreator
+                                        // ponytail: creators can't leave — backend 403 enforces; chip is just the UX signal
+                                        ? Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                            decoration: BoxDecoration(
+                                              color: context.colors.primary.withValues(alpha: 0.1),
+                                              borderRadius: BorderRadius.circular(20),
+                                              border: Border.all(color: context.colors.primary.withValues(alpha: 0.3)),
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Icon(Icons.star_rounded, size: 14, color: context.colors.primary),
+                                                const SizedBox(width: 6),
+                                                Text(
+                                                  'مؤسس المجتمع',
+                                                  style: TextStyle(
+                                                    color: context.colors.primary,
+                                                    fontSize: 13,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
                                                 ),
-                                              );
-                                              if (confirm != true) return;
-
-                                              setState(() {
-                                                _isMemberOverride = false;
-                                                _joiningOrLeaving = true;
-                                              });
-                                              try {
-                                                await ref.read(socialRepositoryProvider).leaveCommunity(widget.communitySlug);
-                                                await ref.refresh(communityProvider(widget.communitySlug).future);
-                                                ref.refresh(communitiesProvider);
-                                              } catch (e) {
-                                                if (mounted) setState(() => _isMemberOverride = null);
-                                              } finally {
-                                                if (mounted) setState(() => _joiningOrLeaving = false);
-                                              }
-                                            },
-                                            icon: _joiningOrLeaving
-                                                ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
-                                                : const Icon(Icons.check, size: 16),
-                                            label: Text(_joiningOrLeaving ? '...' : t.community.joined_checkmark),
-                                            style: OutlinedButton.styleFrom(
-                                              foregroundColor: context.colors.textSecondary,
-                                              side: BorderSide(color: context.colors.border),
-                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                                              padding: const EdgeInsets.symmetric(vertical: 10),
+                                              ],
                                             ),
                                           )
-                                        : FilledButton(
-                                            onPressed: _joiningOrLeaving ? null : () async {
-                                              setState(() {
-                                                _isMemberOverride = true;
-                                                _joiningOrLeaving = true;
-                                              });
-                                              try {
-                                                await ref.read(socialRepositoryProvider).joinCommunity(widget.communitySlug);
-                                                await ref.refresh(communityProvider(widget.communitySlug).future);
-                                                ref.refresh(communitiesProvider);
-                                              } catch (e) {
-                                                if (mounted) setState(() => _isMemberOverride = null);
-                                              } finally {
-                                                if (mounted) setState(() => _joiningOrLeaving = false);
-                                              }
-                                            },
-                                            style: FilledButton.styleFrom(
-                                              backgroundColor: context.colors.primary,
-                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                                              padding: const EdgeInsets.symmetric(vertical: 10),
-                                            ),
-                                            child: _joiningOrLeaving
-                                                ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                                                : Text(t.community.join),
-                                          ),
+                                        : isMember
+                                            ? OutlinedButton.icon(
+                                                onPressed: _joiningOrLeaving ? null : () async {
+                                                  final confirm = await showDialog<bool>(
+                                                    context: context,
+                                                    builder: (ctx) => AlertDialog(
+                                                      title: Text(t.community.leave_title),
+                                                      content: Text(t.community.leave_confirm),
+                                                      actions: [
+                                                        TextButton(
+                                                          onPressed: () => Navigator.pop(ctx, false),
+                                                          child: Text(t.community.cancel),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () => Navigator.pop(ctx, true),
+                                                          child: Text(t.community.leave, style: const TextStyle(color: Colors.red)),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                  if (confirm != true) return;
+
+                                                  setState(() {
+                                                    _isMemberOverride = false;
+                                                    _joiningOrLeaving = true;
+                                                  });
+                                                  try {
+                                                    await ref.read(socialRepositoryProvider).leaveCommunity(widget.communitySlug);
+                                                    ref.invalidate(communitiesProvider);
+                                                    await ref.refresh(communityProvider(widget.communitySlug).future).then<void>((_) {});
+                                                  } catch (e) {
+                                                    if (mounted) setState(() => _isMemberOverride = null);
+                                                  } finally {
+                                                    if (mounted) setState(() => _joiningOrLeaving = false);
+                                                  }
+                                                },
+                                                icon: _joiningOrLeaving
+                                                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                                                    : const Icon(Icons.check, size: 16),
+                                                label: Text(_joiningOrLeaving ? '...' : t.community.joined_checkmark),
+                                                style: OutlinedButton.styleFrom(
+                                                  foregroundColor: context.colors.textSecondary,
+                                                  side: BorderSide(color: context.colors.border),
+                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                                ),
+                                              )
+                                            : isPending
+                                                ? OutlinedButton.icon(
+                                                    onPressed: _joiningOrLeaving ? null : () async {
+                                                      // Tap again to cancel pending request (toggle endpoint)
+                                                      setState(() => _joiningOrLeaving = true);
+                                                      try {
+                                                        final result = await ref.read(socialRepositoryProvider).joinCommunity(widget.communitySlug);
+                                                        setState(() {
+                                                          _isMemberOverride = result['joined'];
+                                                          _isPendingOverride = result['pending'];
+                                                        });
+                                                        ref.invalidate(communitiesProvider);
+                                                      } catch (e) {
+                                                        if (mounted) setState(() => _isPendingOverride = null);
+                                                      } finally {
+                                                        if (mounted) setState(() => _joiningOrLeaving = false);
+                                                      }
+                                                    },
+                                                    icon: _joiningOrLeaving
+                                                        ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                                                        : const Icon(Icons.schedule, size: 16),
+                                                    label: Text(_joiningOrLeaving ? '...' : 'تم إرسال الطلب'),
+                                                    style: OutlinedButton.styleFrom(
+                                                      foregroundColor: context.colors.textMuted,
+                                                      side: BorderSide(color: context.colors.border),
+                                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                                      padding: const EdgeInsets.symmetric(vertical: 10),
+                                                    ),
+                                                  )
+                                                : FilledButton(
+                                                    onPressed: _joiningOrLeaving ? null : () async {
+                                                      setState(() => _joiningOrLeaving = true);
+                                                      try {
+                                                        final result = await ref.read(socialRepositoryProvider).joinCommunity(widget.communitySlug);
+                                                        setState(() {
+                                                          _isMemberOverride = result['joined'];
+                                                          _isPendingOverride = result['pending'];
+                                                        });
+                                                        ref.invalidate(communitiesProvider);
+                                                        await ref.refresh(communityProvider(widget.communitySlug).future).then<void>((_) {});
+                                                      } catch (e) {
+                                                        if (mounted) setState(() { _isMemberOverride = null; _isPendingOverride = null; });
+                                                      } finally {
+                                                        if (mounted) setState(() => _joiningOrLeaving = false);
+                                                      }
+                                                    },
+                                                    style: FilledButton.styleFrom(
+                                                      backgroundColor: context.colors.primary,
+                                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                                      padding: const EdgeInsets.symmetric(vertical: 10),
+                                                    ),
+                                                    child: _joiningOrLeaving
+                                                        ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                                                        : Text(t.community.join),
+                                                  ),
                                   ),
                                 ],
                               ),
@@ -343,6 +390,43 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                     ),
                   ),
                 ),
+
+                // ─── Inline post creation box (Bug 3A) ───
+                if (isMember || community.isCreator)
+                  SliverToBoxAdapter(
+                    child: GestureDetector(
+                      onTap: () => context.pushRoute(CreatePostRoute(
+                        type: PostCreationType.community,
+                        preselectedCommunityId: community.id,
+                      )),
+                      child: Container(
+                        margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: context.colors.surface,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: context.colors.border.withValues(alpha: 0.6)),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.edit_note_outlined, size: 22, color: context.colors.textMuted),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                'ما الذي يدور في ذهنك؟',
+                                style: TextStyle(
+                                  color: context.colors.textMuted.withValues(alpha: 0.7),
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Icon(Icons.image_outlined, size: 20, color: context.colors.textMuted),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
 
                 // ─── Post feed ───
                 postsState.when(
@@ -408,13 +492,18 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.error_outline, color: context.colors.error, size: 48),
+                Icon(Icons.error_outline, size: 48, color: context.colors.error),
+                const SizedBox(height: 12),
+                Text(
+                  err.toString(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: context.colors.textMuted, fontSize: 13),
+                ),
                 const SizedBox(height: 16),
-                Text(err.toString(), style: TextStyle(color: context.colors.textMuted)),
-                const SizedBox(height: 16),
-                ElevatedButton(
+                FilledButton(
                   onPressed: () => ref.invalidate(communityProvider(widget.communitySlug)),
-                  child: Text(t.common.retry),
+                  style: FilledButton.styleFrom(backgroundColor: context.colors.primary),
+                  child: const Text('إعادة المحاولة'),
                 ),
               ],
             ),
@@ -455,6 +544,10 @@ class _CommunitySettingsSheetState extends State<_CommunitySettingsSheet> {
   bool _loadingMembers = true;
   final _memberSearchCtrl = TextEditingController();
 
+  // ─── Pending requests state ───
+  List<Map<String, dynamic>> _pendingRequests = [];
+  bool _loadingPending = false;
+
   @override
   void initState() {
     super.initState();
@@ -466,6 +559,7 @@ class _CommunitySettingsSheetState extends State<_CommunitySettingsSheet> {
     _bannerUrl = widget.community.bannerUrl;
 
     _loadMembers();
+    _loadPendingRequests();
     _memberSearchCtrl.addListener(_filterMembers);
   }
 
@@ -497,6 +591,61 @@ class _CommunitySettingsSheetState extends State<_CommunitySettingsSheet> {
     }
   }
 
+  Future<void> _loadPendingRequests() async {
+    if (!mounted) return;
+    setState(() => _loadingPending = true);
+    try {
+      final res = await MedusaClient.instance.get(
+        '/store/social/communities/${widget.community.slug}/pending-requests',
+      );
+      if (mounted) {
+        final list = res.data['requests'] as List<dynamic>? ?? [];
+        setState(() => _pendingRequests = list.cast<Map<String, dynamic>>());
+      }
+    } catch (_) {
+    } finally {
+      if (mounted) setState(() => _loadingPending = false);
+    }
+  }
+
+  Future<void> _acceptPendingRequest(String memberId) async {
+    try {
+      await MedusaClient.instance.post(
+        '/store/social/communities/${widget.community.slug}/pending-requests/$memberId',
+      );
+      if (!mounted) return;
+      setState(() => _pendingRequests.removeWhere((m) => m['customerId'] == memberId));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تم قبول الطلب بنجاح'), backgroundColor: Colors.green),
+      );
+      widget.ref.invalidate(communityProvider(widget.community.slug));
+      _loadMembers();
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('فشل قبول الطلب'), backgroundColor: Colors.red),
+      );
+    }
+  }
+
+  Future<void> _rejectPendingRequest(String memberId) async {
+    try {
+      await MedusaClient.instance.delete(
+        '/store/social/communities/${widget.community.slug}/pending-requests/$memberId',
+      );
+      if (!mounted) return;
+      setState(() => _pendingRequests.removeWhere((m) => m['customerId'] == memberId));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تم رفض الطلب'), backgroundColor: Colors.orange),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('فشل رفض الطلب'), backgroundColor: Colors.red),
+      );
+    }
+  }
+
   void _filterMembers() {
     final query = _memberSearchCtrl.text.trim().toLowerCase();
     if (query.isEmpty) {
@@ -517,12 +666,14 @@ class _CommunitySettingsSheetState extends State<_CommunitySettingsSheet> {
       await MedusaClient.instance.delete(
         '/store/social/communities/${widget.community.slug}/members/$memberId',
       );
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('تم إزالة العضو بنجاح'), backgroundColor: Colors.green),
       );
       _loadMembers();
       widget.ref.invalidate(communityProvider(widget.community.slug));
     } catch (_) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('فشل إزالة العضو'), backgroundColor: Colors.red),
       );
@@ -570,12 +721,14 @@ class _CommunitySettingsSheetState extends State<_CommunitySettingsSheet> {
         '/store/social/communities/${widget.community.slug}/members/$memberId/ban',
         data: {'reason': reasonController.text.trim()},
       );
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('تم حظر العضو بنجاح'), backgroundColor: Colors.green),
       );
       _loadMembers();
       widget.ref.invalidate(communityProvider(widget.community.slug));
     } catch (_) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('فشل حظر العضو'), backgroundColor: Colors.red),
       );
@@ -587,12 +740,14 @@ class _CommunitySettingsSheetState extends State<_CommunitySettingsSheet> {
       await MedusaClient.instance.delete(
         '/store/social/communities/${widget.community.slug}/members/$memberId/ban',
       );
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('تم إلغاء حظر العضو بنجاح'), backgroundColor: Colors.green),
       );
       _loadMembers();
       widget.ref.invalidate(communityProvider(widget.community.slug));
     } catch (_) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('فشل إلغاء الحظر'), backgroundColor: Colors.red),
       );
@@ -605,11 +760,7 @@ class _CommunitySettingsSheetState extends State<_CommunitySettingsSheet> {
     if (file == null) return;
 
     setState(() {
-      if (isBanner) {
-        _uploadingBanner = true;
-      } else {
-        _uploadingIcon = true;
-      }
+      if (isBanner) { _uploadingBanner = true; } else { _uploadingIcon = true; }
       _error = null;
     });
 
@@ -629,11 +780,7 @@ class _CommunitySettingsSheetState extends State<_CommunitySettingsSheet> {
       final urls = (uploadRes.data['urls'] as List<dynamic>?)?.map((u) => u.toString()).toList() ?? [];
       if (urls.isNotEmpty) {
         setState(() {
-          if (isBanner) {
-            _bannerUrl = urls.first;
-          } else {
-            _iconUrl = urls.first;
-          }
+          if (isBanner) { _bannerUrl = urls.first; } else { _iconUrl = urls.first; }
         });
       }
     } catch (e) {
@@ -656,7 +803,7 @@ class _CommunitySettingsSheetState extends State<_CommunitySettingsSheet> {
 
     try {
       final isDefault = widget.community.slug == 'general' || widget.community.slug == 'product-questions';
-      
+
       final updated = await widget.ref.read(socialRepositoryProvider).updateCommunity(
         widget.community.slug,
         name: isDefault ? null : _nameCtrl.text.trim(),
@@ -670,9 +817,9 @@ class _CommunitySettingsSheetState extends State<_CommunitySettingsSheet> {
       if (mounted) {
         final newSlug = updated.slug;
         widget.ref.invalidate(communityProvider(widget.community.slug));
-        
+
         Navigator.pop(context);
-        
+
         if (newSlug != widget.community.slug) {
           context.router.replace(CommunityRoute(communitySlug: newSlug));
         } else {
@@ -691,25 +838,24 @@ class _CommunitySettingsSheetState extends State<_CommunitySettingsSheet> {
     }
   }
 
+  // Bug 7 fix: check real avatarUrl before falling back to DiceBear
   Widget _memberAvatar(dynamic member) {
-    final style = member['avatarStyle'] as String? ?? 'big-smile';
-    final seed = member['avatarSeed'] as String? ?? member['customerId'] as String? ?? 'Felix';
-    final avatarUrl = 'https://api.dicebear.com/9.x/$style/png?seed=$seed&size=64';
-    
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: context.colors.surfaceVariant,
-        border: Border.all(color: context.colors.border),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: CachedNetworkImage(
-        imageUrl: avatarUrl,
-        fit: BoxFit.cover,
-        errorWidget: (_, __, ___) => Icon(Icons.person_outline, color: context.colors.textMuted, size: 20),
-      ),
+    return UserAvatar(
+      fallbackSeed: member['customerId'] as String? ?? 'anon',
+      avatarUrl: member['avatarUrl'] as String?,
+      avatarStyle: member['avatarStyle'] as String?,
+      avatarSeed: member['avatarSeed'] as String?,
+      size: 40,
+    );
+  }
+
+  Widget _pendingAvatar(Map<String, dynamic> member) {
+    return UserAvatar(
+      fallbackSeed: member['customerId'] as String? ?? 'anon',
+      avatarUrl: member['avatarUrl'] as String?,
+      avatarStyle: member['avatarStyle'] as String?,
+      avatarSeed: member['avatarSeed'] as String?,
+      size: 40,
     );
   }
 
@@ -718,13 +864,13 @@ class _CommunitySettingsSheetState extends State<_CommunitySettingsSheet> {
     final isDefault = widget.community.slug == 'general' || widget.community.slug == 'product-questions';
 
     return Container(
-      height: MediaQuery.of(context).size.height * 0.80,
+      height: MediaQuery.of(context).size.height * 0.85,
       decoration: BoxDecoration(
         color: context.colors.background,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: DefaultTabController(
-        length: 2,
+        length: 3,
         child: Column(
           children: [
             const SizedBox(height: 12),
@@ -759,20 +905,24 @@ class _CommunitySettingsSheetState extends State<_CommunitySettingsSheet> {
                 ],
               ),
             ),
-            
+
             TabBar(
+              isScrollable: true,
               labelColor: context.colors.primary,
               unselectedLabelColor: context.colors.textMuted,
               indicatorColor: context.colors.primary,
+              tabAlignment: TabAlignment.start,
               tabs: const [
-                Tab(text: 'الإعدادات العامة'),
-                Tab(text: 'الأعضاء والمشرفين'),
+                Tab(text: 'الإعدادات'),
+                Tab(text: 'الأعضاء'),
+                Tab(text: 'طلبات الانضمام'),
               ],
             ),
-            
+
             Expanded(
               child: TabBarView(
                 children: [
+                  // ─── Tab 1: General Settings ───
                   Form(
                     key: _formKey,
                     child: SingleChildScrollView(
@@ -898,7 +1048,7 @@ class _CommunitySettingsSheetState extends State<_CommunitySettingsSheet> {
                             title: const Text('مجتمع خاص', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                             subtitle: const Text('عند تفعيل هذا الخيار، سيتمكن الأعضاء الموافق عليهم فقط من رؤية المشاركات والمحتوى.', style: TextStyle(fontSize: 11)),
                             contentPadding: EdgeInsets.zero,
-                            activeColor: context.colors.primary,
+                            activeThumbColor: context.colors.primary,
                           ),
                           const SizedBox(height: 24),
 
@@ -920,7 +1070,8 @@ class _CommunitySettingsSheetState extends State<_CommunitySettingsSheet> {
                       ),
                     ),
                   ),
-                  
+
+                  // ─── Tab 2: Members ───
                   Column(
                     children: [
                       Padding(
@@ -942,7 +1093,7 @@ class _CommunitySettingsSheetState extends State<_CommunitySettingsSheet> {
                           ),
                         ),
                       ),
-                      
+
                       Expanded(
                         child: _loadingMembers
                             ? Center(child: CircularProgressIndicator(color: context.colors.primary))
@@ -980,20 +1131,11 @@ class _CommunitySettingsSheetState extends State<_CommunitySettingsSheet> {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             if (username.isNotEmpty)
-                                              Text(
-                                                '@$username',
-                                                style: TextStyle(color: context.colors.textMuted, fontSize: 11),
-                                              ),
+                                              Text('@$username', style: TextStyle(color: context.colors.textMuted, fontSize: 11)),
                                             if (isOwner)
-                                              Text(
-                                                'مؤسس المجتمع (Owner)',
-                                                style: TextStyle(color: context.colors.primary, fontSize: 10, fontWeight: FontWeight.bold),
-                                              )
+                                              Text('مؤسس المجتمع (Owner)', style: TextStyle(color: context.colors.primary, fontSize: 10, fontWeight: FontWeight.bold))
                                             else if (isBanned)
-                                              Text(
-                                                'محظور: ${banReason ?? "لا يوجد سبب"}',
-                                                style: const TextStyle(color: Colors.red, fontSize: 10, fontWeight: FontWeight.w600),
-                                              ),
+                                              Text('محظور: ${banReason ?? "لا يوجد سبب"}', style: const TextStyle(color: Colors.red, fontSize: 10, fontWeight: FontWeight.w600)),
                                           ],
                                         ),
                                         trailing: isOwner
@@ -1021,6 +1163,107 @@ class _CommunitySettingsSheetState extends State<_CommunitySettingsSheet> {
                                                   ],
                                                 ],
                                               ),
+                                      );
+                                    },
+                                  ),
+                      ),
+                    ],
+                  ),
+
+                  // ─── Tab 3: Pending Join Requests (Bug 3B) ───
+                  Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'طلبات الانضمام المعلقة',
+                              style: TextStyle(
+                                color: context.colors.textPrimary,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            if (_pendingRequests.isNotEmpty)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: context.colors.primary.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  '${_pendingRequests.length}',
+                                  style: TextStyle(color: context.colors.primary, fontSize: 12, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            IconButton(
+                              icon: Icon(Icons.refresh, size: 18, color: context.colors.textMuted),
+                              onPressed: _loadPendingRequests,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: _loadingPending
+                            ? Center(child: CircularProgressIndicator(color: context.colors.primary))
+                            : _pendingRequests.isEmpty
+                                ? Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.how_to_reg_outlined, size: 48, color: context.colors.textMuted.withValues(alpha: 0.4)),
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          widget.community.isPrivate
+                                              ? 'لا توجد طلبات انضمام معلقة'
+                                              : 'المجتمع عام — لا توجد طلبات',
+                                          style: TextStyle(color: context.colors.textMuted, fontSize: 13),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : ListView.separated(
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                    itemCount: _pendingRequests.length,
+                                    separatorBuilder: (_, __) => const Divider(height: 1),
+                                    itemBuilder: (ctx, idx) {
+                                      final m = _pendingRequests[idx];
+                                      final displayName = m['displayName'] as String? ?? '';
+                                      final username = m['username'] as String? ?? '';
+                                      final customerId = m['customerId'] as String;
+
+                                      return ListTile(
+                                        leading: _pendingAvatar(m),
+                                        title: Text(
+                                          displayName.isNotEmpty ? displayName : (username.isNotEmpty ? '@$username' : 'مستخدم'),
+                                          style: TextStyle(
+                                            color: context.colors.textPrimary,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        subtitle: username.isNotEmpty
+                                            ? Text('@$username', style: TextStyle(color: context.colors.textMuted, fontSize: 11))
+                                            : null,
+                                        trailing: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            // Accept button
+                                            IconButton(
+                                              icon: const Icon(Icons.check_circle_outline, color: Colors.green, size: 26),
+                                              tooltip: 'قبول الطلب',
+                                              onPressed: () => _acceptPendingRequest(customerId),
+                                            ),
+                                            // Reject button
+                                            IconButton(
+                                              icon: const Icon(Icons.cancel_outlined, color: Colors.red, size: 26),
+                                              tooltip: 'رفض الطلب',
+                                              onPressed: () => _rejectPendingRequest(customerId),
+                                            ),
+                                          ],
+                                        ),
                                       );
                                     },
                                   ),
