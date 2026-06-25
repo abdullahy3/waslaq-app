@@ -217,13 +217,21 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                                 ),
                               ),
                               const SizedBox(height: 2),
-                              Text(
-                                'r/${community.slug}',
-                                style: TextStyle(
-                                  color: context.colors.textPrimary,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w900,
-                                ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'r/${community.slug}',
+                                    style: TextStyle(
+                                      color: context.colors.textPrimary,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                  if (community.isOfficial) ...[
+                                    const SizedBox(width: 6),
+                                    Icon(Icons.verified_rounded, size: 20, color: context.colors.primary),
+                                  ],
+                                ],
                               ),
                               const SizedBox(height: 4),
                               Text(

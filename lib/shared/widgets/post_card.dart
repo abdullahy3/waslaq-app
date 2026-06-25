@@ -1,14 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/account/providers/account_providers.dart';
 import '../../features/social/data/models/social_models.dart';
 import '../theme/app_colors.dart';
 import '../../i18n/strings.g.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:waslaq_app/core/error/error_localizer.dart';
+import 'user_avatar.dart';
 
-class PostCard extends ConsumerWidget {
+// ponytail: StatelessWidget (not ConsumerWidget) so a bookmark toggle / savedItems
+// invalidation only rebuilds the one _BookmarkButton — not every card + its image.
+class PostCard extends StatelessWidget {
   final PostModel post;
   final VoidCallback? onTap;
   final void Function(String userId)? onAuthorTap;
@@ -34,14 +37,8 @@ class PostCard extends ConsumerWidget {
     return t.social.just_now;
   }
 
-  String _avatarUrl(String? style, String? seed) {
-    final s = (style != null && style.isNotEmpty) ? style : 'bottts';
-    final d = (seed != null && seed.isNotEmpty) ? seed : 'default';
-    return 'https://api.dicebear.com/7.x/$s/svg?seed=$d';
-  }
-
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -66,31 +63,39 @@ class PostCard extends ConsumerWidget {
                       color: context.colors.primary.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Text('r/${post.communitySlug}',
-                        style: TextStyle(color: context.colors.primary, fontSize: 11, fontWeight: FontWeight.w700)),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('r/${post.communitySlug}',
+                            style: TextStyle(color: context.colors.primary, fontSize: 11, fontWeight: FontWeight.w700)),
+                        if (post.communityIsOfficial) ...[
+                          const SizedBox(width: 3),
+                          Icon(Icons.verified_rounded, size: 11, color: context.colors.primary),
+                        ],
+                      ],
+                    ),
                   ),
                 ),
-              if (post.communitySlug.isNotEmpty) SizedBox(width: 8),
+              if (post.communitySlug.isNotEmpty) const SizedBox(width: 8),
               // Author
               GestureDetector(
                 onTap: () { if (post.author != null) onAuthorTap?.call(post.author!.customerId); },
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      width: 22, height: 22, color: context.colors.surfaceVariant,
-                      child: SvgPicture.network(_avatarUrl(post.author?.avatarStyle, post.author?.avatarSeed),
-                          width: 22, height: 22, placeholderBuilder: (_) => SizedBox()),
-                    ),
+                  UserAvatar(
+                    fallbackSeed: post.author?.customerId ?? 'anon',
+                    avatarUrl: post.author?.avatarUrl,
+                    avatarStyle: post.author?.avatarStyle,
+                    avatarSeed: post.author?.avatarSeed,
+                    size: 22,
                   ),
-                  SizedBox(width: 6),
+                  const SizedBox(width: 6),
                   Text(post.author?.displayName ?? 'Unknown',
                       style: TextStyle(color: context.colors.textSecondary, fontSize: 11, fontWeight: FontWeight.w500)),
                 ]),
               ),
-              SizedBox(width: 6),
+              const SizedBox(width: 6),
               Text('·', style: TextStyle(color: context.colors.textMuted.withValues(alpha: 0.5), fontSize: 10)),
-              SizedBox(width: 6),
+              const SizedBox(width: 6),
               Text(_timeAgo(post.createdAt),
                   style: TextStyle(color: context.colors.textMuted, fontSize: 10)),
             ]),
@@ -122,6 +127,7 @@ class PostCard extends ConsumerWidget {
                 child: Stack(children: [
                   CachedNetworkImage(
                     imageUrl: post.mediaUrls.first,
+                    memCacheWidth: 800,
                     height: 200, width: double.infinity, fit: BoxFit.cover,
                     placeholder: (_, __) => Container(height: 200, color: context.colors.surfaceVariant),
                     errorWidget: (_, __, ___) => Container(height: 200, color: context.colors.surfaceVariant,
@@ -132,7 +138,7 @@ class PostCard extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.7), borderRadius: BorderRadius.circular(12)),
                       child: Text('+${post.mediaUrls.length - 1}',
-                          style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                          style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
                     )),
                 ]),
               ),
@@ -187,10 +193,10 @@ class PostCard extends ConsumerWidget {
                   ),
                 ]),
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               // Comments
               _ActionChip(icon: Icons.chat_bubble_outline_rounded, label: t.social.comment_button, onTap: onTap),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               // Share
               _ActionChip(
                 icon: Icons.ios_share_rounded,
@@ -202,53 +208,67 @@ class PostCard extends ConsumerWidget {
                 },
               ),
               const Spacer(),
-              // Bookmark
-              ref.watch(savedItemsProvider).when(
-                data: (savedItems) {
-                  final isSaved = savedItems.isPostSaved(post.id);
-                  return GestureDetector(
-                    onTap: () async {
-                      try {
-                        final newSavedState = await ref.read(accountRepositoryProvider).toggleSave('post', post.id);
-                        ref.invalidate(savedItemsProvider);
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(newSavedState 
-                                ? t.settings.saved_ok 
-                                : (Localizations.localeOf(context).languageCode == 'ar' ? 'تمت الإزالة من المحفوظات' : 'Removed from saved items')),
-                              duration: const Duration(seconds: 2),
-                            ),
-                          );
-                        }
-                      } catch (e) {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(e.toString())),
-                          );
-                        }
-                      }
-                    },
-                    child: Icon(
-                      isSaved ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded,
-                      color: isSaved ? context.colors.primary : context.colors.textMuted.withValues(alpha: 0.6),
-                      size: 20,
-                    ),
-                  );
-                },
-                loading: () => SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: context.colors.primary),
-                ),
-                error: (_, __) => GestureDetector(
-                  onTap: () => ref.invalidate(savedItemsProvider),
-                  child: Icon(Icons.bookmark_outline_rounded, color: context.colors.textMuted.withValues(alpha: 0.6), size: 20),
-                ),
-              ),
+              // Bookmark — isolated so only it rebuilds on savedItems changes
+              _BookmarkButton(postId: post.id),
             ]),
           ),
         ]),
+      ),
+    );
+  }
+}
+
+// ponytail: own ConsumerWidget so savedItemsProvider rebuilds touch only this icon,
+// and loading/error show a static icon (no per-card CircularProgressIndicator repainting every frame).
+class _BookmarkButton extends ConsumerWidget {
+  final String postId;
+  const _BookmarkButton({required this.postId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final mutedIcon = Icon(
+      Icons.bookmark_outline_rounded,
+      color: context.colors.textMuted.withValues(alpha: 0.6),
+      size: 20,
+    );
+
+    return ref.watch(savedItemsProvider).when(
+      data: (savedItems) {
+        final isSaved = savedItems.isPostSaved(postId);
+        return GestureDetector(
+          onTap: () async {
+            try {
+              final newSavedState = await ref.read(accountRepositoryProvider).toggleSave('post', postId);
+              ref.invalidate(savedItemsProvider);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(newSavedState
+                      ? t.settings.saved_ok
+                      : (Localizations.localeOf(context).languageCode == 'ar' ? 'تمت الإزالة من المحفوظات' : 'Removed from saved items')),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              }
+            } catch (e) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(localizeError(e))),
+                );
+              }
+            }
+          },
+          child: Icon(
+            isSaved ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded,
+            color: isSaved ? context.colors.primary : context.colors.textMuted.withValues(alpha: 0.6),
+            size: 20,
+          ),
+        );
+      },
+      loading: () => mutedIcon,
+      error: (_, __) => GestureDetector(
+        onTap: () => ref.invalidate(savedItemsProvider),
+        child: mutedIcon,
       ),
     );
   }
@@ -290,7 +310,7 @@ class _ActionChip extends StatelessWidget {
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           Icon(icon, size: 14, color: context.colors.textMuted),
-          SizedBox(width: 4),
+          const SizedBox(width: 4),
           Text(label, style: TextStyle(color: context.colors.textMuted, fontSize: 11, fontWeight: FontWeight.w600)),
         ]),
       ),

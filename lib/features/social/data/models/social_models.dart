@@ -9,11 +9,13 @@ class CommunityModel {
   final String id, slug, name, title;
   final String? description;
   final bool isPrivate;
+  final bool isOfficial;
   final int memberCount;
   final String createdBy;
   final DateTime createdAt;
   final bool isMember;
   final bool isCreator;
+  final bool isPending;
   final String? iconUrl;
   final String? bannerUrl;
 
@@ -24,11 +26,13 @@ class CommunityModel {
     required this.title,
     this.description,
     required this.isPrivate,
+    this.isOfficial = false,
     required this.memberCount,
     required this.createdBy,
     required this.createdAt,
     required this.isMember,
     required this.isCreator,
+    this.isPending = false,
     this.iconUrl,
     this.bannerUrl,
   });
@@ -41,11 +45,13 @@ class CommunityModel {
       title: json['title'] as String,
       description: json['description'] as String?,
       isPrivate: json['isPrivate'] as bool? ?? false,
+      isOfficial: json['isOfficial'] as bool? ?? false,
       memberCount: json['memberCount'] as int? ?? 0,
       createdBy: json['createdBy'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       isMember: json['isMember'] as bool? ?? false,
       isCreator: json['isCreator'] as bool? ?? false,
+      isPending: json['isPending'] as bool? ?? false,
       iconUrl: json['iconUrl'] as String?,
       bannerUrl: json['bannerUrl'] as String?,
     );
@@ -79,6 +85,7 @@ class PostAuthor {
 
 class PostModel {
   final String id, title, content, contentType, authorId, communityId, communitySlug, communityName;
+  final bool communityIsOfficial;
   final int score;
   final int upvotes;
   final int downvotes;
@@ -98,6 +105,7 @@ class PostModel {
     required this.communityId,
     required this.communitySlug,
     required this.communityName,
+    this.communityIsOfficial = false,
     required this.score,
     required this.upvotes,
     required this.downvotes,
@@ -128,6 +136,7 @@ class PostModel {
       communityId: json['communityId'] as String,
       communitySlug: community?['slug'] as String? ?? '',
       communityName: community?['name'] as String? ?? '',
+      communityIsOfficial: community?['isOfficial'] as bool? ?? false,
       score: json['score'] as int? ?? 0,
       upvotes: json['upvotes'] as int? ?? 0,
       downvotes: json['downvotes'] as int? ?? 0,
@@ -149,6 +158,7 @@ class PostModel {
     String? communityId,
     String? communitySlug,
     String? communityName,
+    bool? communityIsOfficial,
     int? score,
     int? upvotes,
     int? downvotes,
@@ -168,6 +178,7 @@ class PostModel {
       communityId: communityId ?? this.communityId,
       communitySlug: communitySlug ?? this.communitySlug,
       communityName: communityName ?? this.communityName,
+      communityIsOfficial: communityIsOfficial ?? this.communityIsOfficial,
       score: score ?? this.score,
       upvotes: upvotes ?? this.upvotes,
       downvotes: downvotes ?? this.downvotes,
@@ -221,6 +232,7 @@ class CommentModel {
 class UserProfileModel {
   final String customerId, username, displayName, bio, avatarStyle, avatarSeed;
   final int followerCount;
+  final int followingCount;
   final bool isFollowing;
   final List<PostModel> recentPosts;
   final List<CommentModel> recentComments;
@@ -242,6 +254,7 @@ class UserProfileModel {
     required this.avatarStyle,
     required this.avatarSeed,
     required this.followerCount,
+    this.followingCount = 0,
     required this.isFollowing,
     required this.recentPosts,
     this.recentComments = const [],
@@ -280,6 +293,7 @@ class UserProfileModel {
       hobbies: (json['hobbies'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
       socialLinks: (json['socialLinks'] as Map<String, dynamic>?)?.map((k, v) => MapEntry(k, v.toString())) ?? {},
       followerCount: json['followerCount'] as int? ?? 0,
+      followingCount: json['followingCount'] as int? ?? 0,
       isFollowing: json['isFollowing'] as bool? ?? false,
       isPrivate: json['isPrivate'] as bool? ?? false,
       showActivityStatus: json['showActivityStatus'] as bool? ?? true,
@@ -297,6 +311,39 @@ class UserProfileModel {
       mediaPosts: (json['mediaPosts'] as List<dynamic>? ?? [])
           .map((e) => PostModel.fromJson(e as Map<String, dynamic>))
           .toList(),
+    );
+  }
+}
+
+/// Lightweight user row for follower / following lists and similar.
+class SocialUserLite {
+  final String customerId, displayName, username;
+  final String? avatarStyle, avatarSeed, avatarUrl;
+  final bool isFollowing, isMe;
+
+  const SocialUserLite({
+    required this.customerId,
+    required this.displayName,
+    required this.username,
+    this.avatarStyle,
+    this.avatarSeed,
+    this.avatarUrl,
+    this.isFollowing = false,
+    this.isMe = false,
+  });
+
+  factory SocialUserLite.fromJson(Map<String, dynamic> json) {
+    return SocialUserLite(
+      customerId: json['customerId'] as String? ?? '',
+      displayName: (json['displayName'] as String?)?.isNotEmpty == true
+          ? json['displayName'] as String
+          : (json['username'] as String? ?? ''),
+      username: json['username'] as String? ?? '',
+      avatarStyle: json['avatarStyle'] as String?,
+      avatarSeed: json['avatarSeed'] as String?,
+      avatarUrl: json['avatarUrl'] as String?,
+      isFollowing: json['isFollowing'] as bool? ?? false,
+      isMe: json['isMe'] as bool? ?? false,
     );
   }
 }
