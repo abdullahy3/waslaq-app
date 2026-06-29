@@ -17,6 +17,9 @@ import '../../data/repositories/vendor_repository.dart';
 import '../../providers/vendor_providers.dart';
 import '../../../../../i18n/strings.g.dart';
 import 'package:waslaq_app/core/error/error_localizer.dart';
+import '../../../account/ui/screens/dispute_detail_screen.dart';
+import '../../../account/data/models/dispute_model.dart';
+import 'vendor_registry_notice_dialog.dart';
 
 @RoutePage()
 class VendorDashboardScreen extends ConsumerStatefulWidget {
@@ -45,6 +48,13 @@ class _VendorDashboardScreenState extends ConsumerState<VendorDashboardScreen>
   void initState() {
     super.initState();
     _tab = TabController(length: _tabs.length, vsync: this);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        final res = await MedusaClient.instance.get('/store/vendors/me');
+        final agreed = res.data['vendor']?['ecommerce_registry_agreed'] ?? true;
+        if (!agreed && mounted) await showVendorRegistryNotice(context);
+      } catch (_) {}
+    });
   }
 
   @override
@@ -446,7 +456,9 @@ class _ProductsTabState extends ConsumerState<_ProductsTab> {
                       ),
                       SizedBox(height: 16),
                     ],
-                    ...products.map((p) => _ProductTile(product: p, ref: ref)),
+                    // ValueKey ties each tile's State (incl. its _deleting spinner) to the product
+                    // id, so removing one product can't recycle a sibling's delete-in-progress state.
+                    ...products.map((p) => _ProductTile(key: ValueKey(p.id), product: p, ref: ref)),
                   ],
                 ),
         ),
@@ -488,7 +500,7 @@ class _ProductsTabState extends ConsumerState<_ProductsTab> {
 class _ProductTile extends StatefulWidget {
   final VendorProduct product;
   final WidgetRef ref;
-  const _ProductTile({required this.product, required this.ref});
+  const _ProductTile({super.key, required this.product, required this.ref});
 
   @override
   State<_ProductTile> createState() => _ProductTileState();
@@ -502,11 +514,11 @@ class _ProductTileState extends State<_ProductTile> {
     final descCtrl = TextEditingController(text: widget.product.description ?? '');
     final priceCtrl = TextEditingController(
         text: widget.product.price?.toStringAsFixed(2) ?? '');
-    
+
     final skuCtrl = TextEditingController(text: widget.product.sku ?? '');
     final inventoryCtrl = TextEditingController(text: widget.product.manageInventory ? widget.product.inventoryQuantity.toString() : '');
     bool manageInventory = widget.product.manageInventory;
-    
+
     final digitalUrlCtrl = TextEditingController();
 
     // Existing image URLs from product
@@ -673,14 +685,14 @@ class _ProductTileState extends State<_ProductTile> {
                          uploadedUrls = await repo.uploadImages(newImages);
                       }
                       final allImageUrls = [...keptUrls, ...uploadedUrls];
-                      
+
                       String? finalDigitalUrl;
                       if (widget.product.productType == 'virtual') {
                         if (digitalUrlCtrl.text.trim().isNotEmpty) {
                         finalDigitalUrl = digitalUrlCtrl.text.trim();
                       }
                       }
-                      
+
                       final variantId = widget.product.variantId;
                       final allVariantIds = widget.product.allVariantIds;
                       await repo.updateProduct(
@@ -935,7 +947,7 @@ class _AddProductFormState extends ConsumerState<_AddProductForm> with Automatic
           _digitalUrlCtrl.text = uploaded.first;
         }
       }
-      
+
       await repo.createProduct(
         title: _titleCtrl.text.trim(),
         description: _descCtrl.text.trim(),
@@ -2440,6 +2452,27 @@ class _DisputesTabState extends State<_DisputesTab> {
     }
   }
 
+  void _openChat(VendorDispute d) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => DisputeDetailScreen(
+          isVendorView: true,
+          dispute: DisputeModel(
+            id: d.id,
+            orderId: d.orderId,
+            vendorId: '',
+            customerId: '',
+            disputeType: d.disputeType,
+            description: d.description,
+            status: d.status,
+            createdAt: d.createdAt,
+          ),
+        ),
+      ),
+    );
+  }
+
   Color _statusColor(String status) {
     if (status == 'open') return context.colors.error;
     if (status == 'vendor_responded') return context.colors.warning;
@@ -2457,88 +2490,6 @@ class _DisputesTabState extends State<_DisputesTab> {
       case 'resolved_release': return 'Resolved – Released';
       default: return status;
     }
-  }
-
-  Future<void> _respond(VendorDispute dispute) async {
-    final ctrl = TextEditingController(text: dispute.vendorResponse ?? '');
-    bool saving = false;
-    String? err;
-
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: context.colors.surface,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
-      builder: (ctx) => StatefulBuilder(builder: (ctx, set) => Padding(
-        padding: EdgeInsets.only(
-            bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
-            left: 16, right: 16, top: 20),
-        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Text(t.vendor_dashboard.respond_to_dispute,
-                style: TextStyle(color: context.colors.textPrimary,
-                    fontWeight: FontWeight.bold, fontSize: 16)),
-            IconButton(icon: Icon(Icons.close, color: context.colors.textSecondary),
-                onPressed: () => Navigator.pop(ctx)),
-          ]),
-          SizedBox(height: 4),
-          Text('${t.account.orders.replaceAll("s", "")}: ${dispute.orderId.substring(dispute.orderId.length > 8 ? dispute.orderId.length - 8 : 0)}',
-              style: TextStyle(color: context.colors.textMuted, fontSize: 12)),
-          SizedBox(height: 12),
-          if (err != null)
-            Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: context.colors.error.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8)),
-              child: Text(err!, style: TextStyle(color: context.colors.error, fontSize: 13))),
-          TextField(
-            controller: ctrl, maxLines: 5,
-            style: TextStyle(color: context.colors.textPrimary, fontSize: 13),
-            decoration: InputDecoration(
-              labelText: t.vendor_dashboard.your_response,
-              labelStyle: TextStyle(color: context.colors.textSecondary),
-              hintText: t.vendor_dashboard.explain_side_placeholder,
-              hintStyle: TextStyle(color: context.colors.textMuted, fontSize: 12),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-              enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: context.colors.border)),
-              contentPadding: const EdgeInsets.all(12),
-            ),
-          ),
-          SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: saving ? null : () async {
-                if (ctrl.text.trim().isEmpty) {
-                  set(() => err = t.vendor_dashboard.response_empty);
-                  return;
-                }
-                set(() { saving = true; err = null; });
-                try {
-                  await VendorRepository(MedusaClient.instance)
-                      .respondToDispute(dispute.id, ctrl.text.trim());
-                  _load();
-                  if (ctx.mounted) Navigator.pop(ctx);
-                } catch (e) {
-                  set(() { err = e.toString(); saving = false; });
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: context.colors.primary, foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  padding: const EdgeInsets.symmetric(vertical: 14)),
-              child: saving
-                  ? SizedBox(width: 20, height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                  : Text(t.vendor_dashboard.submit_response, style: TextStyle(fontWeight: FontWeight.bold)),
-            ),
-          ),
-        ]),
-      )),
-    );
-    ctrl.dispose();
   }
 
   @override
@@ -2570,82 +2521,71 @@ class _DisputesTabState extends State<_DisputesTab> {
         itemBuilder: (_, i) {
           final d = _disputes[i];
           final color = _statusColor(d.status);
-          return Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: context.colors.surface, borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: d.isOpen ? context.colors.error.withValues(alpha: 0.3) : context.colors.border)),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              // Header
-              Row(children: [
-                Icon(Icons.gavel_outlined, color: color, size: 20),
-                SizedBox(width: 8),
-                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(d.disputeType.replaceAll('_', ' ').toUpperCase(),
-                      style: TextStyle(color: context.colors.textPrimary,
-                          fontWeight: FontWeight.bold, fontSize: 13)),
-                  Text('${t.account.orders.replaceAll("s", "")}: ...${d.orderId.length > 8 ? d.orderId.substring(d.orderId.length - 8) : d.orderId}',
-                      style: TextStyle(color: context.colors.textSecondary, fontSize: 12)),
-                ])),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(20)),
-                  child: Text(_statusLabel(d.status),
-                      style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold)),
-                ),
-              ]),
-              if (d.description != null) ...[
-                SizedBox(height: 8),
-                Text('${t.auth.display_name}: ${d.description}', // "Customer" is general. Let's use Display Name or just customer description.
-                    style: TextStyle(color: context.colors.textSecondary, fontSize: 13)),
-              ],
-              if (d.vendorResponse != null) ...[
-                SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: context.colors.primary.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border(left: BorderSide(color: context.colors.primary, width: 3))),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(t.vendor_dashboard.your_response,
-                        style: TextStyle(color: context.colors.primary,
-                            fontSize: 11, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 4),
-                    Text(d.vendorResponse!, style: TextStyle(color: context.colors.textPrimary, fontSize: 13)),
-                  ]),
-                ),
-              ],
-              // Dates
-              SizedBox(height: 8),
-              Row(children: [
-                Text(t.vendor_dashboard.opened_date(date: '${d.createdAt.day}/${d.createdAt.month}/${d.createdAt.year}'),
-                    style: TextStyle(color: context.colors.textMuted, fontSize: 11)),
-                if (d.resolvedAt != null) ...[
-                  Text(' · ', style: TextStyle(color: context.colors.textMuted)),
-                  Text(t.vendor_dashboard.resolved_date(date: '${d.resolvedAt!.day}/${d.resolvedAt!.month}/${d.resolvedAt!.year}'),
-                      style: TextStyle(color: context.colors.textMuted, fontSize: 11)),
+          return InkWell(
+            onTap: () => _openChat(d),
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: context.colors.surface, borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: d.isOpen ? context.colors.error.withValues(alpha: 0.3) : context.colors.border)),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                // Header
+                Row(children: [
+                  Icon(Icons.gavel_outlined, color: color, size: 20),
+                  SizedBox(width: 8),
+                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(d.disputeType.replaceAll('_', ' ').toUpperCase(),
+                        style: TextStyle(color: context.colors.textPrimary,
+                            fontWeight: FontWeight.bold, fontSize: 13)),
+                    Text('${t.account.orders.replaceAll("s", "")}: ...${d.orderId.length > 8 ? d.orderId.substring(d.orderId.length - 8) : d.orderId}',
+                        style: TextStyle(color: context.colors.textSecondary, fontSize: 12)),
+                  ])),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(20)),
+                    child: Text(_statusLabel(d.status),
+                        style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold)),
+                  ),
+                ]),
+                if (d.description != null) ...[
+                  SizedBox(height: 8),
+                  Text(d.description!,
+                      style: TextStyle(color: context.colors.textSecondary, fontSize: 13),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis),
                 ],
-              ]),
-              // Respond button (only for open disputes without response)
-              if (d.isOpen) ...[
+                // Dates
+                SizedBox(height: 8),
+                Row(children: [
+                  Text(t.vendor_dashboard.opened_date(date: '${d.createdAt.day}/${d.createdAt.month}/${d.createdAt.year}'),
+                      style: TextStyle(color: context.colors.textMuted, fontSize: 11)),
+                  if (d.resolvedAt != null) ...[
+                    Text(' · ', style: TextStyle(color: context.colors.textMuted)),
+                    Text(t.vendor_dashboard.resolved_date(date: '${d.resolvedAt!.day}/${d.resolvedAt!.month}/${d.resolvedAt!.year}'),
+                        style: TextStyle(color: context.colors.textMuted, fontSize: 11)),
+                  ],
+                ]),
+                // Open chat button
                 SizedBox(height: 12),
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
-                    onPressed: () => _respond(d),
-                    icon: Icon(Icons.reply, size: 16),
-                    label: Text(d.vendorResponse != null ? t.vendor_dashboard.update_response : t.vendor_dashboard.respond,
-                        style: TextStyle(fontSize: 13)),
+                    onPressed: () => _openChat(d),
+                    icon: Icon(Icons.chat_bubble_outline, size: 16),
+                    label: Text(
+                      d.isOpen ? t.vendor_dashboard.respond : 'View Chat',
+                      style: TextStyle(fontSize: 13),
+                    ),
                     style: OutlinedButton.styleFrom(
                         foregroundColor: context.colors.primary,
                         side: BorderSide(color: context.colors.primary),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
                   ),
                 ),
-              ],
-            ]),
+              ]),
+            ),
           );
         },
       ),
