@@ -7,7 +7,6 @@ class FirebaseService {
   FirebaseService._();
 
   static final _auth = FirebaseAuth.instance;
-  static bool _googleInitialized = false; // unused, kept to avoid breaking main.dart
 
   static Stream<User?> get authStateChanges => _auth.authStateChanges();
   static User? get currentUser => _auth.currentUser;

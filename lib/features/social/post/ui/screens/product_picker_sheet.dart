@@ -256,6 +256,7 @@ class _ProductCard extends StatelessWidget {
                 child: product.thumbnail != null
                     ? CachedNetworkImage(
                         imageUrl: product.thumbnail!,
+                        memCacheWidth: 400,
                         fit: BoxFit.cover,
                         placeholder: (_, __) => Container(color: context.colors.surfaceVariant),
                         errorWidget: (_, __, ___) => Container(

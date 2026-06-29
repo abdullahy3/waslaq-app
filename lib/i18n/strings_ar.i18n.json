@@ -1908,7 +1908,15 @@
     "hours_short": "${n}س",
     "minutes_short": "${n}د",
     "now_short": "الآن",
-    "share_post": "شاهد هذا المنشور على واصلك: ${title}\n${url}"
+    "share_post": "شاهد هذا المنشور على واصلك: ${title}\n${url}",
+    "edit_post": "تعديل المنشور",
+    "delete_post": "حذف المنشور",
+    "delete_post_confirm": "هل أنت متأكد من حذف هذا المنشور؟ لا يمكن التراجع عن هذا الإجراء.",
+    "edit_title_hint": "العنوان",
+    "edit_content_hint": "النص (اختياري)",
+    "post_updated": "تم تحديث المنشور",
+    "post_deleted": "تم حذف المنشور",
+    "edit_empty_title": "لا يمكن ترك العنوان فارغاً"
   },
   "store": {
     "title": "المتجر",

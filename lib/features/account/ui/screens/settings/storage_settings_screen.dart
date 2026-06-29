@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:waslaq_app/i18n/strings.g.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:waslaq_app/shared/theme/app_colors.dart';
 import 'package:waslaq_app/core/auth/auth_notifier.dart';
 import 'package:waslaq_app/core/storage/isar_service.dart';
+import 'package:waslaq_app/core/error/error_localizer.dart';
 
 @RoutePage()
 class StorageSettingsScreen extends ConsumerStatefulWidget {
@@ -68,7 +68,7 @@ class _StorageSettingsScreenState extends ConsumerState<StorageSettingsScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to clear image cache: $e'), backgroundColor: context.colors.error),
+        SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
       );
     }
   }
@@ -84,7 +84,7 @@ class _StorageSettingsScreenState extends ConsumerState<StorageSettingsScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to clear recently viewed: $e'), backgroundColor: context.colors.error),
+        SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
       );
     }
   }
@@ -215,7 +215,7 @@ class _StorageSettingsScreenState extends ConsumerState<StorageSettingsScreen> {
                     subtitle: const Text('Completely wipes all local databases', style: TextStyle(fontSize: 10)),
                     onTap: () async {
                       await IsarService.clearAll();
-                      if (!mounted) return;
+                      if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Isar DB cleared successfully!'), backgroundColor: Colors.green),
                       );

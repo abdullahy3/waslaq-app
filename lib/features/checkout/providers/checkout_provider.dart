@@ -27,7 +27,7 @@ class CheckoutNotifier extends _$CheckoutNotifier {
   Future<void> submitAddress(ShippingAddress address, String email) async {
     final current = state;
     if (current == null) return;
-    
+
     try {
       await CheckoutRepository.setShippingAddress(current.cartId, address, email);
       final options = await CheckoutRepository.getShippingOptions(current.cartId);
@@ -47,12 +47,15 @@ class CheckoutNotifier extends _$CheckoutNotifier {
   Future<void> selectShipping(String optionId) async {
     final current = state;
     if (current == null) return;
-    
+
     try {
       await CheckoutRepository.selectShippingMethod(current.cartId, optionId);
-      await CheckoutRepository.initPaymentSession(current.cartId);
+      // Refresh cart so total in review screen includes shipping cost
+      await ref.read(cartProvider.notifier).refresh();
+      final clientSecret = await CheckoutRepository.initPaymentSession(current.cartId);
       state = current.copyWith(
         selectedShippingOptionId: optionId,
+        clientSecret: clientSecret,
         step: CheckoutStep.review,
         errorMessage: null,
       );

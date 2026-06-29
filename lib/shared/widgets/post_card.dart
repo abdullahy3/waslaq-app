@@ -9,6 +9,14 @@ import 'package:share_plus/share_plus.dart';
 import 'package:waslaq_app/core/error/error_localizer.dart';
 import 'user_avatar.dart';
 
+// Strips common markdown syntax so preview text is readable in card context.
+String _stripMarkdown(String s) => s
+    .replaceAllMapped(RegExp(r'\*\*(.+?)\*\*'), (m) => m[1]!)
+    .replaceAllMapped(RegExp(r'\*(.+?)\*'), (m) => m[1]!)
+    .replaceAllMapped(RegExp(r'\[(.+?)\]\(.+?\)'), (m) => m[1]!)
+    .replaceAll(RegExp(r'#{1,6} '), '')
+    .replaceAll('`', '');
+
 // ponytail: StatelessWidget (not ConsumerWidget) so a bookmark toggle / savedItems
 // invalidation only rebuilds the one _BookmarkButton — not every card + its image.
 class PostCard extends StatelessWidget {
@@ -91,6 +99,14 @@ class PostCard extends StatelessWidget {
                   const SizedBox(width: 6),
                   Text(post.author?.displayName ?? 'Unknown',
                       style: TextStyle(color: context.colors.textSecondary, fontSize: 11, fontWeight: FontWeight.w500)),
+                  // Admin / trusted-vendor badge (mirrors storefront PostItem)
+                  if (post.author?.isAdmin == true) ...[
+                    const SizedBox(width: 3),
+                    const Icon(Icons.verified_rounded, size: 13, color: Color(0xFFF59E0B)),
+                  ] else if (post.author?.isTrustedVendor == true) ...[
+                    const SizedBox(width: 3),
+                    const Icon(Icons.verified_rounded, size: 13, color: Color(0xFFEAB308)),
+                  ],
                 ]),
               ),
               const SizedBox(width: 6),
@@ -113,7 +129,7 @@ class PostCard extends StatelessWidget {
           if (post.contentType == 'TEXT' && post.content.isNotEmpty)
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 5, 14, 0),
-              child: Text(post.content,
+              child: Text(_stripMarkdown(post.content),
                   style: TextStyle(color: context.colors.textMuted, fontSize: 12, height: 1.4),
                   maxLines: 2, overflow: TextOverflow.ellipsis),
             ),

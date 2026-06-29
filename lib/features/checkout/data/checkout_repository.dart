@@ -11,7 +11,8 @@ class CheckoutRepository {
 
   static Future<void> setShippingAddress(
       String cartId, ShippingAddress address, String email) async {
-    await MedusaClient.instance.patch(
+    // Medusa v2 uses POST (not PATCH) to update carts
+    await MedusaClient.instance.post(
       '/store/carts/$cartId',
       data: {
         'shipping_address': address.toJson(),
@@ -39,12 +40,55 @@ class CheckoutRepository {
     );
   }
 
-  static Future<void> initPaymentSession(String cartId) async {
-    await MedusaClient.instance.post(
+  /// Initializes (or retrieves existing) Stripe payment session for the cart.
+  /// Returns the PaymentIntent clientSecret needed for flutter_stripe PaymentSheet.
+  ///
+  /// Medusa v2 requires two steps:
+  ///   1. POST /store/payment-collections  — create/get the collection
+  ///   2. POST /store/payment-collections/:id/payment-sessions  — init Stripe session
+  static Future<String> initPaymentSession(String cartId) async {
+    // Step 1: create or retrieve the payment collection for this cart
+    final colResponse = await MedusaClient.instance.post(
       '/store/payment-collections',
       data: {'cart_id': cartId},
     );
+
+    final collection = colResponse.data['payment_collection'] as Map<String, dynamic>?;
+    if (collection == null) {
+      throw Exception('Failed to create payment collection for cart $cartId');
+    }
+
+    final collectionId = collection['id'] as String?;
+    if (collectionId == null || collectionId.isEmpty) {
+      throw Exception('Payment collection ID missing');
+    }
+
+    // Step 2: initialize the Stripe payment session inside the collection
+    final sessionResponse = await MedusaClient.instance.post(
+      '/store/payment-collections/$collectionId/payment-sessions',
+      data: {'provider_id': 'pp_stripe_stripe'},
+    );
+
+    // Response: { payment_collection: { payment_sessions: [...] } }
+    final updatedCollection =
+        sessionResponse.data['payment_collection'] as Map<String, dynamic>?;
+    final sessions =
+        updatedCollection?['payment_sessions'] as List<dynamic>?;
+
+    if (sessions == null || sessions.isEmpty) {
+      throw Exception('No Stripe payment session returned for collection $collectionId');
+    }
+
+    final session = sessions.first as Map<String, dynamic>;
+    final data = session['data'] as Map<String, dynamic>?;
+    final clientSecret = data?['client_secret'] as String?;
+
+    if (clientSecret == null || clientSecret.isEmpty) {
+      throw Exception('Stripe clientSecret missing from payment session');
+    }
+
     CrashReporter.log('Payment session initialized for cart: $cartId');
+    return clientSecret;
   }
 
   static Future<Order> placeOrder(String cartId) async {
@@ -54,7 +98,7 @@ class CheckoutRepository {
     final type = response.data['type'] as String;
     if (type == 'order') {
       return Order.fromJson(
-        response.data['data'] as Map<String, dynamic>,
+        response.data['order'] as Map<String, dynamic>,
       );
     }
     throw Exception('Cart completion returned type=$type (expected "order")');

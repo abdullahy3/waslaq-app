@@ -61,6 +61,7 @@ class CommunityModel {
 class PostAuthor {
   final String customerId, username, displayName, avatarStyle, avatarSeed;
   final String? avatarUrl;
+  final bool isAdmin, isTrustedVendor;
 
   PostAuthor({
     required this.customerId,
@@ -69,6 +70,8 @@ class PostAuthor {
     required this.avatarStyle,
     required this.avatarSeed,
     this.avatarUrl,
+    this.isAdmin = false,
+    this.isTrustedVendor = false,
   });
 
   factory PostAuthor.fromJson(Map<String, dynamic> json) {
@@ -79,6 +82,8 @@ class PostAuthor {
       avatarStyle: json['avatarStyle'] as String? ?? '',
       avatarSeed: json['avatarSeed'] as String? ?? 'Felix',
       avatarUrl: json['avatarUrl'] as String?,
+      isAdmin: json['isAdmin'] as bool? ?? false,
+      isTrustedVendor: json['isTrustedVendor'] as bool? ?? false,
     );
   }
 }

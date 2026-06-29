@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/api/medusa_client.dart';
 import '../../../../router/app_router.dart';
 import '../../../../shared/theme/app_colors.dart';
+import '../../../../shared/widgets/user_avatar.dart';
 import '../../../../i18n/strings.g.dart';
 
 // Data models
@@ -28,7 +29,14 @@ class _CommunityHit {
 
 class _UserHit {
   final String id, displayName;
-  const _UserHit({required this.id, required this.displayName});
+  final String? avatarStyle, avatarSeed, avatarUrl;
+  const _UserHit({
+    required this.id,
+    required this.displayName,
+    this.avatarStyle,
+    this.avatarSeed,
+    this.avatarUrl,
+  });
 }
 
 class _PostHit {
@@ -61,8 +69,11 @@ class _SearchScreenState extends State<SearchScreen> {
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 400), () {
       setState(() => _query = value.trim());
-      if (value.trim().isNotEmpty) _performSearch(value.trim());
-      else setState(() { _products = []; _vendors = []; _communities = []; _users = []; _posts = []; });
+      if (value.trim().isNotEmpty) {
+        _performSearch(value.trim());
+      } else {
+        setState(() { _products = []; _vendors = []; _communities = []; _users = []; _posts = []; });
+      }
     });
   }
 
@@ -88,6 +99,9 @@ class _SearchScreenState extends State<SearchScreen> {
         )).toList();
         _users = ((d['users'] as List?) ?? []).map((e) => _UserHit(
           id: e['customerId'] ?? '', displayName: e['displayName'] ?? e['username'] ?? '',
+          avatarStyle: e['avatarStyle'] as String?,
+          avatarSeed: e['avatarSeed'] as String?,
+          avatarUrl: e['avatarUrl'] as String?,
         )).toList();
         _posts = ((d['posts'] as List?) ?? []).map((e) => _PostHit(
           id: e['id'] ?? '', title: e['title'] ?? '',
@@ -285,6 +299,7 @@ class _ProductCard extends StatelessWidget {
               child: hit.thumbnail != null && hit.thumbnail!.isNotEmpty
                   ? CachedNetworkImage(
                       imageUrl: hit.thumbnail!,
+                      memCacheWidth: 600,
                       fit: BoxFit.cover,
                       placeholder: (context, url) => Container(color: context.colors.surfaceVariant),
                       errorWidget: (context, url, error) => Container(color: context.colors.surfaceVariant),
@@ -351,6 +366,7 @@ class _VendorCard extends StatelessWidget {
               child: vendor.logoUrl != null && vendor.logoUrl!.isNotEmpty
                   ? CachedNetworkImage(
                       imageUrl: vendor.logoUrl!,
+                      memCacheWidth: 600,
                       fit: BoxFit.cover,
                       placeholder: (context, url) => Container(color: context.colors.surfaceVariant),
                       errorWidget: (context, url, error) => _buildPlaceholder(context),
@@ -478,19 +494,12 @@ class _UserCard extends StatelessWidget {
         child: Row(
           children: [
             const SizedBox(width: 4),
-            Container(
-              width: 72,
-              height: 72,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: context.colors.surfaceVariant,
-              ),
-              child: Center(
-                child: Text(
-                  user.displayName.isNotEmpty ? user.displayName[0].toUpperCase() : '?',
-                  style: TextStyle(color: context.colors.primary, fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-              ),
+            UserAvatar(
+              fallbackSeed: user.id,
+              avatarUrl: user.avatarUrl,
+              avatarStyle: user.avatarStyle,
+              avatarSeed: user.avatarSeed,
+              size: 72,
             ),
             const SizedBox(width: 12),
             Expanded(

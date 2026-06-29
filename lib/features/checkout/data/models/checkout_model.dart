@@ -12,6 +12,7 @@ enum CheckoutStep { address, shipping, review, processing, done, failed }
 
 class ShippingAddress {
   final String firstName, lastName, address1, city, phone;
+  final String countryCode;
   final String? province, postalCode, company;
   const ShippingAddress({
     required this.firstName,
@@ -19,6 +20,7 @@ class ShippingAddress {
     required this.address1,
     required this.city,
     required this.phone,
+    this.countryCode = 'ps',
     this.province,
     this.postalCode,
     this.company,
@@ -29,7 +31,7 @@ class ShippingAddress {
         'address_1': address1,
         'city': city,
         'phone': phone,
-        'country_code': 'ps',
+        'country_code': countryCode.toLowerCase(),
         if (province != null) 'province': province,
         if (postalCode != null) 'postal_code': postalCode,
         if (company != null) 'company': company,
@@ -55,6 +57,7 @@ class CheckoutSession {
   final String cartId;
   final double total;
   final String? paymentSessionId;
+  final String? clientSecret;
   final CheckoutStatus status;
   final ShippingAddress? shippingAddress;
   final String? selectedShippingOptionId;
@@ -66,6 +69,7 @@ class CheckoutSession {
     required this.cartId,
     required this.total,
     this.paymentSessionId,
+    this.clientSecret,
     required this.status,
     this.shippingAddress,
     this.selectedShippingOptionId,
@@ -73,11 +77,12 @@ class CheckoutSession {
     this.shippingOptions = const [],
     this.errorMessage,
   });
-  
+
   CheckoutSession copyWith({
     String? cartId,
     double? total,
     String? paymentSessionId,
+    String? clientSecret,
     CheckoutStatus? status,
     ShippingAddress? shippingAddress,
     String? selectedShippingOptionId,
@@ -89,6 +94,7 @@ class CheckoutSession {
       cartId: cartId ?? this.cartId,
       total: total ?? this.total,
       paymentSessionId: paymentSessionId ?? this.paymentSessionId,
+      clientSecret: clientSecret ?? this.clientSecret,
       status: status ?? this.status,
       shippingAddress: shippingAddress ?? this.shippingAddress,
       selectedShippingOptionId: selectedShippingOptionId ?? this.selectedShippingOptionId,
@@ -100,8 +106,6 @@ class CheckoutSession {
 }
 
 /// Mirrors the Medusa StoreOrder object.
-/// Field names confirmed from /store/orders/:id in the storefront's
-/// order confirmed page fetch at confirmed/page.tsx line 32.
 class Order {
   final String id;
   final String displayId;
@@ -122,7 +126,6 @@ class Order {
   factory Order.fromJson(Map<String, dynamic> json) {
     return Order(
       id: json['id'] as String,
-      // display_id is an int from Medusa — prefix with '#'
       displayId: '#${json['display_id']}',
       total: (json['total'] as num).toDouble(),
       status: json['status'] as String,
@@ -134,8 +137,6 @@ class Order {
   }
 }
 
-/// Mirrors StoreOrderLineItem.
-/// product_title confirmed as top-level field in line item components.
 class OrderItem {
   final String id;
   final String title;
@@ -153,7 +154,6 @@ class OrderItem {
 
   factory OrderItem.fromJson(Map<String, dynamic> json) => OrderItem(
         id: json['id'] as String,
-        // product_title is the Medusa v2 field for line items
         title: json['product_title'] as String? ??
             json['title'] as String? ??
             '',

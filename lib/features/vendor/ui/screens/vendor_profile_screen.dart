@@ -10,6 +10,7 @@ import '../../../../router/app_router.dart';
 import '../../../../i18n/strings.g.dart';
 import '../../../../shared/widgets/context_aware_scaffold.dart';
 import '../../../../features/social/post/providers/fab_context_provider.dart';
+import 'package:waslaq_app/core/error/error_localizer.dart';
 
 @RoutePage()
 class VendorProfileScreen extends ConsumerStatefulWidget {
@@ -54,9 +55,9 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> with 
       // Load Q&A, reviews, policy in parallel (safe — catch errors individually)
       dynamic qRes, rRes, pRes;
       await Future.wait([
-        MedusaClient.instance.get('/store/vendors/${widget.slug}/questions').then((r) => qRes = r).catchError((_) {}),
-        MedusaClient.instance.get('/store/vendors/${widget.slug}/review').then((r) => rRes = r).catchError((_) {}),
-        MedusaClient.instance.get('/store/vendors/${widget.slug}/policy').then((r) => pRes = r).catchError((_) {}),
+        MedusaClient.instance.get('/store/vendors/${widget.slug}/questions').then<void>((r) => qRes = r).catchError((_) {}),
+        MedusaClient.instance.get('/store/vendors/${widget.slug}/review').then<void>((r) => rRes = r).catchError((_) {}),
+        MedusaClient.instance.get('/store/vendors/${widget.slug}/policy').then<void>((r) => pRes = r).catchError((_) {}),
       ]);
       _questions = (qRes?.data['questions'] as List<dynamic>?) ?? [];
       _reviews = (rRes?.data['reviews'] as List<dynamic>?) ?? [];
@@ -99,7 +100,7 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> with 
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: context.colors.error),
+          SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
         );
       }
     }
@@ -143,11 +144,6 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> with 
       fabContext: FabContextData(storeSlug: widget.slug ?? ''),
       child: Scaffold(
         backgroundColor: context.colors.background,
-        floatingActionButton: const WaslaqFAB(),
-        floatingActionButtonLocation:
-            Directionality.of(context) == TextDirection.rtl
-                ? FloatingActionButtonLocation.startFloat
-                : FloatingActionButtonLocation.endFloat,
         body: RefreshIndicator(
         onRefresh: _loadVendor,
         child: NestedScrollView(
@@ -300,7 +296,6 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> with 
         final id = p['id'] as String?;
         final title = p['title'] as String? ?? '';
         final thumbnail = p['thumbnail'] as String?;
-        final handle = p['handle'] as String?;
         final variants = p['variants'] as List<dynamic>? ?? [];
         final firstPrice = variants.isNotEmpty
             ? ((variants[0] as Map<String, dynamic>)['prices'] as List<dynamic>?)?.firstOrNull

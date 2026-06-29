@@ -151,6 +151,8 @@ class _AccountTabIcon extends StatelessWidget {
         child: avatarUrl != null && avatarUrl!.isNotEmpty
             ? CachedNetworkImage(
                 imageUrl: avatarUrl!,
+                // ponytail: 26dp icon was decoding the full-size avatar; cap the texture
+                memCacheWidth: 80,
                 fit: BoxFit.cover,
                 width: 26,
                 height: 26,

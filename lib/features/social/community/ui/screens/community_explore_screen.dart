@@ -136,8 +136,8 @@ class _CommunityListTileState extends ConsumerState<_CommunityListTile> {
                 });
                 try {
                   await ref.read(socialRepositoryProvider).joinCommunity(community.slug);
-                  ref.refresh(communitiesProvider);
-                  ref.refresh(communityProvider(community.slug));
+                  ref.invalidate(communitiesProvider);
+                  ref.invalidate(communityProvider(community.slug));
                 } catch (e) {
                   if (mounted) setState(() => _isMemberOverride = null);
                 } finally {

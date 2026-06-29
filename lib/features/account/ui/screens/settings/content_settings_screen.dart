@@ -6,6 +6,7 @@ import 'package:waslaq_app/shared/theme/app_colors.dart';
 import 'package:waslaq_app/core/providers/preferences_provider.dart';
 import 'package:waslaq_app/features/vendor/providers/vendor_providers.dart';
 import 'package:waslaq_app/features/account/providers/account_providers.dart';
+import 'package:waslaq_app/core/error/error_localizer.dart';
 
 @RoutePage()
 class ContentSettingsScreen extends ConsumerStatefulWidget {
@@ -13,31 +14,6 @@ class ContentSettingsScreen extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<ContentSettingsScreen> createState() => _ContentSettingsScreenState();
-}
-
-class _ProfileField extends StatelessWidget {
-  final String label;
-  final TextEditingController controller;
-  final String? hint;
-
-  const _ProfileField({required this.label, required this.controller, this.hint});
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      style: TextStyle(color: context.colors.textPrimary),
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        hintStyle: TextStyle(color: context.colors.textMuted, fontSize: 13),
-        filled: true,
-        fillColor: context.colors.surface,
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: context.colors.border)),
-        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: context.colors.primary)),
-      ),
-    );
-  }
 }
 
 class _ContentSettingsScreenState extends ConsumerState<ContentSettingsScreen> {
@@ -90,7 +66,7 @@ class _ContentSettingsScreenState extends ConsumerState<ContentSettingsScreen> {
       });
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to set vacation mode: $e'), backgroundColor: context.colors.error),
+        SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
       );
     }
   }
@@ -304,7 +280,7 @@ class _ContentSettingsScreenState extends ConsumerState<ContentSettingsScreen> {
                 side: BorderSide(color: context.colors.border),
               ),
               child: SwitchListTile(
-                activeColor: context.colors.primary,
+                activeThumbColor: context.colors.primary,
                 title: const Text('Vacation Mode', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                 subtitle: const Text('When ON, your store shows a vacation banner and no new orders can be placed',
                     style: TextStyle(fontSize: 11)),

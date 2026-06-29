@@ -22,6 +22,7 @@ import '../../../social/providers/social_providers.dart';
 import '../../../../shared/widgets/post_card.dart';
 import '../../../social/data/models/social_models.dart';
 import '../../../../core/notifications/notification_bus.dart';
+import '../widgets/site_banners.dart';
 
 // ── Home-specific providers (small, fast fetches for the home feed) ──────────
 
@@ -53,6 +54,8 @@ class HomeScreen extends ConsumerWidget {
         child: Column(
           children: [
             const _WaslaqTopNav(),
+            const SiteAnnouncementBar(),
+            const SitePopupHost(),
             Expanded(
               child: RefreshIndicator(
                 color: context.colors.primary,
@@ -61,6 +64,7 @@ class HomeScreen extends ConsumerWidget {
                   ref.invalidate(productListProvider());
                   ref.invalidate(_homeFeedPostsProvider);
                   ref.invalidate(_homeStoresProvider);
+                  ref.invalidate(siteConfigProvider);
                 },
                 child: CustomScrollView(
                   slivers: [
@@ -713,11 +717,6 @@ class _WaslaqDrawerState extends ConsumerState<_WaslaqDrawer> {
     } catch (_) {}
   }
 
-  void _nav(Widget Function() routeBuilder) {
-    Navigator.pop(context);
-    context.router.push(routeBuilder() as PageRouteInfo);
-  }
-
   void _navRoute(PageRouteInfo route) {
     Navigator.pop(context);
     context.router.push(route);
@@ -935,45 +934,6 @@ class _WaslaqDrawerState extends ConsumerState<_WaslaqDrawer> {
   }
 }
 
-class _DrawerItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final Color? iconColor;
-  final Color? labelColor;
-  final String? badge;
-
-  const _DrawerItem({required this.icon, required this.label, required this.onTap, this.iconColor, this.labelColor, this.badge});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: Icon(icon, color: iconColor ?? context.colors.textPrimary, size: 20),
-      title: Row(
-        children: [
-          Text(label, style: TextStyle(color: labelColor ?? context.colors.textPrimary, fontSize: 14)),
-          if (badge != null) ...[
-            SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: context.colors.surfaceVariant,
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: context.colors.border),
-              ),
-              child: Text(badge!, style: TextStyle(color: context.colors.textMuted, fontSize: 10)),
-            ),
-          ],
-        ],
-      ),
-      onTap: onTap,
-      dense: true,
-      visualDensity: const VisualDensity(vertical: -1),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-    );
-  }
-}
-
 // ── Avatar dropdown — matches web UI ─────────────────────────────────────────
 
 class _AvatarDropdown extends ConsumerStatefulWidget {
@@ -1121,7 +1081,7 @@ class _HomeSectionHeader extends StatelessWidget {
             width: 3,
             height: 18,
             decoration: BoxDecoration(
-              color: context.colors.primary.withOpacity(0.7),
+              color: context.colors.primary.withValues(alpha: 0.7),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -1141,7 +1101,7 @@ class _HomeSectionHeader extends StatelessWidget {
               child: Text(
                 t.common.view_all,
                 style: TextStyle(
-                  color: context.colors.primary.withOpacity(0.8),
+                  color: context.colors.primary.withValues(alpha: 0.8),
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
                 ),
@@ -1273,6 +1233,7 @@ class _StoresSection extends ConsumerWidget {
                         child: logo != null
                             ? CachedNetworkImage(
                                 imageUrl: logo,
+                                memCacheWidth: 600,
                                 fit: BoxFit.cover,
                                 errorWidget: (_, __, ___) => Center(
                                   child: Text(

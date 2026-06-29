@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import '../api/medusa_client.dart';
 import '../storage/secure_storage.dart';
 import '../config/app_config.dart';

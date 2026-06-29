@@ -2,16 +2,15 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../../router/app_router.dart';
 import '../../../../../shared/theme/app_colors.dart';
 import '../../../../../i18n/strings.g.dart';
 import '../../../../../shared/widgets/post_card.dart';
 import '../../../../../shared/widgets/post_card_skeleton.dart';
 import '../../../providers/social_providers.dart';
-import '../../../data/models/social_models.dart';
 import '../../../../../core/auth/auth_notifier.dart';
 import '../../../../../core/api/social_client.dart';
+import 'package:waslaq_app/core/error/error_localizer.dart';
 
 @RoutePage()
 class FeedScreen extends ConsumerStatefulWidget {
@@ -163,7 +162,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                             Container(width: 28, height: 28,
                               decoration: BoxDecoration(shape: BoxShape.circle, color: colors[i % colors.length]),
                               child: icon != null
-                                  ? ClipOval(child: CachedNetworkImage(imageUrl: icon, width: 28, height: 28, fit: BoxFit.cover,
+                                  ? ClipOval(child: CachedNetworkImage(imageUrl: icon, memCacheWidth: 800, width: 28, height: 28, fit: BoxFit.cover,
                                       errorWidget: (_, __, ___) => _communityInitial(name)))
                                   : _communityInitial(name)),
                             SizedBox(width: 6),
@@ -235,7 +234,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                 child: Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
                   Icon(Icons.error_outline, color: context.colors.error, size: 48),
                   SizedBox(height: 12),
-                  Text(err.toString(), style: TextStyle(color: context.colors.textMuted, fontSize: 13)),
+                  Text(localizeError(err), style: TextStyle(color: context.colors.textMuted, fontSize: 13), textAlign: TextAlign.center),
                   SizedBox(height: 12),
                   ElevatedButton(
                     onPressed: () => ref.invalidate(feedPostsNotifierProvider(sort: _sort)),

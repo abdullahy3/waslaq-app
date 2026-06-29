@@ -20,6 +20,12 @@ subprojects {
 }
 
 subprojects {
+    configurations.all {
+        exclude(group = "com.google.android.gms", module = "play-services-tapandpay")
+    }
+}
+
+subprojects {
     val configureSubproject = {
         if (project.plugins.hasPlugin("com.android.library") || project.plugins.hasPlugin("com.android.application")) {
             val android = project.extensions.findByName("android")

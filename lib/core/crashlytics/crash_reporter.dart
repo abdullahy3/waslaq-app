@@ -20,7 +20,16 @@ class CrashReporter {
     // Catch uncaught async errors outside Flutter framework
     PlatformDispatcher.instance.onError = (error, stack) {
       debugPrint('🚨 UNCAUGHT ASYNC ERROR: $error\n$stack');
-      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      // Routine connectivity drops (Stream Chat websocket, sockets, timeouts
+      // on flaky 3G) are expected churn — record as non-fatal so Crashlytics
+      // fatal stats stay meaningful.
+      final s = error.toString();
+      final isNetworkNoise = s.contains('SocketException') ||
+          s.contains('WebSocketChannelException') ||
+          s.contains('TimeoutException') ||
+          s.contains('HandshakeException');
+      FirebaseCrashlytics.instance
+          .recordError(error, stack, fatal: !isNetworkNoise);
       return false; // Return false so it is also logged to standard output
     };
   }

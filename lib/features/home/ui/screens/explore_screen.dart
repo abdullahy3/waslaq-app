@@ -3,7 +3,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -57,10 +56,8 @@ class ExploreScreen extends ConsumerStatefulWidget {
 class _ExploreScreenState extends ConsumerState<ExploreScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
-  late AnimationController _animationController;
-  late Animation<double> _animation;
 
-  // Lazy-init tracking for IndexedStack tabs
+  // Lazy-init tracking so a tab's providers don't fire until first viewed.
   int _currentTab = 0;
   final Set<int> _initializedTabs = {0};
 
@@ -69,16 +66,6 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(_onTabChanged);
-
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
-    _animation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOut,
-    );
-    _animationController.value = 1.0; // Start fully visible
   }
 
   void _onTabChanged() {
@@ -88,31 +75,13 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen>
       _currentTab = idx;
       _initializedTabs.add(idx);
     });
-    // Reset top bar on every tab switch
-    _animationController.forward();
   }
 
   @override
   void dispose() {
     _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
-    _animationController.dispose();
     super.dispose();
-  }
-
-  // Called by each tab's scroll listener with the user scroll direction.
-  void _onUserScroll(ScrollDirection direction) {
-    if (direction == ScrollDirection.reverse) {
-      // User is scrolling down — hide header
-      if (_animationController.value > 0 && !_animationController.isAnimating) {
-        _animationController.reverse();
-      }
-    } else if (direction == ScrollDirection.forward) {
-      // User is scrolling up — show header
-      if (_animationController.value < 1 && !_animationController.isAnimating) {
-        _animationController.forward();
-      }
-    }
   }
 
   Widget _buildTitleSearch(BuildContext context) {
@@ -163,75 +132,134 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen>
     return Scaffold(
       backgroundColor: context.colors.surfaceVariant,
       body: SafeArea(
-        child: NotificationListener<UserScrollNotification>(
-          onNotification: (notification) {
-            _onUserScroll(notification.direction);
-            return false;
-          },
-          child: Column(
-            children: [
-              // ─── Header (title+search static, tab chips sticky) ──
-              Container(
-                color: context.colors.background,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SizeTransition(
-                      sizeFactor: _animation,
-                      alignment: Alignment.topCenter,
-                      child: _buildTitleSearch(context),
-                    ),
-                    // Tab chips — always visible, never hides
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                            color: context.colors.border, width: 0.5),
-                      ),
-                    ),
-                    child: TabBar(
-                      controller: _tabController,
-                      labelColor: context.colors.primary,
-                      unselectedLabelColor: context.colors.textMuted,
-                      indicatorColor: context.colors.primary,
-                      indicatorWeight: 2.5,
-                      labelStyle: const TextStyle(
-                          fontWeight: FontWeight.w700, fontSize: 13),
-                      unselectedLabelStyle: const TextStyle(
-                          fontWeight: FontWeight.normal, fontSize: 13),
-                      tabs: [
-                        Tab(text: t.explore.products),
-                        Tab(text: t.explore.communities),
-                        Tab(text: t.explore.stores),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+        // NestedScrollView drives the collapsing header natively — no per-frame
+        // SizeTransition relayout of the list viewport (that was the scroll jank).
+        child: NestedScrollView(
+          floatHeaderSlivers: true,
+          headerSliverBuilder: (context, innerBoxIsScrolled) => [
+            // Title + search — floats away on scroll-down, snaps back on scroll-up.
+            SliverAppBar(
+              backgroundColor: context.colors.background,
+              surfaceTintColor: Colors.transparent,
+              elevation: 0,
+              scrolledUnderElevation: 0,
+              automaticallyImplyLeading: false,
+              floating: true,
+              snap: true,
+              toolbarHeight: 112,
+              flexibleSpace: _buildTitleSearch(context),
             ),
-
-            // ─── Tab content — IndexedStack keeps tabs alive ───────
-            Expanded(
-              child: IndexedStack(
-                index: _currentTab,
-                children: [
-                  _ProductsTab(
-                    initialized: _initializedTabs.contains(0),
-                  ),
-                  _CommunitiesTab(
-                    initialized: _initializedTabs.contains(1),
-                  ),
-                  _StoresTab(
-                    initialized: _initializedTabs.contains(2),
-                  ),
-                ],
+            // Tab chips — always pinned, never hides.
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _SliverTabBarDelegate(
+                background: context.colors.background,
+                borderColor: context.colors.border,
+                tabBar: TabBar(
+                  controller: _tabController,
+                  labelColor: context.colors.primary,
+                  unselectedLabelColor: context.colors.textMuted,
+                  indicatorColor: context.colors.primary,
+                  indicatorWeight: 2.5,
+                  labelStyle: const TextStyle(
+                      fontWeight: FontWeight.w700, fontSize: 13),
+                  unselectedLabelStyle: const TextStyle(
+                      fontWeight: FontWeight.normal, fontSize: 13),
+                  tabs: [
+                    Tab(text: t.explore.products),
+                    Tab(text: t.explore.communities),
+                    Tab(text: t.explore.stores),
+                  ],
+                ),
               ),
             ),
           ],
-        ),
+          // Swipe disabled to match the old IndexedStack (tap-only tab switch);
+          // _KeepAlive preserves each tab's state/scroll like IndexedStack did.
+          body: TabBarView(
+            controller: _tabController,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              _KeepAlive(
+                child: _ProductsTab(initialized: _initializedTabs.contains(0)),
+              ),
+              _KeepAlive(
+                child: _CommunitiesTab(initialized: _initializedTabs.contains(1)),
+              ),
+              _KeepAlive(
+                child: _StoresTab(initialized: _initializedTabs.contains(2)),
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+}
+
+// ─── Pinned TabBar header for the NestedScrollView ───────────────────────────
+
+class _SliverTabBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabBar tabBar;
+  final Color background;
+  final Color borderColor;
+
+  const _SliverTabBarDelegate({
+    required this.tabBar,
+    required this.background,
+    required this.borderColor,
+  });
+
+  static const double _height = 48;
+
+  @override
+  double get minExtent => _height;
+
+  @override
+  double get maxExtent => _height;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    // RepaintBoundary: pinned header is static, so cache it as a layer instead of
+    // re-rastering (saveLayer) it on every scroll frame as content moves under it.
+    return RepaintBoundary(
+      child: Container(
+        height: _height,
+        decoration: BoxDecoration(
+          color: background,
+          border: Border(bottom: BorderSide(color: borderColor, width: 0.5)),
+        ),
+        child: tabBar,
+      ),
+    );
+  }
+
+  @override
+  bool shouldRebuild(_SliverTabBarDelegate old) =>
+      tabBar != old.tabBar ||
+      background != old.background ||
+      borderColor != old.borderColor;
+}
+
+// ─── Keeps a TabBarView child alive (state + scroll) like IndexedStack did ────
+
+class _KeepAlive extends StatefulWidget {
+  final Widget child;
+  const _KeepAlive({required this.child});
+
+  @override
+  State<_KeepAlive> createState() => _KeepAliveState();
+}
+
+class _KeepAliveState extends State<_KeepAlive>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return widget.child;
   }
 }
 
@@ -458,6 +486,8 @@ class _ProductsTab extends ConsumerWidget {
               child: imageUrl != null && imageUrl.isNotEmpty
                   ? CachedNetworkImage(
                       imageUrl: imageUrl,
+                      // ponytail: cell renders ~308px on A55; 360 stays crisp at ~1/4 the memory of 600
+                      memCacheWidth: 360,
                       fit: BoxFit.cover,
                       width: double.infinity,
                       height: double.infinity,
@@ -757,7 +787,7 @@ class _PostSkeletonItem extends StatelessWidget {
 
 class _LoadMoreTrigger extends StatefulWidget {
   final VoidCallback onLoad;
-  const _LoadMoreTrigger({super.key, required this.onLoad});
+  const _LoadMoreTrigger({required this.onLoad});
 
   @override
   State<_LoadMoreTrigger> createState() => _LoadMoreTriggerState();
@@ -818,6 +848,7 @@ class _PostCreatorBox extends ConsumerWidget {
                 child: avatarUrl != null
                     ? CachedNetworkImage(
                         imageUrl: avatarUrl,
+                        memCacheWidth: 600,
                         fit: BoxFit.cover,
                         placeholder: (_, __) => Container(color: context.colors.surfaceVariant),
                         errorWidget: (_, __, ___) => Icon(Icons.person_outline, color: context.colors.textMuted, size: 20),
@@ -948,6 +979,7 @@ class _CommunityHorizontalList extends StatelessWidget {
                           child: iconUrl != null && iconUrl.isNotEmpty
                               ? CachedNetworkImage(
                                   imageUrl: iconUrl,
+                                  memCacheWidth: 600,
                                   fit: BoxFit.cover,
                                   placeholder: (_, __) => Container(color: context.colors.surfaceVariant),
                                   errorWidget: (_, __, ___) => _initialPlaceholder(context, name),
@@ -1630,12 +1662,10 @@ class _StoresTabState extends ConsumerState<_StoresTab> {
                   final title = p.title.toLowerCase();
                   final color = _colorFilter!.toLowerCase();
                   bool hasColor = title.contains(color);
-                  if (p.variants != null) {
-                    for (final v in p.variants!) {
-                      if (v.title?.toLowerCase().contains(color) ?? false) {
-                        hasColor = true;
-                        break;
-                      }
+                  for (final v in p.variants) {
+                    if (v.title?.toLowerCase().contains(color) ?? false) {
+                      hasColor = true;
+                      break;
                     }
                   }
                   if (!hasColor) return false;
@@ -1851,14 +1881,13 @@ class _PaginationArrowButton extends StatelessWidget {
 class _StoreCard extends ConsumerWidget {
   final Map<String, dynamic> store;
 
-  const _StoreCard({super.key, required this.store});
+  const _StoreCard({required this.store});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final name = store['store_name'] as String? ?? 'Store';
     final logo = store['logo_url'] as String?;
     final banner = store['banner_url'] as String?;
-    final id = store['id'] as String?;
     final category = store['category'] as String? ??
         store['store_category'] as String?;
     final slug = store['slug'] as String?;
@@ -1895,6 +1924,8 @@ class _StoreCard extends ConsumerWidget {
                     child: (banner != null && banner.isNotEmpty)
                         ? CachedNetworkImage(
                             imageUrl: banner,
+                            // ponytail: banner renders ~120dp wide; 330px texture vs 600 = ~3x less GPU upload
+                            memCacheWidth: 330,
                             fit: BoxFit.cover,
                             errorWidget: (_, __, ___) => _StoreFallbackBanner(name: name),
                           )
@@ -1923,6 +1954,8 @@ class _StoreCard extends ConsumerWidget {
                       child: (logo != null && logo.isNotEmpty)
                           ? CachedNetworkImage(
                               imageUrl: logo,
+                              // ponytail: logo renders 36dp; 110px texture vs 600 = ~30x less GPU upload
+                              memCacheWidth: 110,
                               fit: BoxFit.cover,
                               errorWidget: (_, __, ___) => _StoreLogoPlaceholder(name: name),
                             )
@@ -2106,7 +2139,7 @@ class _StoresFilterSheetState extends State<_StoresFilterSheet> {
             Text(t.explore.category, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
             const SizedBox(height: 6),
             DropdownButtonFormField<String?>(
-              value: _selectedCategoryId,
+              initialValue: _selectedCategoryId,
               dropdownColor: context.colors.surface,
               style: TextStyle(color: context.colors.textPrimary, fontSize: 14),
               decoration: InputDecoration(

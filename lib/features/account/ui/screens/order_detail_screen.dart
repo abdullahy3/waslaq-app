@@ -2,25 +2,35 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../shared/theme/app_colors.dart';
 import '../../../../i18n/strings.g.dart';
 import '../../data/models/order_model.dart';
+import '../../providers/dispute_providers.dart';
 
-class OrderDetailScreen extends StatelessWidget {
+class OrderDetailScreen extends ConsumerWidget {
   final OrderModel order;
   const OrderDetailScreen({super.key, required this.order});
 
   // Vendor flow is two-state (mirrors web order-tracking):
   //   vendor_sub_order.status 'shipped' => Delivered, anything else => Processing.
-  // Payment status is intentionally NOT shown — the web never surfaces it.
   bool get _delivered => order.fulfillmentStatus.toLowerCase() == 'shipped';
 
   // Timeline: Order Placed (0) -> Processing (1) -> Delivered (2).
-  // Delivered => step 2 (all filled); otherwise step 1 (Placed + Processing).
   int get _currentStep => _delivered ? 2 : 1;
 
+  // Dispute eligibility:
+  // - Shipped: always show (backend enforces 1h min / 4-day max after ship date)
+  // - Not shipped: show only between 72h and 30 days after order placement
+  bool get _canOpenDispute {
+    if (_delivered) return true;
+    final hoursSinceOrder =
+        DateTime.now().difference(order.createdAt).inHours;
+    return hoursSinceOrder >= 72 && hoursSinceOrder <= 720;
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: context.colors.background,
       appBar: AppBar(
@@ -121,6 +131,10 @@ class OrderDetailScreen extends StatelessWidget {
             ),
           ),
 
+          if (_canOpenDispute) ...[
+            const SizedBox(height: 8),
+            _OpenDisputeButton(order: order),
+          ],
           const SizedBox(height: 24),
         ],
       ),
@@ -130,6 +144,148 @@ class OrderDetailScreen extends StatelessWidget {
   String _formatDate(DateTime d) {
     final months = t.common.months;
     return '${d.day} ${months[d.month - 1]} ${d.year}';
+  }
+}
+
+// ─── Open Dispute Button ──────────────────────────────────────────────────────
+
+class _OpenDisputeButton extends ConsumerWidget {
+  final OrderModel order;
+  const _OpenDisputeButton({required this.order});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 0),
+      child: OutlinedButton.icon(
+        onPressed: () => _showDisputeSheet(context, ref),
+        icon: const Icon(Icons.gavel_outlined, size: 18),
+        label: const Text('Open a Dispute'),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: context.colors.error,
+          side: BorderSide(color: context.colors.error),
+          minimumSize: const Size(double.infinity, 48),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      ),
+    );
+  }
+
+  void _showDisputeSheet(BuildContext context, WidgetRef ref) {
+    String selectedType = 'not_delivered';
+    final descController = TextEditingController();
+    bool loading = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: context.colors.surface,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) => Padding(
+          padding: EdgeInsets.fromLTRB(
+              20, 24, 20, 20 + MediaQuery.of(ctx).viewInsets.bottom),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Open a Dispute',
+                style: TextStyle(
+                    color: context.colors.textPrimary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: selectedType,
+                decoration: InputDecoration(
+                  labelText: 'Reason',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+                items: const [
+                  DropdownMenuItem(
+                      value: 'not_delivered', child: Text('Not Delivered')),
+                  DropdownMenuItem(
+                      value: 'damaged', child: Text('Damaged')),
+                  DropdownMenuItem(
+                      value: 'product_not_as_described',
+                      child: Text('Not as Described')),
+                  DropdownMenuItem(value: 'other', child: Text('Other')),
+                ],
+                onChanged: (v) =>
+                    setState(() => selectedType = v ?? selectedType),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: descController,
+                maxLines: 3,
+                decoration: InputDecoration(
+                  labelText: 'Describe your issue',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: loading
+                      ? null
+                      : () async {
+                          if (descController.text.trim().isEmpty) return;
+                          setState(() => loading = true);
+                          try {
+                            final itemId = order.items.isNotEmpty
+                                ? order.items[0].id
+                                : '';
+                            await ref
+                                .read(disputeRepositoryProvider)
+                                .openDispute(
+                                  orderId: order.id,
+                                  orderItemId: itemId,
+                                  disputeType: selectedType,
+                                  description:
+                                      descController.text.trim(),
+                                );
+                            if (ctx.mounted) Navigator.pop(ctx);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        'Dispute opened successfully. We will review it shortly.')),
+                              );
+                            }
+                          } catch (e) {
+                            setState(() => loading = false);
+                            if (ctx.mounted) {
+                              ScaffoldMessenger.of(ctx).showSnackBar(
+                                SnackBar(content: Text(e.toString())),
+                              );
+                            }
+                          }
+                        },
+                  style: FilledButton.styleFrom(
+                    backgroundColor: context.colors.error,
+                    minimumSize: const Size(double.infinity, 50),
+                  ),
+                  child: loading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                              color: Colors.white, strokeWidth: 2))
+                      : const Text('Submit Dispute'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -177,20 +333,18 @@ class _ProgressStepper extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, c) {
         final w = c.maxWidth;
-        final trackLeft = (w / 3) / 2; // center of first circle (w/6)
-        final trackWidth = w - 2 * trackLeft; // span first->last circle center
+        final trackLeft = (w / 3) / 2;
+        final trackWidth = w - 2 * trackLeft;
         final fillWidth = trackWidth * (currentStep / (steps.length - 1));
 
         return Stack(
           children: [
-            // background track (sits at vertical center of the circles)
             Positioned(
               left: trackLeft,
               top: circle / 2 - 1,
               child: Container(
                   width: trackWidth, height: 2, color: context.colors.border),
             ),
-            // filled track
             Positioned(
               left: trackLeft,
               top: circle / 2 - 1,

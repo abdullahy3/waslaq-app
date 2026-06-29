@@ -1,6 +1,7 @@
 /// Global notification refresh bus.
 /// main.dart calls notifyRefreshListeners() when any FCM message arrives (foreground).
 /// _BellIconWithBadge listens to immediately re-fetch badge count without polling.
+library;
 
 final List<void Function()> _notifRefreshListeners = [];
 

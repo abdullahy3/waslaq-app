@@ -3,6 +3,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../data/cart_repository.dart';
 import '../data/models/cart_model.dart';
+import '../../../core/auth/auth_notifier.dart';
 
 part 'cart_provider.g.dart';
 
@@ -10,7 +11,15 @@ part 'cart_provider.g.dart';
 class Cart extends _$Cart {
   @override
   Future<CartModel> build() async {
-    return CartRepository.getOrCreateCart();
+    final authState = ref.watch(authNotifierProvider);
+    String? currentCustomerId;
+    authState.maybeWhen(
+      authenticated: (customerId, _, __, ___, ____) {
+        currentCustomerId = customerId;
+      },
+      orElse: () {},
+    );
+    return CartRepository.getOrCreateCart(currentCustomerId: currentCustomerId);
   }
 
   Future<void> addItem(String variantId, {int quantity = 1}) async {
@@ -47,8 +56,16 @@ class Cart extends _$Cart {
 
   Future<void> refresh() async {
     state = const AsyncValue.loading();
+    final authState = ref.read(authNotifierProvider);
+    String? currentCustomerId;
+    authState.maybeWhen(
+      authenticated: (customerId, _, __, ___, ____) {
+        currentCustomerId = customerId;
+      },
+      orElse: () {},
+    );
     state = await AsyncValue.guard(
-      () => CartRepository.getOrCreateCart(),
+      () => CartRepository.getOrCreateCart(currentCustomerId: currentCustomerId),
     );
   }
 }

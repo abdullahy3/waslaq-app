@@ -142,6 +142,37 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
     return t.social.now_short;
   }
 
+  // A single "12 Followers" style stat; tappable when [onTap] is provided.
+  Widget _statItem(
+    BuildContext context, {
+    required String value,
+    required String label,
+    VoidCallback? onTap,
+  }) {
+    final child = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(value,
+            style: TextStyle(
+                color: context.colors.textPrimary,
+                fontSize: 14,
+                fontWeight: FontWeight.bold)),
+        const SizedBox(width: 4),
+        Text(label,
+            style: TextStyle(color: context.colors.textSecondary, fontSize: 14)),
+      ],
+    );
+    if (onTap == null) return child;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: child,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final profileAsync = ref.watch(userProfileProvider(widget.userId));
@@ -427,18 +458,39 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                             ),
                           ],
 
-                          // Stats
+                          // Stats — followers & following are tappable.
                           const SizedBox(height: 12),
-                          Text(
-                            t.user_profile.stats(
-                                followers:
-                                    profile.followerCount.toString(),
-                                posts: profile.recentPosts.length
-                                    .toString()),
-                            style: TextStyle(
-                                color: context.colors.textPrimary,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold),
+                          Row(
+                            children: [
+                              _statItem(
+                                context,
+                                value: profile.followerCount.toString(),
+                                label: t.connections.followers,
+                                onTap: () => context.router.push(FollowListRoute(
+                                  userId: widget.userId,
+                                  initialIndex: 0,
+                                  isOwner: isOwnProfile,
+                                )),
+                              ),
+                              const SizedBox(width: 20),
+                              _statItem(
+                                context,
+                                value: profile.followingCount.toString(),
+                                label: t.connections.following,
+                                onTap: () => context.router.push(FollowListRoute(
+                                  userId: widget.userId,
+                                  initialIndex: 1,
+                                  isOwner: isOwnProfile,
+                                )),
+                              ),
+                              const SizedBox(width: 20),
+                              _statItem(
+                                context,
+                                value: profile.recentPosts.length.toString(),
+                                label: t.user_profile.posts_tab,
+                                onTap: null,
+                              ),
+                            ],
                           ),
 
                           // ── Visit My Store card ────────────────────

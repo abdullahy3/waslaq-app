@@ -219,10 +219,11 @@ class NotificationTile extends ConsumerWidget {
           } catch (_) {}
         }
         // Navigate to relevant content based on notification type
+        if (!context.mounted) return;
         _navigateNotification(context, notification);
       },
       child: Container(
-        color: notification.isRead ? context.colors.surface : context.colors.primary.withOpacity(0.05),
+        color: notification.isRead ? context.colors.surface : context.colors.primary.withValues(alpha: 0.05),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -230,7 +231,7 @@ class NotificationTile extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.1),
+                color: iconColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(iconData, color: iconColor, size: 24),

@@ -7,11 +7,6 @@ import '../../../../router/app_router.dart';
 import '../../../../shared/theme/app_colors.dart';
 import '../../../../i18n/strings.g.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:shimmer/shimmer.dart';
-import '../../../social/community/ui/screens/community_explore_screen.dart';
-import '../../../vendor/ui/screens/following_stores_screen.dart';
-import '../../../vendor/ui/screens/vendor_dashboard_screen.dart';
-import '../../../vendor/ui/screens/become_vendor_screen.dart';
 
 @RoutePage()
 class AccountScreen extends ConsumerStatefulWidget {
@@ -162,6 +157,16 @@ class _AuthenticatedView extends ConsumerWidget {
             icon: Icons.favorite_border,
             label: t.account.saved_items_label,
             onTap: () => context.router.push(const SavedItemsRoute()),
+          ),
+          _AccountTile(
+            icon: Icons.gavel_outlined,
+            label: 'My Disputes',
+            onTap: () => context.router.push(const DisputesRoute()),
+          ),
+          _AccountTile(
+            icon: Icons.cloud_download_outlined,
+            label: 'Digital Vault',
+            onTap: () => context.router.push(const DigitalVaultRoute()),
           ),
           const SizedBox(height: 8),
 

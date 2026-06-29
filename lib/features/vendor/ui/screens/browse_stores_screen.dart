@@ -73,7 +73,7 @@ class BrowseStoresScreen extends ConsumerWidget {
                         ),
                         clipBehavior: Clip.antiAlias,
                         child: logo != null && logo.isNotEmpty
-                            ? CachedNetworkImage(imageUrl: logo, fit: BoxFit.cover, width: 56, height: 56,
+                            ? CachedNetworkImage(imageUrl: logo, memCacheWidth: 600, fit: BoxFit.cover, width: 56, height: 56,
                                 errorWidget: (_, __, ___) => _initial(context, name))
                             : _initial(context, name),
                       ),

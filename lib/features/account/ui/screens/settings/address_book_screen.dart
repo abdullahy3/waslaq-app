@@ -5,6 +5,7 @@ import 'package:waslaq_app/i18n/strings.g.dart';
 import 'package:waslaq_app/shared/theme/app_colors.dart';
 import 'package:waslaq_app/features/account/data/models/address_model.dart';
 import 'package:waslaq_app/features/account/providers/account_providers.dart';
+import 'package:waslaq_app/core/error/error_localizer.dart';
 
 @RoutePage()
 class AddressBookScreen extends ConsumerStatefulWidget {
@@ -36,7 +37,7 @@ class _AddressBookScreenState extends ConsumerState<AddressBookScreen> {
       setState(() => _isLoading = false);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load addresses: $e'), backgroundColor: context.colors.error),
+        SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
       );
     }
   }
@@ -52,7 +53,7 @@ class _AddressBookScreenState extends ConsumerState<AddressBookScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete address: $e'), backgroundColor: context.colors.error),
+        SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
       );
     }
   }
@@ -79,12 +80,12 @@ class _AddressBookScreenState extends ConsumerState<AddressBookScreen> {
                     await ref.read(accountRepositoryProvider).updateAddress(address.id, data);
                   }
                   _loadAddresses();
-                  if (!mounted) return;
+                  if (!ctx.mounted) return;
                   Navigator.pop(ctx);
                 } catch (e) {
-                  if (!mounted) return;
+                  if (!ctx.mounted || !mounted) return;
                   ScaffoldMessenger.of(ctx).showSnackBar(
-                    SnackBar(content: Text('Failed to save address: $e'), backgroundColor: context.colors.error),
+                    SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
                   );
                 }
               },
@@ -151,6 +152,7 @@ class _AddressBookScreenState extends ConsumerState<AddressBookScreen> {
                   },
                 ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: null,
         backgroundColor: context.colors.primary,
         foregroundColor: Colors.white,
         onPressed: () => _showAddressForm(),
@@ -191,7 +193,7 @@ class _AddressCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: context.colors.primary.withOpacity(0.1),
+                    color: context.colors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -204,7 +206,7 @@ class _AddressCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
+                      color: Colors.green.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: const Text(
@@ -433,7 +435,7 @@ class _AddressFormSheetState extends State<_AddressFormSheet> {
 
             // Governorate
             DropdownButtonFormField<String>(
-              value: _governorate,
+              initialValue: _governorate,
               style: TextStyle(color: context.colors.textPrimary),
               dropdownColor: context.colors.surface,
               decoration: InputDecoration(
@@ -474,7 +476,7 @@ class _AddressFormSheetState extends State<_AddressFormSheet> {
             SwitchListTile(
               title: const Text('Set as Default Address', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
               value: _isDefault,
-              activeColor: context.colors.primary,
+              activeThumbColor: context.colors.primary,
               onChanged: (val) => setState(() => _isDefault = val),
               contentPadding: EdgeInsets.zero,
             ),
@@ -482,7 +484,7 @@ class _AddressFormSheetState extends State<_AddressFormSheet> {
 
             // Info Card at bottom
             Card(
-              color: context.colors.primary.withOpacity(0.05),
+              color: context.colors.primary.withValues(alpha: 0.05),
               elevation: 0,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               child: const Padding(

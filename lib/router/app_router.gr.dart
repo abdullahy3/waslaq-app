@@ -462,6 +462,44 @@ class CreatePostRouteArgs {
 }
 
 /// generated route for
+/// [DigitalVaultScreen]
+class DigitalVaultRoute extends PageRouteInfo<void> {
+  const DigitalVaultRoute({List<PageRouteInfo>? children})
+      : super(
+          DigitalVaultRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'DigitalVaultRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const DigitalVaultScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [DisputesScreen]
+class DisputesRoute extends PageRouteInfo<void> {
+  const DisputesRoute({List<PageRouteInfo>? children})
+      : super(
+          DisputesRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'DisputesRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const DisputesScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [ExploreScreen]
 class ExploreRoute extends PageRouteInfo<void> {
   const ExploreRoute({List<PageRouteInfo>? children})
@@ -516,6 +554,68 @@ class FeedbackRoute extends PageRouteInfo<void> {
       return const FeedbackScreen();
     },
   );
+}
+
+/// generated route for
+/// [FollowListScreen]
+class FollowListRoute extends PageRouteInfo<FollowListRouteArgs> {
+  FollowListRoute({
+    Key? key,
+    required String userId,
+    int initialIndex = 0,
+    bool isOwner = false,
+    List<PageRouteInfo>? children,
+  }) : super(
+          FollowListRoute.name,
+          args: FollowListRouteArgs(
+            key: key,
+            userId: userId,
+            initialIndex: initialIndex,
+            isOwner: isOwner,
+          ),
+          rawPathParams: {'userId': userId},
+          initialChildren: children,
+        );
+
+  static const String name = 'FollowListRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<FollowListRouteArgs>(
+          orElse: () =>
+              FollowListRouteArgs(userId: pathParams.getString('userId')));
+      return FollowListScreen(
+        key: args.key,
+        userId: args.userId,
+        initialIndex: args.initialIndex,
+        isOwner: args.isOwner,
+      );
+    },
+  );
+}
+
+class FollowListRouteArgs {
+  const FollowListRouteArgs({
+    this.key,
+    required this.userId,
+    this.initialIndex = 0,
+    this.isOwner = false,
+  });
+
+  final Key? key;
+
+  final String userId;
+
+  final int initialIndex;
+
+  final bool isOwner;
+
+  @override
+  String toString() {
+    return 'FollowListRouteArgs{key: $key, userId: $userId, initialIndex: $initialIndex, isOwner: $isOwner}';
+  }
 }
 
 /// generated route for
@@ -1160,6 +1260,25 @@ class VendorDashboardRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const VendorDashboardScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [VendorImportScreen]
+class VendorImportRoute extends PageRouteInfo<void> {
+  const VendorImportRoute({List<PageRouteInfo>? children})
+      : super(
+          VendorImportRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'VendorImportRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const VendorImportScreen();
     },
   );
 }

@@ -62,6 +62,7 @@ class WaslaqFAB extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return FloatingActionButton.small(
+      heroTag: null,
       backgroundColor: const Color(0xFF7C3AED),
       elevation: 1.0,
       highlightElevation: 1.5,
@@ -74,7 +75,7 @@ class WaslaqFAB extends ConsumerWidget {
   void _handleTap(BuildContext context, WidgetRef ref) {
     final authState = ref.read(authNotifierProvider);
     final isAuth = authState.maybeWhen(
-      authenticated: (_, __, ___, ____, _____) => true,
+      authenticated: (_, __, ___, url, _____) => true,
       orElse: () => false,
     );
 

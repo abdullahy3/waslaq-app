@@ -366,7 +366,7 @@ class RefundPolicyScreen extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _RefundHeader extends StatelessWidget {
-  _RefundHeader();
+  const _RefundHeader();
 
   @override
   Widget build(BuildContext context) {

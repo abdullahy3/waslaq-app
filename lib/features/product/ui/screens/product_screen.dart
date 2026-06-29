@@ -16,11 +16,9 @@ import '../../../../router/app_router.dart';
 import '../../../../i18n/strings.g.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../data/models/product_model.dart';
-import '../../../../core/api/social_client.dart';
 import '../../../social/data/models/social_models.dart';
 import '../../../social/providers/social_providers.dart';
 import '../../../social/post/providers/fab_context_provider.dart';
-import '../../../../shared/widgets/context_aware_scaffold.dart';
 
 @RoutePage()
 class ProductScreen extends ConsumerStatefulWidget {
@@ -107,11 +105,6 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
 
     return Scaffold(
       backgroundColor: context.colors.background,
-      floatingActionButton: const WaslaqFAB(),
-      floatingActionButtonLocation:
-          Directionality.of(context) == TextDirection.rtl
-              ? FloatingActionButtonLocation.startFloat
-              : FloatingActionButtonLocation.endFloat,
       body: productAsync.when(
         loading: () => _buildSkeleton(),
         error: (e, _) => Center(
@@ -590,7 +583,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                               border: Border.all(color: context.colors.border)),
                             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                               Text('Q: ${qa['question'] ?? ''}', style: TextStyle(color: context.colors.textPrimary, fontWeight: FontWeight.w600, fontSize: 13)),
-                              if (qa['answer'] != null && (qa['answer'] as String).isNotEmpty) ...[                                
+                              if (qa['answer'] != null && (qa['answer'] as String).isNotEmpty) ...[
                                 SizedBox(height: 8),
                                 Container(padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(color: context.colors.primary.withValues(alpha: 0.05),
@@ -605,7 +598,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                     ],
 
                     // ── You Might Also Like ──────────────────
-                    if (_relatedProducts.isNotEmpty) ...[                      
+                    if (_relatedProducts.isNotEmpty) ...[
                       Divider(color: context.colors.border, height: 1),
                       Padding(padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                         child: Text(t.product.you_might_also_like, style: TextStyle(color: context.colors.textSecondary, fontSize: 14, fontWeight: FontWeight.w600))),

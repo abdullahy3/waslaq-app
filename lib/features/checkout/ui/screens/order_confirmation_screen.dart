@@ -8,6 +8,8 @@ import '../../../../shared/theme/app_colors.dart';
 import '../../../../shared/utils/ils_formatter.dart';
 import '../../../../i18n/strings.g.dart';
 import '../../providers/checkout_provider.dart';
+import 'package:waslaq_app/core/error/error_localizer.dart';
+import '../../data/models/checkout_model.dart';
 
 @RoutePage()
 class OrderConfirmationScreen extends ConsumerWidget {
@@ -37,7 +39,7 @@ class OrderConfirmationScreen extends ConsumerWidget {
                   color: context.colors.error, size: 48),
               SizedBox(height: 16),
               Text(
-                'Error loading order',
+                localizeError(e),
                 style: TextStyle(color: context.colors.textPrimary, fontSize: 18),
               ),
               SizedBox(height: 8),
@@ -63,7 +65,7 @@ class OrderConfirmationScreen extends ConsumerWidget {
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: context.colors.success.withOpacity(0.12),
+                    color: context.colors.success.withValues(alpha: 0.12),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -106,7 +108,7 @@ class OrderConfirmationScreen extends ConsumerWidget {
                 ),
                 SizedBox(height: 32),
 
-                // Item list (compact)
+                // Item list with thumbnails
                 if (order.items.isNotEmpty) ...[
                   Container(
                     width: double.infinity,
@@ -127,34 +129,10 @@ class OrderConfirmationScreen extends ConsumerWidget {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        SizedBox(height: 10),
-                        ...order.items.map((item) => Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 4),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      '${item.quantity}× ${item.title}',
-                                      style: TextStyle(
-                                        color: context.colors.textPrimary,
-                                        fontSize: 14,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  Text(
-                                    ILSFormatter.format(
-                                        item.unitPrice * item.quantity),
-                                    style: TextStyle(
-                                      color: context.colors.textSecondary,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )),
+                        SizedBox(height: 12),
+                        ...order.items.map(
+                          (item) => _ItemRow(item: item),
+                        ),
                       ],
                     ),
                   ),
@@ -188,6 +166,88 @@ class OrderConfirmationScreen extends ConsumerWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _ItemRow extends StatelessWidget {
+  final OrderItem item;
+  const _ItemRow({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Thumbnail
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: item.thumbnail != null
+                ? Image.network(
+                    item.thumbnail!,
+                    width: 48,
+                    height: 48,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => _placeholder(context),
+                  )
+                : _placeholder(context),
+          ),
+          const SizedBox(width: 12),
+          // Title + qty
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.title,
+                  style: TextStyle(
+                    color: context.colors.textPrimary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Qty: ${item.quantity}',
+                  style: TextStyle(
+                    color: context.colors.textSecondary,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          // Price
+          Text(
+            ILSFormatter.format(item.unitPrice * item.quantity),
+            style: TextStyle(
+              color: context.colors.textSecondary,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _placeholder(BuildContext context) {
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: context.colors.border,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Icon(
+        Icons.image_outlined,
+        color: context.colors.textMuted,
+        size: 24,
       ),
     );
   }

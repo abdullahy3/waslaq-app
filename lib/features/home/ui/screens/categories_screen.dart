@@ -145,8 +145,6 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
                           final name = _catName(sub, lang);
                           final meta = sub['metadata'] as Map<String, dynamic>?;
                           final imageUrl = meta?['image'] as String?;
-                          final handle = sub['handle'] as String? ?? '';
-                          final parentHandle = selected['handle'] as String? ?? '';
                           final id = sub['id'] as String? ?? '';
 
                           return GestureDetector(
@@ -166,6 +164,7 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
                                   child: imageUrl != null && imageUrl.isNotEmpty
                                       ? CachedNetworkImage(
                                           imageUrl: imageUrl,
+                                          memCacheWidth: 600,
                                           fit: BoxFit.cover,
                                           width: double.infinity,
                                           height: double.infinity,

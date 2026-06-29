@@ -11,9 +11,9 @@ class AppException implements Exception {
     this.endpoint,
   });
 
+  // toString() returns only the user-facing message — no status codes, no endpoint paths
   @override
-  String toString() =>
-      'AppException($statusCode): $message [endpoint: $endpoint]';
+  String toString() => message;
 
   // Named constructors for common cases
   factory AppException.network(String endpoint) => AppException(

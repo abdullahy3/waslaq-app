@@ -7,7 +7,9 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import '../../../../router/app_router.dart';
 import '../../../../shared/theme/app_colors.dart';
+import '../../../../i18n/strings.g.dart';
 import '../../providers/stream_chat_provider.dart';
 
 @RoutePage()
@@ -83,8 +85,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final client = ref.watch(streamChatClientProvider);
-
     if (_loading) {
       return Scaffold(
         backgroundColor: context.colors.background,
@@ -136,12 +136,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       channel: _channel!,
       child: Scaffold(
         backgroundColor: context.colors.background,
-        appBar: StreamChannelHeader(
-          backgroundColor: context.colors.surface,
-          elevation: 0,
-          showTypingIndicator: true,
-          onBackPressed: () => context.router.maybePop(),
-        ),
+        appBar: _buildHeader(context),
         body: Column(
           children: [
             Expanded(
@@ -154,7 +149,69 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     );
   }
 
-  StreamChatThemeData _buildStreamTheme(BuildContext context) {
-    return StreamChatThemeData();
+  // Custom header: resolves the other member's real name + avatar (never the
+  // raw "customer_xxx" id) and makes the title tappable → their profile.
+  PreferredSizeWidget _buildHeader(BuildContext context) {
+    final client = ref.read(streamChatClientProvider);
+    final me = client.state.currentUser?.id;
+    final members = _channel?.state?.members ?? const <Member>[];
+    final others = members.where((m) => m.userId != me).toList();
+    final other = others.length == 1 ? others.first : null;
+
+    final rawName = other?.user?.name ?? '';
+    final title = (rawName.isNotEmpty && !rawName.startsWith('customer_'))
+        ? rawName
+        : (others.length == 1
+            ? t.common.unknown_user
+            : (_channel?.name ?? t.messages.title));
+    final image = other?.user?.image;
+    final customerId = (other?.userId ?? '').startsWith('customer_')
+        ? other!.userId!.substring('customer_'.length)
+        : '';
+
+    void openProfile() {
+      if (customerId.isNotEmpty) {
+        context.router.push(UserProfileRoute(userId: customerId));
+      }
+    }
+
+    return AppBar(
+      backgroundColor: context.colors.surface,
+      elevation: 0,
+      titleSpacing: 0,
+      iconTheme: IconThemeData(color: context.colors.textPrimary),
+      leading: IconButton(
+        icon: const BackButtonIcon(),
+        onPressed: () => context.router.maybePop(),
+      ),
+      title: InkWell(
+        onTap: customerId.isEmpty ? null : openProfile,
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 18,
+              backgroundColor: context.colors.primary.withValues(alpha: 0.15),
+              backgroundImage: (image != null && image.isNotEmpty) ? NetworkImage(image) : null,
+              child: (image == null || image.isEmpty)
+                  ? Text(title.isNotEmpty ? title[0].toUpperCase() : '?',
+                      style: TextStyle(color: context.colors.primary, fontWeight: FontWeight.bold))
+                  : null,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                    color: context.colors.textPrimary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

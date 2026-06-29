@@ -22,7 +22,7 @@ class MessagesScreen extends ConsumerWidget {
     final authState = ref.watch(authNotifierProvider);
 
     final isAuthenticated = authState.maybeWhen(
-      authenticated: (_, __, ___, ____, _____) => true,
+      authenticated: (_, __, ___, url, _____) => true,
       orElse: () => false,
     );
 
@@ -87,11 +87,55 @@ class MessagesScreen extends ConsumerWidget {
 }
 
 /// Separate widget — only mounts when authenticated.
-class _StreamMessagesBody extends ConsumerWidget {
+class _StreamMessagesBody extends ConsumerStatefulWidget {
   const _StreamMessagesBody({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_StreamMessagesBody> createState() => _StreamMessagesBodyState();
+}
+
+class _StreamMessagesBodyState extends ConsumerState<_StreamMessagesBody> {
+  bool _refreshedNames = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _refreshMemberNames());
+  }
+
+  // One-shot: collect every DM partner id and ask the backend to re-upsert
+  // their Stream user with the real name + avatar. Fixes old conversations
+  // that show the raw "customer_xxx" id. Stream pushes the updated users to
+  // this connected client, so the list/header refresh automatically.
+  Future<void> _refreshMemberNames() async {
+    if (_refreshedNames) return;
+    _refreshedNames = true;
+    try {
+      final client = ref.read(streamChatClientProvider);
+      final me = client.state.currentUser?.id;
+      if (me == null) return;
+      final channels = await client.queryChannels(
+        filter: Filter.in_('members', [me]),
+        channelStateSort: const [SortOption('last_message_at')],
+        paginationParams: const PaginationParams(limit: 30),
+      ).first;
+      final ids = <String>{};
+      for (final ch in channels) {
+        for (final m in ch.state?.members ?? const []) {
+          final uid = m.userId;
+          if (uid != null && uid != me) ids.add(uid);
+        }
+      }
+      if (ids.isEmpty) return;
+      await SocialClient.instance.post(
+        '/store/social/chat/refresh-members',
+        data: {'customerIds': ids.toList()},
+      );
+    } catch (_) {}
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final connectionAsync = ref.watch(streamChatConnectionProvider);
     final client = ref.watch(streamChatClientProvider);
 
@@ -145,6 +189,7 @@ class _StreamMessagesBody extends ConsumerWidget {
             backgroundColor: context.colors.background,
             appBar: _buildAppBar(context),
             floatingActionButton: FloatingActionButton.small(
+              heroTag: null,
               backgroundColor: context.colors.primary,
               foregroundColor: Colors.white,
               elevation: 1.0,
@@ -173,10 +218,16 @@ class _StreamMessagesBody extends ConsumerWidget {
                 final otherMember = channel.state?.members
                     .where((m) => m.userId != currentUserId)
                     .firstOrNull;
-                final otherName = otherMember?.user?.name?.isNotEmpty == true
-                    ? otherMember!.user!.name!
-                    : (otherMember?.userId ?? '...');
+                final rawName = otherMember?.user?.name ?? '';
+                // Never surface the raw "customer_xxx" Stream id to the user.
+                final otherName = (rawName.isNotEmpty && !rawName.startsWith('customer_'))
+                    ? rawName
+                    : t.common.unknown_user;
                 final otherImage = otherMember?.user?.image;
+                // customerId (without the customer_ prefix) for profile navigation.
+                final otherCustomerId = (otherMember?.userId ?? '').startsWith('customer_')
+                    ? otherMember!.userId!.substring('customer_'.length)
+                    : (otherMember?.userId ?? '');
                 final lastMsg = channel.state?.messages.lastOrNull;
                 final lastText = lastMsg?.text ?? '';
 
@@ -187,14 +238,20 @@ class _StreamMessagesBody extends ConsumerWidget {
                     final unread = snapshot.data ?? 0;
                     return ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                      leading: CircleAvatar(
-                        radius: 24,
-                        backgroundColor: context.colors.primary.withValues(alpha: 0.15),
-                        backgroundImage: otherImage != null ? NetworkImage(otherImage) : null,
-                        child: otherImage == null
-                            ? Text(otherName.isNotEmpty ? otherName[0].toUpperCase() : '?',
-                                style: TextStyle(color: context.colors.primary, fontWeight: FontWeight.bold))
-                            : null,
+                      // Tap the avatar → open the partner's profile.
+                      leading: GestureDetector(
+                        onTap: otherCustomerId.isEmpty
+                            ? null
+                            : () => context.router.push(UserProfileRoute(userId: otherCustomerId)),
+                        child: CircleAvatar(
+                          radius: 24,
+                          backgroundColor: context.colors.primary.withValues(alpha: 0.15),
+                          backgroundImage: otherImage != null ? NetworkImage(otherImage) : null,
+                          child: otherImage == null
+                              ? Text(otherName.isNotEmpty ? otherName[0].toUpperCase() : '?',
+                                  style: TextStyle(color: context.colors.primary, fontWeight: FontWeight.bold))
+                              : null,
+                        ),
                       ),
                       title: Text(otherName,
                           style: TextStyle(
@@ -273,8 +330,8 @@ class _StreamMessagesBody extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => ProviderScope(
-        parent: ProviderScope.containerOf(context),
+      builder: (_) => UncontrolledProviderScope(
+        container: ProviderScope.containerOf(context),
         child: _UserSearchSheet(client: client),
       ),
     );

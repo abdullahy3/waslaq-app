@@ -33,8 +33,38 @@ class CartScreen extends ConsumerWidget {
         loading: () => Center(
             child: CircularProgressIndicator(color: context.colors.primary)),
         error: (e, _) => Center(
-          child: Text(t.cart.could_not_load,
-              style: TextStyle(color: context.colors.textPrimary)),
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.wifi_off_rounded,
+                    color: context.colors.textMuted, size: 48),
+                const SizedBox(height: 16),
+                Text(
+                  t.cart.could_not_load,
+                  style: TextStyle(
+                      color: context.colors.textSecondary, fontSize: 15),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.refresh_rounded, size: 18),
+                  label: Text(t.common.retry),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: context.colors.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(22)),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
+                  ),
+                  onPressed: () =>
+                      ref.read(cartProvider.notifier).refresh(),
+                ),
+              ],
+            ),
+          ),
         ),
         data: (cart) => cart.isEmpty
             ? Center(
@@ -79,6 +109,7 @@ class CartScreen extends ConsumerWidget {
                                 child: item.thumbnail != null
                                     ? CachedNetworkImage(
                                         imageUrl: item.thumbnail!,
+                                        memCacheWidth: 400,
                                         fit: BoxFit.cover,
                                         errorWidget: (_, __, ___) =>
                                             Container(

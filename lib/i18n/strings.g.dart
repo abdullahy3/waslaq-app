@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 3968 (1984 per locale)
+/// Strings: 3984 (1992 per locale)
 ///
-/// Built on 2026-06-23 at 17:40 UTC
+/// Built on 2026-06-28 at 23:43 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -2384,6 +2384,14 @@ class StringsSocialEn {
 	String minutes_short({required Object n}) => '${n}m';
 	String get now_short => 'now';
 	String share_post({required Object title, required Object url}) => 'Check out this post on WaslaQ: ${title}\n${url}';
+	String get edit_post => 'Edit Post';
+	String get delete_post => 'Delete Post';
+	String get delete_post_confirm => 'Are you sure you want to delete this post? This can\'t be undone.';
+	String get edit_title_hint => 'Title';
+	String get edit_content_hint => 'Body (optional)';
+	String get post_updated => 'Post updated';
+	String get post_deleted => 'Post deleted';
+	String get edit_empty_title => 'Title can\'t be empty';
 }
 
 // Path: store
@@ -4908,6 +4916,14 @@ class StringsSocialAr extends StringsSocialEn {
 	@override String minutes_short({required Object n}) => '${n}د';
 	@override String get now_short => 'الآن';
 	@override String share_post({required Object title, required Object url}) => 'شاهد هذا المنشور على واصلك: ${title}\n${url}';
+	@override String get edit_post => 'تعديل المنشور';
+	@override String get delete_post => 'حذف المنشور';
+	@override String get delete_post_confirm => 'هل أنت متأكد من حذف هذا المنشور؟ لا يمكن التراجع عن هذا الإجراء.';
+	@override String get edit_title_hint => 'العنوان';
+	@override String get edit_content_hint => 'النص (اختياري)';
+	@override String get post_updated => 'تم تحديث المنشور';
+	@override String get post_deleted => 'تم حذف المنشور';
+	@override String get edit_empty_title => 'لا يمكن ترك العنوان فارغاً';
 }
 
 // Path: store
@@ -7008,6 +7024,14 @@ extension on Translations {
 			case 'social.minutes_short': return ({required Object n}) => '${n}m';
 			case 'social.now_short': return 'now';
 			case 'social.share_post': return ({required Object title, required Object url}) => 'Check out this post on WaslaQ: ${title}\n${url}';
+			case 'social.edit_post': return 'Edit Post';
+			case 'social.delete_post': return 'Delete Post';
+			case 'social.delete_post_confirm': return 'Are you sure you want to delete this post? This can\'t be undone.';
+			case 'social.edit_title_hint': return 'Title';
+			case 'social.edit_content_hint': return 'Body (optional)';
+			case 'social.post_updated': return 'Post updated';
+			case 'social.post_deleted': return 'Post deleted';
+			case 'social.edit_empty_title': return 'Title can\'t be empty';
 			case 'store.title': return 'Store';
 			case 'store.all_categories': return 'All';
 			case 'store.products_count': return ({required Object count}) => '${count} products';
@@ -9000,6 +9024,14 @@ extension on StringsAr {
 			case 'social.minutes_short': return ({required Object n}) => '${n}د';
 			case 'social.now_short': return 'الآن';
 			case 'social.share_post': return ({required Object title, required Object url}) => 'شاهد هذا المنشور على واصلك: ${title}\n${url}';
+			case 'social.edit_post': return 'تعديل المنشور';
+			case 'social.delete_post': return 'حذف المنشور';
+			case 'social.delete_post_confirm': return 'هل أنت متأكد من حذف هذا المنشور؟ لا يمكن التراجع عن هذا الإجراء.';
+			case 'social.edit_title_hint': return 'العنوان';
+			case 'social.edit_content_hint': return 'النص (اختياري)';
+			case 'social.post_updated': return 'تم تحديث المنشور';
+			case 'social.post_deleted': return 'تم حذف المنشور';
+			case 'social.edit_empty_title': return 'لا يمكن ترك العنوان فارغاً';
 			case 'store.title': return 'المتجر';
 			case 'store.all_categories': return 'الكل';
 			case 'store.products_count': return ({required Object count}) => '${count} منتج';

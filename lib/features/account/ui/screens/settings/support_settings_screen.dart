@@ -113,7 +113,7 @@ class SupportSettingsScreen extends ConsumerWidget {
                   const SizedBox(height: 8),
                   Text(
                     'Your money is protected by WaslaQ Escrow. Funds are held securely until you confirm delivery or 24 hours pass. If anything goes wrong, open a dispute within 4 days of delivery.',
-                    style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 13, height: 1.4),
+                    style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 13, height: 1.4),
                   ),
                 ],
               ),
@@ -136,7 +136,7 @@ class SupportSettingsScreen extends ConsumerWidget {
                   if (escrowCount > 0)
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(color: context.colors.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: context.colors.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
                       child: Text(
                         '$escrowCount',
                         style: TextStyle(color: context.colors.primary, fontWeight: FontWeight.bold, fontSize: 11),

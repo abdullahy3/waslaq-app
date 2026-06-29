@@ -4,10 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:waslaq_app/i18n/strings.g.dart';
 import 'package:waslaq_app/shared/theme/app_colors.dart';
-import 'package:waslaq_app/core/providers/preferences_provider.dart';
 import 'package:waslaq_app/features/vendor/providers/vendor_providers.dart';
 import 'package:waslaq_app/features/account/data/models/social_settings_model.dart';
 import 'package:waslaq_app/features/account/providers/account_providers.dart';
+import 'package:waslaq_app/core/error/error_localizer.dart';
 
 @RoutePage()
 class NotificationSettingsScreen extends ConsumerStatefulWidget {
@@ -56,15 +56,6 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
     }
   }
 
-  Future<void> _requestPermission() async {
-    try {
-      final status = await Permission.notification.request();
-      setState(() {
-        _notificationStatus = status;
-      });
-    } catch (_) {}
-  }
-
   Future<void> _loadSettings() async {
     try {
       final map = await ref.read(accountRepositoryProvider).getSocialSettings();
@@ -84,7 +75,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update: $e'), backgroundColor: context.colors.error),
+        SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
       );
     }
   }
@@ -170,35 +161,35 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                   child: Column(
                     children: [
                       SwitchListTile(
-                        activeColor: context.colors.primary,
+                        activeThumbColor: context.colors.primary,
                         title: Text(s.notifNewFollowers, style: TextStyle(fontSize: 14)),
                         value: _newFollowers,
                         onChanged: (val) => setState(() => _newFollowers = val),
                       ),
                       Divider(height: 1, color: context.colors.border),
                       SwitchListTile(
-                        activeColor: context.colors.primary,
+                        activeThumbColor: context.colors.primary,
                         title: Text(s.notifComments, style: TextStyle(fontSize: 14)),
                         value: _commentsOnPosts,
                         onChanged: (val) => setState(() => _commentsOnPosts = val),
                       ),
                       Divider(height: 1, color: context.colors.border),
                       SwitchListTile(
-                        activeColor: context.colors.primary,
+                        activeThumbColor: context.colors.primary,
                         title: Text(s.notifUpvotes, style: TextStyle(fontSize: 14)),
                         value: _upvotesOnPosts,
                         onChanged: (val) => setState(() => _upvotesOnPosts = val),
                       ),
                       Divider(height: 1, color: context.colors.border),
                       SwitchListTile(
-                        activeColor: context.colors.primary,
+                        activeThumbColor: context.colors.primary,
                         title: Text(s.notifMentions, style: TextStyle(fontSize: 14)),
                         value: _mentions,
                         onChanged: (val) => setState(() => _mentions = val),
                       ),
                       Divider(height: 1, color: context.colors.border),
                       SwitchListTile(
-                        activeColor: context.colors.primary,
+                        activeThumbColor: context.colors.primary,
                         title: Text(s.notifFollowRequests, style: TextStyle(fontSize: 14)),
                         value: _followRequests,
                         onChanged: (val) => setState(() => _followRequests = val),
@@ -237,28 +228,28 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                   child: Column(
                     children: [
                       SwitchListTile(
-                        activeColor: context.colors.primary,
+                        activeThumbColor: context.colors.primary,
                         title: Text(s.notifOrderConfirmed, style: TextStyle(fontSize: 14)),
                         value: _orderConfirmed,
                         onChanged: (val) => setState(() => _orderConfirmed = val),
                       ),
                       Divider(height: 1, color: context.colors.border),
                       SwitchListTile(
-                        activeColor: context.colors.primary,
+                        activeThumbColor: context.colors.primary,
                         title: Text(s.notifOrderShipped, style: TextStyle(fontSize: 14)),
                         value: _orderShipped,
                         onChanged: (val) => setState(() => _orderShipped = val),
                       ),
                       Divider(height: 1, color: context.colors.border),
                       SwitchListTile(
-                        activeColor: context.colors.primary,
+                        activeThumbColor: context.colors.primary,
                         title: Text(s.notifOrderDelivered, style: TextStyle(fontSize: 14)),
                         value: _orderDelivered,
                         onChanged: (val) => setState(() => _orderDelivered = val),
                       ),
                       Divider(height: 1, color: context.colors.border),
                       SwitchListTile(
-                        activeColor: context.colors.primary,
+                        activeThumbColor: context.colors.primary,
                         title: Text(s.notifRefundProcessed, style: TextStyle(fontSize: 14)),
                         value: _refundProcessed,
                         onChanged: (val) => setState(() => _refundProcessed = val),
@@ -266,7 +257,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                       if (_socialSettings != null) ...[
                         Divider(height: 1, color: context.colors.border),
                         SwitchListTile(
-                          activeColor: context.colors.primary,
+                          activeThumbColor: context.colors.primary,
                           title: Text(s.notifPriceDrop, style: TextStyle(fontSize: 14)),
                           value: _socialSettings!.priceDropAlerts,
                           onChanged: (val) {
@@ -275,7 +266,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                         ),
                         Divider(height: 1, color: context.colors.border),
                         SwitchListTile(
-                          activeColor: context.colors.primary,
+                          activeThumbColor: context.colors.primary,
                           title: Text(s.notifBackInStock, style: TextStyle(fontSize: 14)),
                           value: _socialSettings!.backInStockAlerts,
                           onChanged: (val) {
@@ -300,7 +291,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                     child: Column(
                       children: [
                         SwitchListTile(
-                          activeColor: context.colors.primary,
+                          activeThumbColor: context.colors.primary,
                           title: Text(s.notifOrderSound, style: TextStyle(fontSize: 14)),
                           subtitle: Text(s.notifOrderSoundSub, style: TextStyle(fontSize: 11)),
                           value: _socialSettings!.vendorNewOrderSound,
@@ -310,7 +301,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                         ),
                         Divider(height: 1, color: context.colors.border),
                         SwitchListTile(
-                          activeColor: context.colors.primary,
+                          activeThumbColor: context.colors.primary,
                           title: Text(s.notifDailySummary, style: TextStyle(fontSize: 14)),
                           subtitle: Text(s.notifDailySummarySub, style: TextStyle(fontSize: 11)),
                           value: _socialSettings!.vendorDailySummary,
@@ -335,7 +326,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                   child: Column(
                     children: [
                       SwitchListTile(
-                        activeColor: context.colors.primary,
+                        activeThumbColor: context.colors.primary,
                         title: Text(s.notifPromotionsToggle, style: TextStyle(fontSize: 14)),
                         value: _promotions,
                         onChanged: (val) => setState(() => _promotions = val),
@@ -343,7 +334,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                       if (_socialSettings != null) ...[
                         Divider(height: 1, color: context.colors.border),
                         SwitchListTile(
-                          activeColor: context.colors.primary,
+                          activeThumbColor: context.colors.primary,
                           title: Text(s.notifLoginAlerts, style: TextStyle(fontSize: 14)),
                           subtitle: Text(s.notifLoginAlertsSub, style: TextStyle(fontSize: 11)),
                           value: _socialSettings!.loginNotifications,

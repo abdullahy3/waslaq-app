@@ -5,6 +5,7 @@ import 'package:waslaq_app/i18n/strings.g.dart';
 import 'package:waslaq_app/shared/theme/app_colors.dart';
 import 'package:waslaq_app/features/account/data/models/refund_details_model.dart';
 import 'package:waslaq_app/features/account/providers/account_providers.dart';
+import 'package:waslaq_app/core/error/error_localizer.dart';
 
 @RoutePage()
 class RefundDetailsScreen extends ConsumerStatefulWidget {
@@ -66,7 +67,7 @@ class _RefundDetailsScreenState extends ConsumerState<RefundDetailsScreen> {
       setState(() => _isLoading = false);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load refund details: $e'), backgroundColor: context.colors.error),
+        SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
       );
     }
   }
@@ -90,7 +91,7 @@ class _RefundDetailsScreenState extends ConsumerState<RefundDetailsScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save refund details: $e'), backgroundColor: context.colors.error),
+        SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
       );
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -116,11 +117,11 @@ class _RefundDetailsScreenState extends ConsumerState<RefundDetailsScreen> {
                 children: [
                   // Amber Info Banner
                   Card(
-                    color: Colors.amber.withOpacity(0.1),
+                    color: Colors.amber.withValues(alpha: 0.1),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
-                      side: BorderSide(color: Colors.amber.withOpacity(0.5)),
+                      side: BorderSide(color: Colors.amber.withValues(alpha: 0.5)),
                     ),
                     child: const Padding(
                       padding: EdgeInsets.all(12),
@@ -149,7 +150,7 @@ class _RefundDetailsScreenState extends ConsumerState<RefundDetailsScreen> {
 
                   // Bank Dropdown
                   DropdownButtonFormField<String>(
-                    value: _bankName,
+                    initialValue: _bankName,
                     style: TextStyle(color: context.colors.textPrimary),
                     dropdownColor: context.colors.surface,
                     decoration: InputDecoration(

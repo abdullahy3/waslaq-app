@@ -22,6 +22,13 @@ class CartModel {
   int get itemCount => items.fold(0, (sum, item) => sum + item.quantity);
   bool get isEmpty => items.isEmpty;
 
+  // True when ANY item is NOT confirmed digital — determines checkout restrictions.
+  // Only allows all-countries mode when every item explicitly has the digital type ID.
+  // null type = unknown = treated as physical (safe default → Palestine only).
+  bool get hasPhysicalItems =>
+      items.isEmpty ||
+      items.any((item) => !item.isDigital);
+
   const CartModel({
     required this.id,
     required this.items,
@@ -73,6 +80,9 @@ class CartItem {
   final double unitPrice;   // unit_price
   final double subtotal;    // line-item subtotal
   final String? variantTitle;
+  // product_type_id: used to distinguish digital vs physical products.
+  final String? productTypeId;
+  final bool isDigital;
 
   const CartItem({
     required this.id,
@@ -84,6 +94,8 @@ class CartItem {
     required this.unitPrice,
     required this.subtotal,
     this.variantTitle,
+    this.productTypeId,
+    required this.isDigital,
   });
 
   factory CartItem.fromJson(Map<String, dynamic> json) {
@@ -93,18 +105,33 @@ class CartItem {
         json['title'] as String? ??
         '';
 
+    // product_type_id may be a direct field or nested under the product object
+    final typeId = json['product_type_id'] as String? ??
+        (json['product'] as Map<String, dynamic>?)?['type_id'] as String?;
+
+    final productType = (json['product'] as Map<String, dynamic>?)?['type'] as Map<String, dynamic>?;
+    final productMetadata = (json['product'] as Map<String, dynamic>?)?['metadata'] as Map<String, dynamic>?;
+
+    final isDigital = productType?['value'] == 'digital' ||
+        productMetadata?['is_digital'] == true ||
+        productMetadata?['is_digital'] == 'true';
+
     return CartItem(
+      // Null-safe: variant_id / product_id can be absent if variant was
+      // soft-deleted after the item was added. Empty string prevents crash.
       id: json['id'] as String,
-      variantId: json['variant_id'] as String,
-      productId: json['product_id'] as String,
+      variantId: (json['variant_id'] as String?) ?? '',
+      productId: (json['product_id'] as String?) ?? '',
       title: rawTitle,
       thumbnail: json['thumbnail'] as String?,
-      quantity: json['quantity'] as int,
-      unitPrice: (json['unit_price'] as num).toDouble(),
+      quantity: (json['quantity'] as int?) ?? 1,
+      unitPrice: (json['unit_price'] as num? ?? 0).toDouble(),
       subtotal: (json['subtotal'] as num? ?? 0).toDouble(),
       // variant?.title nested object
       variantTitle: (json['variant'] as Map<String, dynamic>?)?['title']
           as String?,
+      productTypeId: typeId,
+      isDigital: isDigital,
     );
   }
 }

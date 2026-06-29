@@ -99,7 +99,7 @@ class _SettingsHubTile extends StatelessWidget {
     return ListTile(
       leading: Container(
         width: 36, height: 36,
-        decoration: BoxDecoration(color: context.colors.primary.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+        decoration: BoxDecoration(color: context.colors.primary.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
         child: Icon(icon, color: context.colors.primary, size: 20),
       ),
       title: Text(label, style: TextStyle(color: context.colors.textPrimary, fontSize: 14, fontWeight: FontWeight.w500)),

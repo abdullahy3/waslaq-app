@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../shared/theme/app_colors.dart';
 import '../../../../router/app_router.dart';
-import '../../../social/data/social_repository.dart';
 import '../../../social/providers/social_providers.dart';
 
 final followingStoresProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) {

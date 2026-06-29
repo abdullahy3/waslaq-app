@@ -86,6 +86,7 @@ class _ProductCardState extends State<ProductCard> {
                       images.isNotEmpty
                           ? CachedNetworkImage(
                               imageUrl: images.first,
+                              memCacheWidth: 600,
                               fit: BoxFit.cover,
                               width: double.infinity,
                               height: double.infinity,
@@ -252,6 +253,8 @@ class _ProductCardState extends State<ProductCard> {
                     product.thumbnail != null
                         ? CachedNetworkImage(
                             imageUrl: product.thumbnail!,
+                            // ponytail: grid cell renders ~175dp; 480px texture vs 600 sized to display
+                            memCacheWidth: 480,
                             fit: BoxFit.cover,
                             placeholder: (ctx, url) => _shimmerBox(),
                             errorWidget: (ctx, url, e) => _placeholderIcon(),

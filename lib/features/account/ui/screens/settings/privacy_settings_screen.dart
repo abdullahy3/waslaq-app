@@ -8,6 +8,7 @@ import 'package:waslaq_app/core/auth/auth_notifier.dart';
 import 'package:waslaq_app/features/social/providers/social_providers.dart';
 import 'package:waslaq_app/features/account/data/models/social_settings_model.dart';
 import 'package:waslaq_app/features/account/providers/account_providers.dart';
+import 'package:waslaq_app/core/error/error_localizer.dart';
 
 @RoutePage()
 class PrivacySettingsScreen extends ConsumerStatefulWidget {
@@ -47,7 +48,7 @@ class _PrivacySettingsScreenState extends ConsumerState<PrivacySettingsScreen> {
       setState(() => _isLoading = false);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load privacy data: $e'), backgroundColor: context.colors.error),
+        SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
       );
     }
   }
@@ -65,7 +66,7 @@ class _PrivacySettingsScreenState extends ConsumerState<PrivacySettingsScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update privacy profile: $e'), backgroundColor: context.colors.error),
+        SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
       );
     }
   }
@@ -77,7 +78,7 @@ class _PrivacySettingsScreenState extends ConsumerState<PrivacySettingsScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update social settings: $e'), backgroundColor: context.colors.error),
+        SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
       );
     }
   }
@@ -96,7 +97,7 @@ class _PrivacySettingsScreenState extends ConsumerState<PrivacySettingsScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to unblock user: $e'), backgroundColor: context.colors.error),
+        SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
       );
     }
   }
@@ -123,7 +124,7 @@ class _PrivacySettingsScreenState extends ConsumerState<PrivacySettingsScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error handling request: $e'), backgroundColor: context.colors.error),
+        SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
       );
     }
   }
@@ -245,7 +246,7 @@ class _PrivacySettingsScreenState extends ConsumerState<PrivacySettingsScreen> {
                   child: Column(
                     children: [
                       SwitchListTile(
-                        activeColor: context.colors.primary,
+                        activeThumbColor: context.colors.primary,
                         title: Text(s.privacyPrivateAccount, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                         subtitle: Text(s.privacyPrivateAccountSub, style: TextStyle(fontSize: 12)),
                         value: profileAsync.valueOrNull?.isPrivate ?? false,
@@ -329,7 +330,7 @@ class _PrivacySettingsScreenState extends ConsumerState<PrivacySettingsScreen> {
                           const SizedBox(height: 12),
                           SwitchListTile(
                             contentPadding: EdgeInsets.zero,
-                            activeColor: context.colors.primary,
+                            activeThumbColor: context.colors.primary,
                             title: Text(s.privacyReadReceipts, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                             subtitle: Text(s.privacyReadReceiptsSub, style: TextStyle(fontSize: 12)),
                             value: _socialSettings!.readReceipts,
@@ -359,7 +360,7 @@ class _PrivacySettingsScreenState extends ConsumerState<PrivacySettingsScreen> {
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+                          decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
                           child: Text(
                             '${_blockedUsers.length}',
                             style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 11),

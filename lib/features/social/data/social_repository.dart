@@ -43,15 +43,21 @@ class SocialRepository {
       final data = Map<String, dynamic>.from(response.data['community'] as Map);
       data['isMember'] = response.data['isMember'];
       data['isCreator'] = response.data['isCreator'];
+      data['isPending'] = response.data['isPending'] ?? false;
       return CommunityModel.fromJson(data);
     } on DioException catch (e) {
       throw _handleDioError(e);
     }
   }
 
-  Future<void> joinCommunity(String slug) async {
+  /// Toggles membership. Returns `{joined, pending}` from backend.
+  Future<Map<String, bool>> joinCommunity(String slug) async {
     try {
-      await _socialClient.post('/store/social/communities/$slug/join');
+      final response = await _socialClient.post('/store/social/communities/$slug/join');
+      return {
+        'joined': response.data['joined'] as bool? ?? false,
+        'pending': response.data['pending'] as bool? ?? false,
+      };
     } on DioException catch (e) {
       throw _handleDioError(e);
     }
@@ -150,6 +156,28 @@ class SocialRepository {
     }
   }
 
+  /// Author-only soft delete. Backend also purges attached media from R2.
+  Future<void> deletePost(String postId) async {
+    try {
+      await _socialClient.delete('/store/social/posts/$postId');
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  /// Author-only edit of title/content. Returns the updated post.
+  Future<PostModel> editPost(String postId, {String? title, String? content}) async {
+    try {
+      final response = await _socialClient.patch('/store/social/posts/$postId', data: {
+        if (title != null) 'title': title,
+        if (content != null) 'content': content,
+      });
+      return PostModel.fromJson(response.data['post'] as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
   // Comments
   Future<List<CommentModel>> getComments(String postId) async {
     try {
@@ -206,6 +234,54 @@ class SocialRepository {
   Future<void> toggleFollow(String userId) async {
     try {
       await _socialClient.post('/store/social/follow/$userId');
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  // Followers / Following lists
+  Future<List<SocialUserLite>> getFollowers(String userId, {int skip = 0}) async {
+    try {
+      final response = await _socialClient
+          .get('/store/social/profiles/$userId/followers', queryParameters: {'skip': skip});
+      final users = response.data['users'] as List<dynamic>? ?? [];
+      return users.map((e) => SocialUserLite.fromJson(e as Map<String, dynamic>)).toList();
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  Future<List<SocialUserLite>> getFollowing(String userId, {int skip = 0}) async {
+    try {
+      final response = await _socialClient
+          .get('/store/social/profiles/$userId/following', queryParameters: {'skip': skip});
+      final users = response.data['users'] as List<dynamic>? ?? [];
+      return users.map((e) => SocialUserLite.fromJson(e as Map<String, dynamic>)).toList();
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  /// Removes [userId] from the current user's followers (no block).
+  Future<void> removeFollower(String userId) async {
+    try {
+      await _socialClient.delete('/store/social/follow/$userId/follower');
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  Future<void> blockUser(String userId) async {
+    try {
+      await _socialClient.post('/store/social/blocked/$userId');
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  Future<void> unblockUser(String userId) async {
+    try {
+      await _socialClient.delete('/store/social/blocked/$userId');
     } on DioException catch (e) {
       throw _handleDioError(e);
     }

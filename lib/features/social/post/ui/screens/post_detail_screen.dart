@@ -1,15 +1,18 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../../core/auth/auth_notifier.dart';
 import '../../../../../i18n/strings.g.dart';
 import '../../../../../router/app_router.dart';
 import '../../../../../shared/theme/app_colors.dart';
 import '../../../data/models/social_models.dart';
 import '../../../providers/social_providers.dart';
+import 'package:waslaq_app/core/error/error_localizer.dart';
 
 final postCommentsProvider = FutureProvider.autoDispose.family<List<CommentModel>, String>((ref, id) {
   return ref.watch(socialRepositoryProvider).getComments(id);
@@ -68,9 +71,151 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
       ref.invalidate(postCommentsProvider(widget.postId));
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.common.error_prefix(error: e.toString()))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(localizeError(e))));
       }
     }
+  }
+
+  Future<void> _confirmDelete() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: context.colors.surface,
+        title: Text(t.social.delete_post, style: TextStyle(color: context.colors.textPrimary)),
+        content: Text(t.social.delete_post_confirm, style: TextStyle(color: context.colors.textSecondary)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.common.cancel)),
+          TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(t.common.delete, style: TextStyle(color: context.colors.error))),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    try {
+      await ref.read(socialRepositoryProvider).deletePost(widget.postId);
+      ref.invalidate(feedPostsNotifierProvider);
+      final myId = ref.read(authNotifierProvider).maybeWhen(
+          authenticated: (id, _, __, ___, ____) => id, orElse: () => null);
+      if (myId != null) ref.invalidate(userProfileProvider(myId));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.social.post_deleted)));
+        await Navigator.of(context).maybePop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error));
+      }
+    }
+  }
+
+  Future<void> _showEditSheet(PostModel post) async {
+    final titleCtrl = TextEditingController(text: post.title);
+    final contentCtrl = TextEditingController(text: post.content);
+    bool saving = false;
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: context.colors.surface,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (sheetCtx) {
+        return StatefulBuilder(builder: (sheetCtx, setSheet) {
+          return Padding(
+            padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 16,
+                bottom: MediaQuery.of(sheetCtx).viewInsets.bottom + 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(t.social.edit_post,
+                    style: TextStyle(
+                        color: context.colors.textPrimary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16)),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: titleCtrl,
+                  maxLength: 300,
+                  style: TextStyle(color: context.colors.textPrimary),
+                  decoration: InputDecoration(
+                    labelText: t.social.edit_title_hint,
+                    labelStyle: TextStyle(color: context.colors.textSecondary),
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: contentCtrl,
+                  maxLines: 6,
+                  maxLength: 10000,
+                  style: TextStyle(color: context.colors.textPrimary),
+                  decoration: InputDecoration(
+                    labelText: t.social.edit_content_hint,
+                    labelStyle: TextStyle(color: context.colors.textSecondary),
+                    alignLabelWithHint: true,
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: saving
+                        ? null
+                        : () async {
+                            final newTitle = titleCtrl.text.trim();
+                            if (newTitle.isEmpty) {
+                              ScaffoldMessenger.of(sheetCtx).showSnackBar(
+                                  SnackBar(content: Text(t.social.edit_empty_title)));
+                              return;
+                            }
+                            setSheet(() => saving = true);
+                            try {
+                              await ref.read(socialRepositoryProvider).editPost(
+                                  widget.postId,
+                                  title: newTitle,
+                                  content: contentCtrl.text.trim());
+                              ref.invalidate(postProvider(widget.postId));
+                              ref.invalidate(feedPostsNotifierProvider);
+                              if (sheetCtx.mounted) Navigator.pop(sheetCtx);
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(t.social.post_updated)));
+                              }
+                            } catch (e) {
+                              setSheet(() => saving = false);
+                              if (sheetCtx.mounted) {
+                                ScaffoldMessenger.of(sheetCtx).showSnackBar(SnackBar(
+                                    content: Text(localizeError(e)),
+                                    backgroundColor: sheetCtx.colors.error));
+                              }
+                            }
+                          },
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: context.colors.primary,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(0, 48)),
+                    child: saving
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        : Text(t.common.save_changes),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+      },
+    );
+    titleCtrl.dispose();
+    contentCtrl.dispose();
   }
 
   @override
@@ -81,7 +226,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
       authenticated: (_, __, ___, ____, _____) => true,
       orElse: () => false,
     );
-    
+
     final currentUserSeed = authState.maybeWhen(
       authenticated: (id, _, __, ___, ____) => id,
       orElse: () => 'default',
@@ -93,6 +238,27 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
           'r/${widget.community}',
           style: TextStyle(color: context.colors.primary),
         ),
+        actions: [
+          if (postAsync.valueOrNull != null && currentUserSeed == postAsync.valueOrNull!.authorId)
+            PopupMenuButton<String>(
+              icon: Icon(Icons.more_vert, color: context.colors.primary),
+              color: context.colors.surface,
+              onSelected: (v) {
+                final post = postAsync.valueOrNull;
+                if (post == null) return;
+                if (v == 'edit') _showEditSheet(post);
+                if (v == 'delete') _confirmDelete();
+              },
+              itemBuilder: (_) => [
+                PopupMenuItem(
+                    value: 'edit',
+                    child: Text(t.common.edit, style: TextStyle(color: context.colors.textPrimary))),
+                PopupMenuItem(
+                    value: 'delete',
+                    child: Text(t.common.delete, style: TextStyle(color: context.colors.error))),
+              ],
+            ),
+        ],
         iconTheme: IconThemeData(color: context.colors.primary),
         backgroundColor: context.colors.surface,
       ),
@@ -143,7 +309,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Post Body Section
+                        // Post Body
                         Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Column(
@@ -157,55 +323,70 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                                   }
                                 },
                                 child: Row(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(18),
-                                    child: Container(
-                                      width: 36,
-                                      height: 36,
-                                      color: context.colors.surfaceVariant,
-                                      child: SvgPicture.network(
-                                        _getAvatarUrl(post.author?.avatarStyle, post.author?.avatarSeed),
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(18),
+                                      child: Container(
                                         width: 36,
                                         height: 36,
-                                        placeholderBuilder: (_) => SizedBox(),
+                                        color: context.colors.surfaceVariant,
+                                        child: SvgPicture.network(
+                                          _getAvatarUrl(post.author?.avatarStyle, post.author?.avatarSeed),
+                                          width: 36,
+                                          height: 36,
+                                          placeholderBuilder: (_) => SizedBox(),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          post.author?.displayName ?? t.common.unknown_user,
-                                          style: TextStyle(
-                                            color: context.colors.textPrimary,
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold,
+                                    SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Flexible(
+                                                child: Text(
+                                                  post.author?.displayName ?? t.common.unknown_user,
+                                                  style: TextStyle(
+                                                    color: context.colors.textPrimary,
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                              // Admin / trusted-vendor badge (mirrors post_card.dart)
+                                              if (post.author?.isAdmin == true) ...[
+                                                const SizedBox(width: 4),
+                                                const Icon(Icons.verified_rounded, size: 15, color: Color(0xFFF59E0B)),
+                                              ] else if (post.author?.isTrustedVendor == true) ...[
+                                                const SizedBox(width: 4),
+                                                const Icon(Icons.verified_rounded, size: 15, color: Color(0xFFEAB308)),
+                                              ],
+                                            ],
                                           ),
-                                        ),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              post.author?.username ?? '',
-                                              style: TextStyle(color: context.colors.textMuted, fontSize: 13),
-                                            ),
-                                            SizedBox(width: 4),
-                                            Text('·', style: TextStyle(color: context.colors.textMuted)),
-                                            SizedBox(width: 4),
-                                            Text(
-                                              _getTimeAgo(post.createdAt),
-                                              style: TextStyle(color: context.colors.textMuted, fontSize: 13),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
+                                          Row(
+                                            children: [
+                                              Text(
+                                                post.author?.username ?? '',
+                                                style: TextStyle(color: context.colors.textMuted, fontSize: 13),
+                                              ),
+                                              SizedBox(width: 4),
+                                              Text('·', style: TextStyle(color: context.colors.textMuted)),
+                                              SizedBox(width: 4),
+                                              Text(
+                                                _getTimeAgo(post.createdAt),
+                                                style: TextStyle(color: context.colors.textMuted, fontSize: 13),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),  // end Row
-                              ),  // end GestureDetector
+                                  ],
+                                ),
+                              ),
                               SizedBox(height: 16),
                               Text(
                                 post.title,
@@ -216,14 +397,34 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                                 ),
                               ),
                               SizedBox(height: 12),
-                              
-                              // Content
+
+                              // Content — rendered markdown with primary text color
                               if (post.contentType == 'TEXT' && post.content.isNotEmpty)
-                                Text(
-                                  post.content,
-                                  style: TextStyle(color: context.colors.textSecondary, fontSize: 14),
+                                MarkdownBody(
+                                  data: post.content,
+                                  onTapLink: (_, href, __) async {
+                                    if (href != null) {
+                                      final uri = Uri.tryParse(href);
+                                      if (uri != null) await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                    }
+                                  },
+                                  styleSheet: MarkdownStyleSheet(
+                                    p: TextStyle(color: context.colors.textPrimary, fontSize: 14, height: 1.6),
+                                    h1: TextStyle(color: context.colors.textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
+                                    h2: TextStyle(color: context.colors.textPrimary, fontSize: 17, fontWeight: FontWeight.bold),
+                                    h3: TextStyle(color: context.colors.textPrimary, fontSize: 15, fontWeight: FontWeight.bold),
+                                    strong: TextStyle(color: context.colors.textPrimary, fontWeight: FontWeight.bold),
+                                    em: TextStyle(color: context.colors.textPrimary, fontStyle: FontStyle.italic),
+                                    a: TextStyle(color: context.colors.primary),
+                                    listBullet: TextStyle(color: context.colors.textPrimary, fontSize: 14),
+                                    blockquote: TextStyle(color: context.colors.textSecondary, fontSize: 14),
+                                    code: TextStyle(color: context.colors.textPrimary, backgroundColor: context.colors.surfaceVariant, fontSize: 13),
+                                    horizontalRuleDecoration: BoxDecoration(
+                                      border: Border(bottom: BorderSide(color: context.colors.border, width: 1)),
+                                    ),
+                                  ),
                                 ),
-                              
+
                               if (post.contentType == 'IMAGE' && post.mediaUrls.isNotEmpty)
                                 SizedBox(
                                   height: 280,
@@ -242,10 +443,10 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                                     },
                                   ),
                                 ),
-                              
+
                               SizedBox(height: 16),
-                              
-                              // Footer / Vote row
+
+                              // Vote + community row
                               Row(
                                 children: [
                                   Container(
@@ -341,10 +542,10 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                             ],
                           ),
                         ),
-                        
+
                         Divider(color: context.colors.border),
-                        
-                        // Comments Section
+
+                        // Comments
                         Consumer(
                           builder: (context, ref, child) {
                             final commentsAsync = ref.watch(postCommentsProvider(widget.postId));
@@ -369,10 +570,10 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                                     ),
                                   );
                                 }
-                                
+
                                 final rootComments = comments.where((c) => c.parentId == null).toList()
                                   ..sort((a, b) => b.score.compareTo(a.score));
-                                  
+
                                 return ListView.builder(
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
@@ -381,124 +582,124 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                                     final root = rootComments[index];
                                     final children1 = comments.where((c) => c.parentId == root.id).toList()
                                       ..sort((a, b) => b.score.compareTo(a.score));
-                                      
+
                                     return Column(
-                                       crossAxisAlignment: CrossAxisAlignment.start,
-                                       children: [
-                                         CommentTile(
-                                           comment: root,
-                                           leftPadding: 16.0,
-                                           onReply: (replyTo) {
-                                             setState(() {
-                                               _replyToComment = replyTo;
-                                             });
-                                             final username = replyTo.author?.username ?? "user";
-                                             _commentController.text = '@$username ';
-                                             FocusScope.of(context).requestFocus();
-                                           },
-                                         ),
-                                         for (final child1 in children1) ...[
-                                           IntrinsicHeight(
-                                             child: Row(
-                                               crossAxisAlignment: CrossAxisAlignment.stretch,
-                                               children: [
-                                                 Container(
-                                                   width: 2,
-                                                   margin: const EdgeInsets.only(left: 27, right: 0),
-                                                   color: context.colors.border.withValues(alpha: 0.5),
-                                                 ),
-                                                 Expanded(
-                                                   child: CommentTile(
-                                                     comment: child1,
-                                                     leftPadding: 8.0,
-                                                     onReply: (replyTo) {
-                                                       setState(() {
-                                                         _replyToComment = replyTo;
-                                                       });
-                                                       final username = replyTo.author?.username ?? "user";
-                                                       _commentController.text = '@$username ';
-                                                       FocusScope.of(context).requestFocus();
-                                                     },
-                                                   ),
-                                                 ),
-                                               ],
-                                             ),
-                                           ),
-                                           Builder(
-                                             builder: (context) {
-                                               final children2 = comments.where((c) => c.parentId == child1.id).toList()
-                                                 ..sort((a, b) => b.score.compareTo(a.score));
-                                               if (children2.isEmpty) return const SizedBox();
-                                               return Column(
-                                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                                 children: [
-                                                   for (final child2 in children2)
-                                                     IntrinsicHeight(
-                                                       child: Row(
-                                                         crossAxisAlignment: CrossAxisAlignment.stretch,
-                                                         children: [
-                                                           Container(
-                                                             width: 2,
-                                                             margin: const EdgeInsets.only(left: 27, right: 0),
-                                                             color: context.colors.border.withValues(alpha: 0.5),
-                                                           ),
-                                                           Container(
-                                                             width: 2,
-                                                             margin: const EdgeInsets.only(left: 19, right: 0),
-                                                             color: context.colors.border.withValues(alpha: 0.5),
-                                                           ),
-                                                           Expanded(
-                                                             child: CommentTile(
-                                                               comment: child2,
-                                                               leftPadding: 8.0,
-                                                               onReply: (replyTo) {
-                                                                 setState(() {
-                                                                   _replyToComment = replyTo;
-                                                                 });
-                                                                 final username = replyTo.author?.username ?? "user";
-                                                                 _commentController.text = '@$username ';
-                                                                 FocusScope.of(context).requestFocus();
-                                                               },
-                                                             ),
-                                                           ),
-                                                         ],
-                                                       ),
-                                                     ),
-                                                   if (comments.any((c) => children2.map((e)=>e.id).contains(c.parentId)))
-                                                     IntrinsicHeight(
-                                                       child: Row(
-                                                         crossAxisAlignment: CrossAxisAlignment.stretch,
-                                                         children: [
-                                                           Container(
-                                                             width: 2,
-                                                             margin: const EdgeInsets.only(left: 27, right: 0),
-                                                             color: context.colors.border.withValues(alpha: 0.5),
-                                                           ),
-                                                           Container(
-                                                             width: 2,
-                                                             margin: const EdgeInsets.only(left: 19, right: 0),
-                                                             color: context.colors.border.withValues(alpha: 0.5),
-                                                           ),
-                                                           const SizedBox(width: 8),
-                                                           Expanded(
-                                                             child: Padding(
-                                                               padding: const EdgeInsets.only(left: 8.0, bottom: 8.0, top: 4.0),
-                                                               child: Text(
-                                                                 t.community.view_more_replies,
-                                                                 style: TextStyle(color: context.colors.primary, fontSize: 13, fontWeight: FontWeight.bold),
-                                                               ),
-                                                             ),
-                                                           ),
-                                                         ],
-                                                       ),
-                                                     ),
-                                                 ],
-                                               );
-                                             },
-                                           ),
-                                         ],
-                                       ],
-                                     );
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        CommentTile(
+                                          comment: root,
+                                          leftPadding: 16.0,
+                                          onReply: (replyTo) {
+                                            setState(() {
+                                              _replyToComment = replyTo;
+                                            });
+                                            final username = replyTo.author?.username ?? "user";
+                                            _commentController.text = '@$username ';
+                                            FocusScope.of(context).requestFocus();
+                                          },
+                                        ),
+                                        for (final child1 in children1) ...[
+                                          IntrinsicHeight(
+                                            child: Row(
+                                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                                              children: [
+                                                Container(
+                                                  width: 2,
+                                                  margin: const EdgeInsets.only(left: 27, right: 0),
+                                                  color: context.colors.border.withValues(alpha: 0.5),
+                                                ),
+                                                Expanded(
+                                                  child: CommentTile(
+                                                    comment: child1,
+                                                    leftPadding: 8.0,
+                                                    onReply: (replyTo) {
+                                                      setState(() {
+                                                        _replyToComment = replyTo;
+                                                      });
+                                                      final username = replyTo.author?.username ?? "user";
+                                                      _commentController.text = '@$username ';
+                                                      FocusScope.of(context).requestFocus();
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Builder(
+                                            builder: (context) {
+                                              final children2 = comments.where((c) => c.parentId == child1.id).toList()
+                                                ..sort((a, b) => b.score.compareTo(a.score));
+                                              if (children2.isEmpty) return const SizedBox();
+                                              return Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  for (final child2 in children2)
+                                                    IntrinsicHeight(
+                                                      child: Row(
+                                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                        children: [
+                                                          Container(
+                                                            width: 2,
+                                                            margin: const EdgeInsets.only(left: 27, right: 0),
+                                                            color: context.colors.border.withValues(alpha: 0.5),
+                                                          ),
+                                                          Container(
+                                                            width: 2,
+                                                            margin: const EdgeInsets.only(left: 19, right: 0),
+                                                            color: context.colors.border.withValues(alpha: 0.5),
+                                                          ),
+                                                          Expanded(
+                                                            child: CommentTile(
+                                                              comment: child2,
+                                                              leftPadding: 8.0,
+                                                              onReply: (replyTo) {
+                                                                setState(() {
+                                                                  _replyToComment = replyTo;
+                                                                });
+                                                                final username = replyTo.author?.username ?? "user";
+                                                                _commentController.text = '@$username ';
+                                                                FocusScope.of(context).requestFocus();
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  if (comments.any((c) => children2.map((e) => e.id).contains(c.parentId)))
+                                                    IntrinsicHeight(
+                                                      child: Row(
+                                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                        children: [
+                                                          Container(
+                                                            width: 2,
+                                                            margin: const EdgeInsets.only(left: 27, right: 0),
+                                                            color: context.colors.border.withValues(alpha: 0.5),
+                                                          ),
+                                                          Container(
+                                                            width: 2,
+                                                            margin: const EdgeInsets.only(left: 19, right: 0),
+                                                            color: context.colors.border.withValues(alpha: 0.5),
+                                                          ),
+                                                          const SizedBox(width: 8),
+                                                          Expanded(
+                                                            child: Padding(
+                                                              padding: const EdgeInsets.only(left: 8.0, bottom: 8.0, top: 4.0),
+                                                              child: Text(
+                                                                t.community.view_more_replies,
+                                                                style: TextStyle(color: context.colors.primary, fontSize: 13, fontWeight: FontWeight.bold),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                ],
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ],
+                                    );
                                   },
                                 );
                               },
@@ -512,14 +713,14 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
               },
             ),
           ),
-          
+
           // Comment Input Bar
           Container(
             padding: EdgeInsets.only(
-              left: 16, 
-              right: 16, 
-              top: 12, 
-              bottom: MediaQuery.of(context).padding.bottom + 12
+              left: 16,
+              right: 16,
+              top: 12,
+              bottom: MediaQuery.of(context).padding.bottom + 12,
             ),
             decoration: BoxDecoration(
               color: context.colors.surface,
@@ -664,43 +865,43 @@ class CommentTile extends ConsumerWidget {
                 },
                 child: Row(
                   children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  width: 24,
-                  height: 24,
-                  color: context.colors.surfaceVariant,
-                  child: SvgPicture.network(
-                    _getAvatarUrl(comment.author?.avatarStyle, comment.author?.avatarSeed),
-                    width: 24,
-                    height: 24,
-                    placeholderBuilder: (_) => SizedBox(),
-                  ),
-                ),
-              ),
-              SizedBox(width: 8),
-              Text(
-                comment.author?.displayName ?? t.common.unknown_user,
-                style: TextStyle(
-                  color: context.colors.textPrimary,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(width: 6),
-              Text(
-                _getTimeAgo(comment.createdAt),
-                style: TextStyle(color: context.colors.textMuted, fontSize: 12),
-              ),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        width: 24,
+                        height: 24,
+                        color: context.colors.surfaceVariant,
+                        child: SvgPicture.network(
+                          _getAvatarUrl(comment.author?.avatarStyle, comment.author?.avatarSeed),
+                          width: 24,
+                          height: 24,
+                          placeholderBuilder: (_) => SizedBox(),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      comment.author?.displayName ?? t.common.unknown_user,
+                      style: TextStyle(
+                        color: context.colors.textPrimary,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(width: 6),
+                    Text(
+                      _getTimeAgo(comment.createdAt),
+                      style: TextStyle(color: context.colors.textMuted, fontSize: 12),
+                    ),
                   ],
-                ),  // end inner Row
-              ),  // end GestureDetector
+                ),
+              ),
             ],
-          ),  // end outer Row
+          ),
           SizedBox(height: 6),
           Text(
             comment.content,
-            style: TextStyle(color: context.colors.textSecondary, fontSize: 13),
+            style: TextStyle(color: context.colors.textPrimary, fontSize: 13),
           ),
           SizedBox(height: 6),
           Row(
@@ -716,7 +917,11 @@ class CommentTile extends ConsumerWidget {
               Text(
                 '${comment.score}',
                 style: TextStyle(
-                  color: comment.score > 0 ? context.colors.upvote : comment.score < 0 ? context.colors.downvote : context.colors.textMuted,
+                  color: comment.score > 0
+                      ? context.colors.upvote
+                      : comment.score < 0
+                          ? context.colors.downvote
+                          : context.colors.textMuted,
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),

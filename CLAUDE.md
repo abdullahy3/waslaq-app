@@ -37,9 +37,9 @@ flrun  → [flutter run -d "SM A556E"]
 
 ### Samsung A55 (test device)
 - Tailscale IP: `100.93.45.75`
-- ADB port: 5555 (permanent — `adb tcpip 5555` run once over USB)
+- ADB port: 5555 via `adb tcpip 5555` (USB). Survives WiFi changes & wireless-debug toggles, but NOT reboot/shutdown/dev-options-off — adbd reverts to USB mode (no root = no boot-persist). Re-arm needs USB once.
 - Device serial (USB): `R5CX7289WNF`
-- `adba` alias reconnects after every reboot — no pairing needed
+- `adba` is now a self-healing zsh FUNCTION (~/.zshrc): tries Tailscale `100.93.45.75:5555`; if down and USB present, re-runs `adb tcpip 5555` then reconnects. After a reboot: plug USB once → run `adba`.
 - Flutter sees it as: `SM A556E • android-arm64 • Android 16 (API 36)`
 - APK delivery via Tailscale: `tailscale file cp <apk> abdullahs-a55:`
 
@@ -220,6 +220,12 @@ ios/
 
 ---
 
+## 💱 Currency (display-only ILS/USD)
+- `lib/core/providers/currency_provider.dart` — `currencyProvider` (StateNotifier), SecureStorage key `waslaq_currency`. First launch → IP detect via Dio GET `/store/currency`, persists; "IP once, then dropdown wins". `setCurrency(CurrencyCode.ils|usd)` from Appearance settings.
+- `lib/shared/utils/ils_formatter.dart` — currency-aware via static `ILSFormatter.currency` (synced from notifier `_apply`). Fixed `ilsPerUsd = 3.7`. Existing `ILSFormatter.format()` call sites auto-reflect choice. Hardcoded `'₪${...}'` strings NOT converted (vendor-side stays ₪ on purpose).
+- `main.dart` root does `ref.watch(currencyProvider)` → runs detection + rebuilds tree on switch.
+- Dropdown in `appearance_settings_screen.dart`; slang `settings.currency*` (run `dart run slang`). Display only — charge stays ILS. See memory `currency-display-ils-usd`.
+
 ## 🎨 Theme System
 - `AppThemeMode` enum: `dark` / `light` / `system`
 - Persisted to SecureStorage key `waslaq_theme`
@@ -248,15 +254,28 @@ ios/
 - Private community selection restriction enforced (CreatePostScreen & ExploreScreen)
 - Filter Button on Explorer Page's Stores Tab (resolves categories via `allCategoriesProvider` watched in `build()`)
 - Leave Community action (hits toggle `/join` endpoint instead of obsolete `/leave` endpoint)
-- Explore Page top search/filter header scroll physics (controlled by `SizeTransition` and `NotificationListener<UserScrollNotification>`)
+- Explore Page collapsing header = `NestedScrollView` + `SliverAppBar`(floating/snap title+search) + pinned TabBar (see Rendering/Scroll Performance section). Old `SizeTransition`/`NotificationListener` approach removed 2026-06-22.
 - Community Creation: 3-stage wizard screen (`CreateCommunityScreen`) accessible via the main FAB
 - AI Assistant: Chat interface (`AiAssistantScreen`) with context-aware URL fetching via `/store/social/assistant`
 - Floating FAB buttons: Configured buttons for Community Creation and AI Assistant in `ContextAwareScaffold`
 - Deep Links: Added intent filters for `waslaq.com` to open post details and resolve product handles dynamically in `ProductRepository`
 - App Rename: Renamed display name to `waslaq-واصلك` in AndroidManifest.xml
+- Admin banners/popups (2026-06-27): `lib/features/home/ui/widgets/site_banners.dart` = `siteConfigProvider` (one `/store/site-config` fetch) + `SiteAnnouncementBar` (tappable) + `SitePopupHost`/`_SitePopupDialog` (image/title/body/CTA/close-X, frequency via SecureStorage `wq_popup_<id>`, once_per_session in-memory). Both wired into `home_screen.dart` Column. Link taps → `lib/core/navigation/app_links.dart` `openWaslaqLink()`: external (http/bare-domain) → url_launcher `inAppBrowserView`; internal paths → full route mapping (product/vendor/community/post/user/cart/orders/...) via `appLinkRouter` (set in `main.dart` next to `_globalRouter`); unknown internal → web fallback. Manifest `<queries>` got VIEW(http/https)+CustomTabsService for Android 11+.
+
+## ⚡ Rendering / Scroll Performance (root-caused 2026-06-22, profile-traced on A55)
+- **Impeller is DISABLED** via `AndroidManifest.xml` meta-data `io.flutter.embedding.android.EnableImpeller=false`. Flutter 3.44.1 Impeller (Vulkan) rebuilt the text glyph atlas EVERY frame (`CreateGlyphAtlas` 137×/137 frames) on this bilingual AR/EN app + emitted huge saveLayers → raster thread saturated → "freeze-and-snap" scroll. Measured via VM-service timeline (`getVMTimeline`): raster busy 3075ms→1046ms, saveLayer total 1586ms→10ms, worst frame 196ms→10ms, median 11.3ms→3.4ms. Symptom was RASTER-bound (`1.raster` thread), NOT UI/Dart thread (UI was ~570ms, fine). Re-enable Impeller only after upgrading Flutter + re-profiling.
+- Diagnosis method (reuse): `flutter run --profile -d R5CX7289WNF`, drive scroll with `adb shell input swipe`, `curl <vmservice>/getVMTimeline`, pair B/E events per thread. gfxinfo is USELESS for Flutter (bypasses HWUI → "0 frames").
+- **High refresh rate (90/120Hz) enabled app-wide** via `flutter_displaymode: ^0.6.0` — `main()` calls `FlutterDisplayMode.setHighRefreshRate()` (Android-only guard, try/catch). Picks panel's highest mode at current res; 60Hz-only devices stay 60 (graceful). Verified on A55: `dumpsys display` shows `frameRateOverride uid=...120.0` + measured ~114fps during scroll (was 60). iOS ProMotion already handled by `CADisableMinimumFrameDurationOnPhone` in Info.plist. NOTE: high refresh halves the frame budget (120Hz=8.3ms) — only viable because the Impeller raster fix landed first.
+- Secondary fixes shipped same day: right-sized `memCacheWidth` (store logo 600→110, banner→330, product→480, category→360, bottom-nav avatar uncapped→80) to cut GPU texture churn; `PostCard`→StatelessWidget + isolated `_BookmarkButton` ConsumerWidget (one bookmark toggle no longer rebuilds every card); explore header rebuilt as `NestedScrollView` + `SliverAppBar`(floating/snap) + pinned `SliverPersistentHeader`(TabBar, wrapped in RepaintBoundary) + `TabBarView`(swipe-disabled) + `_KeepAlive`, replacing the old SizeTransition/NotificationListener that relayed out the viewport each scroll-direction flip.
 
 ## 🐛 Known Issues & Active Bugs (To Be Fixed Next)
 *(No active bugs remaining)*
+
+### Post delete/edit + product-tile race fix (2026-06-29)
+- Post delete/edit added: `SocialRepository.deletePost` (DELETE) + `editPost` (PATCH title/content) in `social_repository.dart`; author 3-dot menu (Edit bottom-sheet / Delete confirm) in `post_detail_screen.dart` AppBar `actions` (ownership via `authNotifierProvider` customerId == `post.authorId`). Backend purges post media from R2 on delete. Flutter posts have no media authoring → edit is title+content only.
+- Product-delete spinner race FIXED: `_ProductTile` now keyed `ValueKey(p.id)` (+ `super.key`) in `vendor_dashboard_screen.dart` so `invalidate(vendorProductsProvider)` can't recycle the deleting tile's `_deleting` state onto a sibling product.
+- New slang keys under `social.*` (edit_post / delete_post / delete_post_confirm / edit_title_hint / edit_content_hint / post_updated / post_deleted / edit_empty_title) — ran `dart run slang`.
+- Author **admin / trusted-vendor badge** now on `post_card.dart` (Icons.verified_rounded, amber `#F59E0B`=admin / yellow `#EAB308`=trusted) — mirrors storefront PostItem. `PostAuthor` model gained `isAdmin`+`isTrustedVendor`; backend `authorSelect` now returns them. (post_detail author row not badged yet.)
 
 ## 🔲 Not Yet Tested / Pending
 - iOS production build + App Store submission

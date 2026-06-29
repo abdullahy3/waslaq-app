@@ -203,6 +203,7 @@ class _SavedPostCard extends StatelessWidget {
               child: hasImage
                   ? CachedNetworkImage(
                       imageUrl: post.mediaUrls.first,
+                      memCacheWidth: 600,
                       width: double.infinity,
                       height: 140,
                       fit: BoxFit.cover,

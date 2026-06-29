@@ -83,12 +83,18 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
       final newProducts = res.data['products'] as List<dynamic>? ?? [];
       final count = res.data['count'] as int? ?? 0;
 
-      if (mounted) setState(() {
-        if (reset) _products = newProducts; else _products.addAll(newProducts);
+      if (mounted) {
+        setState(() {
+        if (reset) {
+          _products = newProducts;
+        } else {
+          _products.addAll(newProducts);
+        }
         _offset += newProducts.length;
         _hasMore = _products.length < count;
         _loading = false; _loadingMore = false;
       });
+      }
     } catch (e) {
       if (mounted) setState(() { _loading = false; _loadingMore = false; });
     }
@@ -212,7 +218,6 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
                         final id = p['id'] as String?;
                         final title = p['title'] as String? ?? '';
                         final thumb = p['thumbnail'] as String?;
-                        final handle = p['handle'] as String?;
                         final variants = p['variants'] as List<dynamic>? ?? [];
                         final priceObj = variants.isNotEmpty
                             ? (variants[0] as Map<String, dynamic>)['calculated_price'] as Map<String, dynamic>?
@@ -228,7 +233,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
                               Expanded(child: ClipRRect(
                                 borderRadius: BorderRadius.vertical(top: Radius.circular(11)),
                                 child: thumb != null
-                                    ? CachedNetworkImage(imageUrl: thumb, fit: BoxFit.cover, width: double.infinity,
+                                    ? CachedNetworkImage(imageUrl: thumb, memCacheWidth: 600, fit: BoxFit.cover, width: double.infinity,
                                         errorWidget: (_, __, ___) => Container(color: context.colors.surfaceVariant,
                                             child: Center(child: Icon(Icons.image_outlined, color: context.colors.textMuted, size: 32))))
                                     : Container(color: context.colors.surfaceVariant,

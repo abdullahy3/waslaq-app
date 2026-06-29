@@ -23,6 +23,8 @@ import '../features/account/ui/screens/settings/app_info_settings_screen.dart';
 import '../features/account/ui/screens/settings/support_settings_screen.dart';
 import '../features/account/ui/screens/settings/vendor_settings_screen.dart';
 import '../features/account/ui/screens/saved_items_screen.dart';
+import '../features/account/ui/screens/disputes_screen.dart';
+import '../features/account/ui/screens/digital_vault_screen.dart';
 import '../features/product/ui/screens/product_screen.dart';
 import '../features/social/community/ui/screens/community_screen.dart';
 import '../features/social/community/ui/screens/community_explore_screen.dart';
@@ -32,6 +34,7 @@ import '../features/social/post/ui/screens/create_post_screen.dart';
 import '../features/social/data/models/social_models.dart';
 import '../features/product/data/models/product_model.dart';
 import '../features/account/ui/screens/user_profile_screen.dart';
+import '../features/account/ui/screens/follow_list_screen.dart';
 import '../features/vendor/ui/screens/vendor_profile_screen.dart';
 import '../features/vendor/ui/screens/following_stores_screen.dart';
 import '../features/vendor/ui/screens/vendor_dashboard_screen.dart';
@@ -50,6 +53,7 @@ import '../features/account/ui/screens/refund_policy_screen.dart';
 import '../features/info/ui/screens/about_screen.dart';
 import '../features/info/ui/screens/contact_screen.dart';
 import '../features/info/ui/screens/feedback_screen.dart';
+import '../features/vendor/ui/screens/vendor_import_screen.dart';
 import '../shared/widgets/app_shell.dart';
 
 part 'app_router.gr.dart';
@@ -89,6 +93,7 @@ class AppRouter extends RootStackRouter {
 
     // User profile
     AutoRoute(page: UserProfileRoute.page, path: '/u/:userId'),
+    AutoRoute(page: FollowListRoute.page, path: '/u/:userId/connections'),
 
     // Vendor
     AutoRoute(page: VendorProfileRoute.page, path: '/vendors/:slug'),
@@ -96,6 +101,7 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: BecomeVendorRoute.page, path: '/vendor/apply'),
     AutoRoute(page: StoreRoute.page, path: '/store'),
     AutoRoute(page: BrowseStoresRoute.page, path: '/vendors'),
+    AutoRoute(page: VendorImportRoute.page, path: '/account/vendor/import'),
 
     // Checkout
     AutoRoute(page: CheckoutRoute.page, path: '/checkout'),
@@ -109,6 +115,8 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: CartRoute.page, path: '/cart'),
     AutoRoute(page: MessagesRoute.page, path: '/account/messages'),
     AutoRoute(page: OrdersRoute.page, path: '/account/orders'),
+    AutoRoute(page: DisputesRoute.page, path: '/account/disputes'),
+    AutoRoute(page: DigitalVaultRoute.page, path: '/account/digital-vault'),
     AutoRoute(page: SettingsRoute.page, path: '/account/settings'),
     AutoRoute(page: ProfileSettingsRoute.page, path: '/settings/profile'),
     AutoRoute(page: AccountSettingsRoute.page, path: '/settings/account'),

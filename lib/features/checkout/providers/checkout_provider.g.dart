@@ -167,7 +167,7 @@ class _OrderDetailProviderElement
   String get orderId => (origin as OrderDetailProvider).orderId;
 }
 
-String _$checkoutNotifierHash() => r'25f60bdf51495802189ae7a12e310f7bc9e012a1';
+String _$checkoutNotifierHash() => r'a161d5f0b80428221b515fbff58f7f1075be86fd';
 
 /// See also [CheckoutNotifier].
 @ProviderFor(CheckoutNotifier)

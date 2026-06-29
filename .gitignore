@@ -39,10 +39,18 @@ app.*.symbols
 # Obfuscation related
 app.*.map.json
 
-# Android Studio will place build artifacts here
+# Android build artifacts
 /android/app/debug
 /android/app/profile
 /android/app/release
+/android/build/
+android/local.properties
+
+# iOS build artifacts (iOS build not used — Android only)
+ios/Pods/
+ios/build/
+ios/.symlinks/
+ios/Flutter/flutter_export_environment.sh
 
 # Fix/patch scripts (dev-only utilities)
 fix_*.py
@@ -67,3 +75,7 @@ deps.txt
 bug.md
 .DS_Store
 *.DS_Store
+
+# Graphify AST cache (intermediate build artifacts — graph.json/GRAPH_REPORT.md are tracked)
+graphify-out/cache/ast/
+graphify-out/cache/stat-index.json

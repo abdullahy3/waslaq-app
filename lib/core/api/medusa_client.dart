@@ -3,6 +3,7 @@
 // Handles: products, cart, orders, vendors, checkout
 
 import 'package:dio/dio.dart';
+import 'retry_interceptor.dart';
 import '../config/app_config.dart';
 import '../storage/secure_storage.dart';
 import '../error/app_exception.dart';
@@ -33,7 +34,12 @@ class MedusaClient {
       ),
     );
 
+    // Parse JSON off the main isolate for large payloads — keeps scrolling
+    // smooth on mid-range devices while big feed/product responses decode.
+    dio.transformer = BackgroundTransformer();
     dio.interceptors.add(_AuthInterceptor(dio));
+    // Retries flaky-network GETs (2x with backoff) — poor-3G resilience.
+    dio.interceptors.add(RetryInterceptor(dio));
     return dio;
   }
 }

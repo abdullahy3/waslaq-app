@@ -21,6 +21,10 @@ class AppConfig {
   static const String streamAppId = 'my-feeds';
   static const String streamApiKey = 'jdmvrqw4w4e3';
 
+  // Stripe
+  static const String stripePublishableKey =
+      'pk_test_51TAz2T6hWzK8jG6bHG8BN0xzQ0Zu2rCVaVSadaPu2cfleunsLc2ziUuez23KyjTTNnwbsyi30428vAoMdn4kHQZ6005ayPhMrH';
+
   // Auth
   static const String signupSource = 'mobile_flutter';
   // Google Sign-In — web client ID (client_type: 3 from google-services.json)

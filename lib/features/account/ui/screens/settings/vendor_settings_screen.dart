@@ -6,6 +6,7 @@ import 'package:waslaq_app/shared/theme/app_colors.dart';
 import 'package:waslaq_app/core/api/medusa_client.dart';
 import 'package:waslaq_app/features/account/data/models/social_settings_model.dart';
 import 'package:waslaq_app/features/account/providers/account_providers.dart';
+import 'package:waslaq_app/core/error/error_localizer.dart';
 
 @RoutePage()
 class VendorSettingsScreen extends ConsumerStatefulWidget {
@@ -93,7 +94,7 @@ class _VendorSettingsScreenState extends ConsumerState<VendorSettingsScreen> {
       });
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to set vacation mode: $e'), backgroundColor: context.colors.error),
+        SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
       );
     }
   }
@@ -115,7 +116,7 @@ class _VendorSettingsScreenState extends ConsumerState<VendorSettingsScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save delivery zones: $e'), backgroundColor: context.colors.error),
+        SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
       );
     } finally {
       if (mounted) setState(() => _isSavingDelivery = false);
@@ -129,7 +130,7 @@ class _VendorSettingsScreenState extends ConsumerState<VendorSettingsScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update: $e'), backgroundColor: context.colors.error),
+        SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
       );
     }
   }
@@ -174,7 +175,7 @@ class _VendorSettingsScreenState extends ConsumerState<VendorSettingsScreen> {
                   child: Column(
                     children: [
                       SwitchListTile(
-                        activeColor: context.colors.primary,
+                        activeThumbColor: context.colors.primary,
                         title: const Text('Vacation Mode', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                         subtitle: const Text('When ON: store shows vacation banner. Buyers cannot place new orders.',
                             style: TextStyle(fontSize: 11)),
@@ -219,7 +220,7 @@ class _VendorSettingsScreenState extends ConsumerState<VendorSettingsScreen> {
                         const SizedBox(height: 12),
                         SwitchListTile(
                           contentPadding: EdgeInsets.zero,
-                          activeColor: context.colors.primary,
+                          activeThumbColor: context.colors.primary,
                           title: const Text('Deliver Everywhere (Palestine)',
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                           value: isEverywhere,
@@ -268,7 +269,7 @@ class _VendorSettingsScreenState extends ConsumerState<VendorSettingsScreen> {
                     child: Column(
                       children: [
                         SwitchListTile(
-                          activeColor: context.colors.primary,
+                          activeThumbColor: context.colors.primary,
                           title: const Text('New Order Alert Sound', style: TextStyle(fontSize: 14)),
                           value: _socialSettings!.vendorNewOrderSound,
                           onChanged: (val) {
@@ -277,7 +278,7 @@ class _VendorSettingsScreenState extends ConsumerState<VendorSettingsScreen> {
                         ),
                         Divider(height: 1, color: context.colors.border),
                         SwitchListTile(
-                          activeColor: context.colors.primary,
+                          activeThumbColor: context.colors.primary,
                           title: const Text('Daily Sales Summary', style: TextStyle(fontSize: 14)),
                           value: _socialSettings!.vendorDailySummary,
                           onChanged: (val) {

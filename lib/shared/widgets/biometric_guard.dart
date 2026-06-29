@@ -299,10 +299,10 @@ class _BiometricGuardState extends ConsumerState<BiometricGuard>
                   Container(
                     padding: const EdgeInsets.all(24.0),
                     decoration: BoxDecoration(
-                      color: colors.primary.withOpacity(0.08),
+                      color: colors.primary.withValues(alpha: 0.08),
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: colors.primary.withOpacity(0.2),
+                        color: colors.primary.withValues(alpha: 0.2),
                         width: 2.0,
                       ),
                     ),

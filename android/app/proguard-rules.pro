@@ -22,3 +22,11 @@
 # Flutter engine references these by default for deferred dynamic feature loading,
 # but they are missing if the Play Core library is not explicitly included.
 -dontwarn com.google.android.play.core.**
+
+# Stripe — keep plugin + SDK classes so R8 doesn't strip them
+-keep class com.stripe.android.** { *; }
+-keep class com.reactnativestripesdk.** { *; }
+
+# Stripe push provisioning (compileOnly dep — not in runtime APK, suppress warnings)
+-dontwarn com.stripe.android.pushProvisioning.**
+-dontwarn com.reactnativestripesdk.pushprovisioning.**

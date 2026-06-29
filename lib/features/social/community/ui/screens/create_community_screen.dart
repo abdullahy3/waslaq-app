@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:auto_route/auto_route.dart';
 import '../../../../../router/app_router.dart';
 import '../../../../../shared/theme/app_colors.dart';
-import '../../../data/social_repository.dart';
 import '../../../providers/social_providers.dart';
 
 class CreateCommunityScreen extends ConsumerStatefulWidget {
@@ -92,7 +91,6 @@ class _CreateCommunityScreenState extends ConsumerState<CreateCommunityScreen> {
       final name = _nameController.text.trim();
       final title = _titleController.text.trim();
       final description = _descController.text.trim().isEmpty ? null : _descController.text.trim();
-      final slug = _slugController.text.trim();
 
       // We call the repository to create the community.
       // Note: Backend endpoint also creates slug. We pass slug if needed or backend derives it from name.
@@ -361,7 +359,7 @@ class _CreateCommunityScreenState extends ConsumerState<CreateCommunityScreen> {
                 prefixStyle: TextStyle(color: colors.textMuted),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 filled: true,
-                fillColor: colors.surfaceVariant.withOpacity(0.5),
+                fillColor: colors.surfaceVariant.withValues(alpha: 0.5),
               ),
             ),
             const SizedBox(height: 28),
@@ -381,7 +379,7 @@ class _CreateCommunityScreenState extends ConsumerState<CreateCommunityScreen> {
                     color: !_isPrivate ? colors.primary : colors.border,
                     width: !_isPrivate ? 2 : 1,
                   ),
-                  color: !_isPrivate ? colors.primary.withOpacity(0.05) : Colors.transparent,
+                  color: !_isPrivate ? colors.primary.withValues(alpha: 0.05) : Colors.transparent,
                 ),
                 child: Row(
                   children: [
@@ -433,7 +431,7 @@ class _CreateCommunityScreenState extends ConsumerState<CreateCommunityScreen> {
                     color: _isPrivate ? colors.primary : colors.border,
                     width: _isPrivate ? 2 : 1,
                   ),
-                  color: _isPrivate ? colors.primary.withOpacity(0.05) : Colors.transparent,
+                  color: _isPrivate ? colors.primary.withValues(alpha: 0.05) : Colors.transparent,
                 ),
                 child: Row(
                   children: [

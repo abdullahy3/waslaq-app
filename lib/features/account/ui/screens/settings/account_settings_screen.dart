@@ -11,6 +11,7 @@ import 'package:waslaq_app/shared/widgets/biometric_guard.dart';
 import 'package:waslaq_app/core/providers/preferences_provider.dart';
 import 'package:waslaq_app/features/account/data/models/social_settings_model.dart';
 import 'package:waslaq_app/features/account/providers/account_providers.dart';
+import 'package:waslaq_app/core/error/error_localizer.dart';
 
 @RoutePage()
 class AccountSettingsScreen extends ConsumerStatefulWidget {
@@ -22,7 +23,6 @@ class AccountSettingsScreen extends ConsumerStatefulWidget {
 
 class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
   final LocalAuthentication _auth = LocalAuthentication();
-  bool _canCheckBiometrics = false;
   bool _isBiometricSupported = false;
 
   bool _isChangingEmail = false;
@@ -52,7 +52,6 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
       final canCheck = await _auth.canCheckBiometrics;
       final supported = canCheck || await _auth.isDeviceSupported();
       setState(() {
-        _canCheckBiometrics = canCheck;
         _isBiometricSupported = supported;
       });
     } catch (_) {}
@@ -77,7 +76,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update notifications: $e'), backgroundColor: context.colors.error),
+        SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
       );
     }
   }
@@ -100,7 +99,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to change email: $e'), backgroundColor: context.colors.error),
+        SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
       );
     } finally {
       if (mounted) setState(() => _isChangingEmail = false);
@@ -118,7 +117,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to send reset link: $e'), backgroundColor: context.colors.error),
+        SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
       );
     }
   }
@@ -138,7 +137,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Biometric authentication failed: $e'), backgroundColor: context.colors.error),
+          SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
         );
       } finally {
         BiometricGuard.externalAuthInProgress = false;
@@ -163,7 +162,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Biometric authentication failed: $e'), backgroundColor: context.colors.error),
+          SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
         );
       } finally {
         BiometricGuard.externalAuthInProgress = false;
@@ -187,7 +186,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete account: $e'), backgroundColor: context.colors.error),
+        SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
       );
     } finally {
       if (mounted) setState(() => _isDeleting = false);
@@ -208,7 +207,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to cancel deletion: $e'), backgroundColor: context.colors.error),
+        SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error),
       );
     } finally {
       if (mounted) setState(() => _isDeleting = false);
@@ -266,7 +265,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
     final s = t.settings;
     final authState = ref.watch(authNotifierProvider);
     final email = authState.maybeWhen(
-      authenticated: (_, mail, __, ___, ____) => mail ?? '',
+      authenticated: (_, mail, __, ___, ____) => mail,
       orElse: () => '',
     );
     final prefs = ref.watch(preferencesProvider);
@@ -407,7 +406,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                 side: BorderSide(color: context.colors.border),
               ),
               child: SwitchListTile(
-                activeColor: context.colors.primary,
+                activeThumbColor: context.colors.primary,
                 title: Text(s.accountBiometric, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                 subtitle: Text(s.accountBiometricSub, style: TextStyle(fontSize: 12)),
                 value: prefs.biometricLock,
@@ -424,7 +423,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                 side: BorderSide(color: context.colors.border),
               ),
               child: SwitchListTile(
-                activeColor: context.colors.primary,
+                activeThumbColor: context.colors.primary,
                 title: Text(s.accountPurchaseConfirm, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                 subtitle: Text(s.accountPurchaseConfirmSub, style: TextStyle(fontSize: 12)),
                 value: prefs.purchaseConfirmation,
@@ -469,7 +468,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                 side: BorderSide(color: context.colors.border),
               ),
               child: SwitchListTile(
-                activeColor: context.colors.primary,
+                activeThumbColor: context.colors.primary,
                 title: Text(s.accountLoginNotif, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                 subtitle: Text(s.accountLoginNotifSub, style: TextStyle(fontSize: 12)),
                 value: _socialSettings!.loginNotifications,
@@ -483,7 +482,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
 
           // ─── DELETE ACCOUNT CARD ───
           Card(
-            color: Colors.red.withOpacity(0.02),
+            color: Colors.red.withValues(alpha: 0.02),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
               side: const BorderSide(color: Colors.red, width: 0.8),

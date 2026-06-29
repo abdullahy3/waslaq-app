@@ -7,6 +7,7 @@ import 'package:waslaq_app/shared/theme/app_colors.dart';
 import 'package:waslaq_app/core/providers/theme_provider.dart';
 import 'package:waslaq_app/core/providers/locale_provider.dart';
 import 'package:waslaq_app/core/providers/preferences_provider.dart';
+import 'package:waslaq_app/core/providers/currency_provider.dart';
 
 @RoutePage()
 class AppearanceSettingsScreen extends ConsumerWidget {
@@ -31,6 +32,7 @@ class AppearanceSettingsScreen extends ConsumerWidget {
     final prefsNotifier = ref.read(preferencesProvider.notifier);
     final currentTheme = ref.watch(themeProvider);
     final currentLocale = ref.watch(localeProvider);
+    final currentCurrency = ref.watch(currencyProvider).currency;
     final s = t.settings;
 
     return Scaffold(
@@ -99,6 +101,24 @@ class AppearanceSettingsScreen extends ConsumerWidget {
                 _buildThemeTile(context, ref, AppThemeMode.dark, Icons.dark_mode_outlined, s.themeDark, currentTheme),
                 Divider(height: 1, color: context.colors.border),
                 _buildThemeTile(context, ref, AppThemeMode.system, Icons.brightness_auto_outlined, s.themeSystem, currentTheme),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // ─── CURRENCY SECTION ───
+          _buildSectionHeader(context, s.currencySection),
+          Card(
+            color: context.colors.surface,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: context.colors.border),
+            ),
+            child: Column(
+              children: [
+                _buildCurrencyTile(context, ref, CurrencyCode.ils, Icons.payments_outlined, s.currencyIls, s.currencyIlsSub, currentCurrency),
+                Divider(height: 1, color: context.colors.border),
+                _buildCurrencyTile(context, ref, CurrencyCode.usd, Icons.attach_money_outlined, s.currencyUsd, s.currencyUsdSub, currentCurrency),
               ],
             ),
           ),
@@ -192,7 +212,7 @@ class AppearanceSettingsScreen extends ConsumerWidget {
             child: Column(
               children: [
                 SwitchListTile(
-                  activeColor: context.colors.primary,
+                  activeThumbColor: context.colors.primary,
                   title: Text(s.boldText, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                   value: prefs.boldText,
                   onChanged: (val) {
@@ -201,7 +221,7 @@ class AppearanceSettingsScreen extends ConsumerWidget {
                 ),
                 Divider(height: 1, color: context.colors.border),
                 SwitchListTile(
-                  activeColor: context.colors.primary,
+                  activeThumbColor: context.colors.primary,
                   title: Text(s.reduceAnim, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                   subtitle: Text(s.reduceAnimSub, style: TextStyle(fontSize: 11)),
                   value: prefs.reduceAnimations,
@@ -238,6 +258,17 @@ class AppearanceSettingsScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildCurrencyTile(BuildContext context, WidgetRef ref, CurrencyCode code, IconData icon, String label, String sub, CurrencyCode selected) {
+    final isSelected = selected == code;
+    return ListTile(
+      leading: Icon(icon, color: isSelected ? context.colors.primary : context.colors.textSecondary),
+      title: Text(label, style: TextStyle(fontSize: 14, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+      subtitle: Text(sub, style: const TextStyle(fontSize: 11)),
+      trailing: isSelected ? Icon(Icons.check, color: context.colors.primary) : null,
+      onTap: () => ref.read(currencyProvider.notifier).setCurrency(code),
+    );
+  }
+
   Widget _buildSizeChip(BuildContext context, AppPreferences prefs, PreferencesNotifier notifier, String label, double scale) {
     final isSelected = prefs.textScale == scale;
     return ChoiceChip(
@@ -254,7 +285,6 @@ class AppearanceSettingsScreen extends ConsumerWidget {
   }
 
   Widget _buildFontTile(BuildContext context, AppPreferences prefs, PreferencesNotifier notifier, String fontName, String label, String sampleText) {
-    final isSelected = prefs.arabicFont == fontName;
     return RadioListTile<String>(
       title: Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
       subtitle: Padding(
@@ -297,7 +327,7 @@ class _LanguageCard extends StatelessWidget {
       child: Container(
         height: 60,
         decoration: BoxDecoration(
-          color: isSelected ? context.colors.primary.withOpacity(0.08) : context.colors.background,
+          color: isSelected ? context.colors.primary.withValues(alpha: 0.08) : context.colors.background,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: isSelected ? context.colors.primary : context.colors.border, width: isSelected ? 2 : 1),
         ),

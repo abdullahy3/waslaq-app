@@ -11,6 +11,7 @@ import 'package:waslaq_app/shared/theme/app_colors.dart';
 import 'package:waslaq_app/features/social/providers/social_providers.dart';
 import 'package:waslaq_app/features/social/data/models/social_models.dart';
 import 'package:waslaq_app/features/account/providers/account_providers.dart';
+import 'package:waslaq_app/core/error/error_localizer.dart';
 
 @RoutePage()
 class ProfileSettingsScreen extends ConsumerStatefulWidget {
@@ -165,7 +166,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
       setState(() => _isUploadingBanner = false);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Upload failed: $e'), backgroundColor: context.colors.error));
+          SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error));
     }
   }
 
@@ -190,7 +191,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
       setState(() => _isUploadingAvatar = false);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Upload failed: $e'), backgroundColor: context.colors.error));
+          SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error));
     }
   }
 
@@ -241,7 +242,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed: $e'), backgroundColor: context.colors.error));
+          SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error));
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -282,7 +283,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: context.colors.error));
+          SnackBar(content: Text(localizeError(e)), backgroundColor: context.colors.error));
     } finally {
       if (mounted) setState(() => _isChangingUsername = false);
     }
@@ -360,7 +361,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: context.colors.border, width: 1),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.10), blurRadius: 8, offset: const Offset(0, 2))],
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.10), blurRadius: 8, offset: const Offset(0, 2))],
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(15),
@@ -378,7 +379,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: context.colors.background, width: 4),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.20), blurRadius: 8, offset: const Offset(0, 3))],
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.20), blurRadius: 8, offset: const Offset(0, 3))],
                   ),
                   child: CircleAvatar(
                     radius: 36,
@@ -786,7 +787,7 @@ class _AvatarGalleryModalState extends State<_AvatarGalleryModal> {
             return GestureDetector(
               onTap: () => setState(() => _selectedStyle = s),
               child: Card(
-                color: isSel ? context.colors.primary.withOpacity(0.12) : context.colors.surface,
+                color: isSel ? context.colors.primary.withValues(alpha: 0.12) : context.colors.surface,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8),
                     side: BorderSide(color: isSel ? context.colors.primary : context.colors.border)),
                 child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -815,7 +816,7 @@ class _AvatarGalleryModalState extends State<_AvatarGalleryModal> {
               onTap: () => setState(() => _selectedSeed = seed),
               child: Container(
                 decoration: BoxDecoration(
-                  color: isSel ? context.colors.primary.withOpacity(0.12) : context.colors.surface,
+                  color: isSel ? context.colors.primary.withValues(alpha: 0.12) : context.colors.surface,
                   border: Border.all(color: isSel ? context.colors.primary : context.colors.border, width: isSel ? 2 : 1),
                   borderRadius: BorderRadius.circular(8),
                 ),

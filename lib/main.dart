@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -13,23 +16,28 @@ import 'core/auth/firebase_service.dart';
 import 'core/providers/locale_provider.dart';
 import 'core/providers/theme_provider.dart';
 import 'core/providers/preferences_provider.dart';
+import 'core/providers/currency_provider.dart';
 import 'i18n/strings.g.dart';
 import 'core/config/app_config.dart';
 import 'core/crashlytics/crash_reporter.dart';
 import 'features/messages/providers/stream_chat_provider.dart';
 import 'core/notifications/notification_bus.dart';
+import 'core/navigation/app_links.dart';
 import 'router/app_router.dart';
 import 'shared/theme/app_colors.dart';
 import 'shared/theme/app_theme.dart';
 import 'shared/widgets/biometric_guard.dart';
+import 'shared/widgets/offline_banner.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 
 // ─── Notification channel ────────────────────────────────────────────────────
 const AndroidNotificationChannel _channel = AndroidNotificationChannel(
-  'waslaq_messages',
+  'waslaq_messages_custom',
   'WaslaQ Messages',
   description: 'Notifications for new messages',
   importance: Importance.high,
   playSound: true,
+  sound: RawResourceAndroidNotificationSound('waslaq'),
 );
 
 final FlutterLocalNotificationsPlugin _localNotifications =
@@ -81,13 +89,16 @@ Future<void> _showLocalNotification(RemoteMessage message) async {
         channelDescription: _channel.description,
         importance: _channel.importance,
         priority: Priority.high,
-        icon: '@mipmap/ic_launcher',
+        icon: '@mipmap/launcher_icon',
+        color: const Color(0xFF000000),
         playSound: true,
+        sound: const RawResourceAndroidNotificationSound('waslaq'),
       ),
       iOS: const DarwinNotificationDetails(
         presentAlert: true,
         presentBadge: true,
         presentSound: true,
+        sound: 'waslaq.wav',
       ),
     ),
     payload: payload,
@@ -100,7 +111,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // Must reinitialize flutter_local_notifications in background isolate.
   await _localNotifications.initialize(
     InitializationSettings(
-      android: const AndroidInitializationSettings('@mipmap/ic_launcher'),
+      android: const AndroidInitializationSettings('@mipmap/launcher_icon'),
       iOS: const DarwinInitializationSettings(
         requestAlertPermission: false,
         requestBadgePermission: false,
@@ -129,7 +140,7 @@ Future<void> _initFCM() async {
     // Initialize local notifications plugin
     await _localNotifications.initialize(
       InitializationSettings(
-        android: const AndroidInitializationSettings('@mipmap/ic_launcher'),
+        android: const AndroidInitializationSettings('@mipmap/launcher_icon'),
         iOS: const DarwinInitializationSettings(
           requestAlertPermission: false,
           requestBadgePermission: false,
@@ -231,7 +242,9 @@ final fcmMessageBus = _FCMBus();
 
 class _FCMBus {
   final _listeners = <void Function(RemoteMessage)>[];
-  void notify(RemoteMessage m) { for (final l in _listeners) l(m); }
+  void notify(RemoteMessage m) { for (final l in _listeners) {
+    l(m);
+  } }
   void listen(void Function(RemoteMessage) l) => _listeners.add(l);
 }
 
@@ -244,10 +257,74 @@ String? _pendingNavLink;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // App-wide high refresh rate: pick the panel's highest mode (120/90Hz) at the
+  // current resolution. No-op on 60Hz-only devices → they stay 60Hz. Android only;
+  // iOS ProMotion is handled by CADisableMinimumFrameDurationOnPhone in Info.plist.
+  if (!kIsWeb && Platform.isAndroid) {
+    try {
+      await FlutterDisplayMode.setHighRefreshRate();
+    } catch (_) {
+      // Non-fatal: device doesn't expose mode switching → stays at default.
+    }
+  }
+
   await Firebase.initializeApp();
+
+  // Initialize Stripe — non-blocking: applySettings uses a platform channel
+  // and can hang on release builds if native side is slow to init.
+  try {
+    Stripe.publishableKey = AppConfig.stripePublishableKey;
+    await Stripe.instance.applySettings().timeout(
+      const Duration(seconds: 5),
+      onTimeout: () {
+        debugPrint('[Stripe] applySettings timed out — continuing startup');
+      },
+    );
+  } catch (e) {
+    debugPrint('[Stripe] init error (non-fatal): $e');
+  }
+
   await CrashReporter.initialize();
+
+  // Friendly fallback instead of grey/red crash screen in release builds.
+  // Crashlytics still receives the real error via FlutterError.onError.
+  final defaultErrorBuilder = ErrorWidget.builder;
+  ErrorWidget.builder = (details) {
+    if (kDebugMode) return defaultErrorBuilder(details);
+    return Material(
+      color: const Color(0xFFF8F8F8),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.sentiment_dissatisfied_rounded,
+                  size: 48, color: Color(0xFF9E9E9E)),
+              const SizedBox(height: 16),
+              Text(
+                t.errors.crash_title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF424242)),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                t.errors.crash_message,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 13, color: Color(0xFF757575)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  };
   await FirebaseService.initializeGoogleSignIn();
-  
+
   // Initialize FCM in the background without blocking app startup
   _initFCM().catchError((e, stack) {
     debugPrint('[FCM] Failed to initialize in background: $e');
@@ -411,6 +488,7 @@ class WaslaqApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router       = ref.watch(appRouterProvider);
     _globalRouter = router; // keep global ref for notification tap navigation
+    appLinkRouter = router; // keep global ref for banner/popup deep links
     // Consume any pending deep-link from a notification tap during cold start
     if (_pendingNavLink != null) {
       final link = _pendingNavLink!;
@@ -421,6 +499,9 @@ class WaslaqApp extends ConsumerWidget {
     final themeMode    = ref.watch(themeProvider);
     // ── Watch preferences so the root rebuilds when text scale / font / bold change ──
     final prefs        = ref.watch(preferencesProvider);
+    // ── Watch currency: instantiates the provider (runs first-launch IP detection)
+    //    and rebuilds the whole tree when the user switches ILS/USD in settings ──
+    ref.watch(currencyProvider);
 
     // Resolve the actual brightness for Stream Chat
     final Brightness resolvedBrightness = switch (themeMode) {
@@ -466,7 +547,9 @@ class WaslaqApp extends ConsumerWidget {
         Widget tree = StreamChat(
           client: streamClient,
           streamChatThemeData: _buildStreamTheme(resolvedBrightness),
-          child: BiometricGuard(child: child ?? const SizedBox.shrink()),
+          child: OfflineBanner(
+            child: BiometricGuard(child: child ?? const SizedBox.shrink()),
+          ),
         );
         if (prefs.boldText) {
           tree = DefaultTextStyle.merge(

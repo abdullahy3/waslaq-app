@@ -200,6 +200,19 @@ ios/
 - On mount (`initState`): calls `markAllNotificationsRead()` + `ref.invalidate(notificationsProvider)`
 - Badge resets to 0 when screen opens
 
+### 🎵 Custom Notification Sounds & Icons
+- **Sound Assets**:
+  - Android: `android/app/src/main/res/raw/waslaq.mp3` (derived from `cute_sound.mp3` with volume reduced by 40% using ffmpeg).
+  - iOS: `ios/Runner/waslaq.wav` (WAV transcoded from the same quiet MP3, registered in `project.pbxproj`).
+- **Android Notification Channel**:
+  - ID: `waslaq_messages_custom` (changed from `waslaq_messages` to force Android to register custom sound attributes).
+  - Configured with `sound: RawResourceAndroidNotificationSound('waslaq')`.
+- **Notification Details & Styling**:
+  - Android: Configured with `icon: '@mipmap/launcher_icon'` (uses WQ logo instead of Flutter icon) and `color: const Color(0xFF000000)` (black circular badge background).
+  - iOS: Configured with `sound: 'waslaq.wav'`.
+- **Backend Push Support**:
+  - Configured in Medusa backend `src/lib/fcm/send-push.ts` to push explicit sound tags and the custom channel ID.
+
 ---
 
 ## 🛍️ Commerce Integration
