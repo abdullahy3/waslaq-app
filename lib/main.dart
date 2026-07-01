@@ -20,6 +20,7 @@ import 'core/providers/currency_provider.dart';
 import 'i18n/strings.g.dart';
 import 'core/config/app_config.dart';
 import 'core/crashlytics/crash_reporter.dart';
+import 'core/analytics/posthog_service.dart';
 import 'features/messages/providers/stream_chat_provider.dart';
 import 'core/notifications/notification_bus.dart';
 import 'core/navigation/app_links.dart';
@@ -286,6 +287,7 @@ void main() async {
   }
 
   await CrashReporter.initialize();
+  await AnalyticsService.initialize();
 
   // Friendly fallback instead of grey/red crash screen in release builds.
   // Crashlytics still receives the real error via FlutterError.onError.

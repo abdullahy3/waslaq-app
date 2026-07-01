@@ -8,6 +8,7 @@ import 'auth_repository.dart';
 import '../storage/secure_storage.dart';
 import '../storage/isar_service.dart';
 import '../crashlytics/crash_reporter.dart';
+import '../analytics/posthog_service.dart';
 import '../api/social_client.dart';
 import '../api/medusa_client.dart';
 
@@ -84,6 +85,12 @@ class AuthNotifier extends _$AuthNotifier {
       await SecureStorage.clearSignedOutFlag();
       await CrashReporter.setUserId(customerId);
       CrashReporter.log('User authenticated: $customerId');
+      // Same customer_id used on web + backend — one person across all funnels.
+      AnalyticsService.identify(
+        customerId,
+        email: customer['email'] as String?,
+        displayName: displayName.isEmpty ? null : displayName,
+      );
 
       state = AuthState.authenticated(
         customerId: customerId,
@@ -224,6 +231,7 @@ class AuthNotifier extends _$AuthNotifier {
       await SecureStorage.clearAll();
       await IsarService.clearAll();
       await CrashReporter.clearUserId();
+      await AnalyticsService.reset();
       state = const AuthState.unauthenticated();
     } catch (e, stack) {
       CrashReporter.reportError(e, stack, reason: 'Sign-out failed');
@@ -238,7 +246,7 @@ class AuthNotifier extends _$AuthNotifier {
               .get('/store/social/profiles/$customerId');
           final profile =
               profileResp.data['profile'] as Map<String, dynamic>?;
-          
+
           final newDisplayName = (profile?['displayName'] as String? ?? '').trim();
           final style = profile?['avatarStyle'] as String?;
           final seed = profile?['avatarSeed'] as String?;

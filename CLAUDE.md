@@ -280,6 +280,13 @@ ios/
 ## 🔲 Not Yet Tested / Pending
 - iOS production build + App Store submission
 - Cybersource payment in Flutter (deferred to backlog)
+- PostHog crash bridge only verified for its debug-mode guard logic, not an actual release-build fatal crash (guarded by `kDebugMode`, same as Crashlytics itself)
+
+## 📊 PostHog (added 2026-07-01)
+- `posthog_flutter: ^5.28.0`. `lib/core/analytics/posthog_service.dart` — `AnalyticsService.initialize()` called in `main.dart` right after `CrashReporter.initialize()`. Keys in `AppConfig.postHogApiKey`/`postHogHost` (host = `https://eu.i.posthog.com`).
+- `identify()`/`reset()` wired into `lib/core/auth/auth_notifier.dart` next to the existing `CrashReporter.setUserId`/`clearUserId` calls — same customer_id as web/backend.
+- Crash bridge in `lib/core/crashlytics/crash_reporter.dart`: both `FlutterError.onError` and `PlatformDispatcher.instance.onError` also fire `Posthog().capture('$exception_bridge', ...)`. Crashlytics stays the source of truth for crashes.
+- Verified live on iPhone 17 Pro Simulator: `Application Installed` + a real `Identify` event landed in PostHog. See memory `posthog-analytics-rollout`.
 
 ## graphify
 

@@ -25,6 +25,11 @@ class AppConfig {
   static const String stripePublishableKey =
       'pk_test_51TAz2T6hWzK8jG6bHG8BN0xzQ0Zu2rCVaVSadaPu2cfleunsLc2ziUuez23KyjTTNnwbsyi30428vAoMdn4kHQZ6005ayPhMrH';
 
+  // PostHog — session replay + product analytics (error tracking stays Crashlytics)
+  static const String postHogApiKey =
+      'phc_wQn8vnqctzEbsgniXuwbLYiLGuEFDgH7Pc6ari2JG4ie';
+  static const String postHogHost = 'https://eu.i.posthog.com';
+
   // Auth
   static const String signupSource = 'mobile_flutter';
   // Google Sign-In — web client ID (client_type: 3 from google-services.json)

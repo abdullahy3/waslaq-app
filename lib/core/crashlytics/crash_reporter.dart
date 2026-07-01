@@ -2,6 +2,7 @@
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
+import 'package:posthog_flutter/posthog_flutter.dart';
 
 class CrashReporter {
   CrashReporter._();
@@ -15,6 +16,7 @@ class CrashReporter {
     FlutterError.onError = (details) {
       debugPrint('🚨 FLUTTER ERROR: ${details.exception}\n${details.stack}');
       FirebaseCrashlytics.instance.recordFlutterFatalError(details);
+      _bridgeToPostHog(details.exception.toString());
     };
 
     // Catch uncaught async errors outside Flutter framework
@@ -30,8 +32,21 @@ class CrashReporter {
           s.contains('HandshakeException');
       FirebaseCrashlytics.instance
           .recordError(error, stack, fatal: !isNetworkNoise);
+      if (!isNetworkNoise) _bridgeToPostHog(s);
       return false; // Return false so it is also logged to standard output
     };
+  }
+
+  // Mirror crashes into PostHog — Crashlytics stays the source of truth for
+  // the crash itself, this only lets error-rate alerts and rage-click signals
+  // in PostHog line up with app crashes. Mobile has no Sentry, so this is the
+  // only crash↔replay bridge on the app side.
+  static void _bridgeToPostHog(String message) {
+    if (kDebugMode) return;
+    Posthog().capture(
+      eventName: r'$exception_bridge',
+      properties: {'message': message, 'source': 'crashlytics'},
+    );
   }
 
   // Report non-fatal errors (network failures, API errors, etc.)
