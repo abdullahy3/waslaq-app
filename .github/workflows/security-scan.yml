@@ -1,0 +1,41 @@
+name: Security Scan
+
+# Continuous SAST + secret scanning. Complements Dependabot (deps) and the
+# global pre-commit secret guard. Gitleaks blocks any real committed secret;
+# Semgrep reports all findings and fails only on high-severity (ERROR) ones.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1"   # Mondays 06:00 UTC — pick up newly published rules/CVEs
+  workflow_dispatch:
+
+concurrency:
+  group: security-scan-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Gitleaks (secret scan)
+        run: |
+          VER=8.30.1
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${VER}/gitleaks_${VER}_linux_x64.tar.gz" | tar -xz gitleaks
+          ./gitleaks dir . -c .gitleaks.toml --redact --no-banner --exit-code 1
+
+      - name: Semgrep SAST
+        run: |
+          IMG=semgrep/semgrep:1.168.0
+          # Informational pass — surface every finding in the log, never fails here.
+          docker run --rm -v "$PWD:/src" -w /src $IMG \
+            semgrep scan --config p/owasp-top-ten --config p/secrets --metrics=off || true
+          # Gate — fail the job only on high-severity (ERROR) code/secret findings.
+          docker run --rm -v "$PWD:/src" -w /src $IMG \
+            semgrep scan --config p/owasp-top-ten --config p/secrets --severity ERROR --error --metrics=off

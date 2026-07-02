@@ -1,0 +1,18 @@
+title = "WaslaQ gitleaks config"
+
+# Start from gitleaks' built-in rules, then allowlist known-PUBLIC client keys
+# so the secret-scan gate has no false positives and a REAL leak stands out.
+# NEVER add a server-side secret (DB pw, Stripe secret, private key, notify
+# secret, PAT) here — those must fail the scan.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Public/publishable client keys and literal placeholders (safe to ship in browser/app bundles)"
+regexes = [
+  '''pk_ae810b33651758a40a3f5a2529907c64d3aab6e7901d554ea4c5c8b8541b7186''',
+  '''AIzaSyCi1qe50OtzZY3VMbvBvhm_Ou5YI_YHX0c''',
+  '''AIzaSyCtFqerX_MEKMjJRhjrGnFu5svmSFneTCk''',
+  '''jdmvrqw4w4e3''',
+  '''sk_test_placeholder''',
+]
